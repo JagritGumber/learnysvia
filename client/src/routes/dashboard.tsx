@@ -1,10 +1,50 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import api from "@/utils/api";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
 });
 
 function Dashboard() {
+  const [lessonName, setLessonName] = useState("");
+  const [lessonDescription, setLessonDescription] = useState("");
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const response = await api.post("/api/lessons/create", {
+        name: lessonName,
+        description: lessonDescription,
+      });
+
+      console.log("Lesson created:", response.data.lesson);
+
+      // Reset form
+      setLessonName("");
+      setLessonDescription("");
+
+      // Close modal
+      (
+        document.getElementById("create-lesson-modal") as HTMLDialogElement
+      )?.close();
+
+      // TODO: Navigate to the created lesson or update UI to show it
+    } catch (error) {
+      console.error("Error creating lesson:", error);
+      // TODO: Show error message to user
+    }
+  };
+
+  const handleCancel = () => {
+    setLessonName("");
+    setLessonDescription("");
+    (
+      document.getElementById("create-lesson-modal") as HTMLDialogElement
+    )?.close();
+  };
+
   return (
     <div className="min-h-[calc(100vh-64px)] bg-base-100">
       <div className="container mx-auto py-8 px-6">
@@ -15,6 +55,57 @@ function Dashboard() {
             classes, create lessons, and track student progress.
           </p>
 
+          {/* Create Lesson Modal */}
+          <dialog id="create-lesson-modal" className="modal">
+            <div className="modal-box">
+              <h2 className="text-lg font-bold">Create New Lesson</h2>
+              <form onSubmit={handleFormSubmit} className="space-y-4 mt-4">
+                <div className="form-control flex flex-col gap-2">
+                  <label className="label">
+                    <span className="label-text">Lesson Name</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter lesson name"
+                    className="input input-bordered w-full"
+                    value={lessonName}
+                    onChange={(e) => setLessonName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-control flex flex-col gap-2">
+                  <label className="label">
+                    <span className="label-text">
+                      What is the lesson about?
+                    </span>
+                  </label>
+                  <textarea
+                    placeholder="Describe what this lesson will cover..."
+                    className="textarea textarea-bordered w-full"
+                    rows={4}
+                    value={lessonDescription}
+                    onChange={(e) => setLessonDescription(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="modal-action">
+                  <form method="dialog">
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      onClick={handleCancel}
+                    >
+                      Cancel
+                    </button>
+                  </form>
+                  <button type="submit" className="btn btn-primary">
+                    Create Lesson
+                  </button>
+                </div>
+              </form>
+            </div>
+          </dialog>
+
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="card bg-base-100 border border-base-300">
@@ -24,7 +115,18 @@ function Dashboard() {
                   Start a new interactive lesson with auto-assembling canvas
                 </p>
                 <div className="card-actions justify-end">
-                  <button className="btn btn-primary">Create</button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() =>
+                      (
+                        document.getElementById(
+                          "create-lesson-modal"
+                        ) as HTMLDialogElement
+                      )?.showModal()
+                    }
+                  >
+                    Create
+                  </button>
                 </div>
               </div>
             </div>

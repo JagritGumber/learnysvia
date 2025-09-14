@@ -8,6 +8,13 @@
       "when": 1757844363904,
       "tag": "0000_dapper_zaran",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1757878965070,
+      "tag": "0001_lively_prowler",
+      "breakpoints": true
     }
   ]
 }
