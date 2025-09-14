@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@iconify/react": "^6.0.1",
     "@t3-oss/env-core": "^0.12.0",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/db": "^0.1.1",
@@ -36,6 +37,7 @@
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
+    "daisyui": "^5.1.10",
     "jsdom": "^26.0.0",
     "typescript": "^5.7.2",
     "vite": "^6.3.5",

@@ -1,73 +1,90 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { authClient } from '../utils/auth-client'
-import logo from '../logo.svg'
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Icon } from "@iconify/react";
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: App,
-})
+});
 
 function App() {
-  const { data: session, isPending } = authClient.useSession()
-
-  if (isPending) {
-    return (
-      <div className="text-center">
-        <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-          <div className="text-xl">Loading...</div>
-        </header>
-      </div>
-    )
-  }
-
   return (
-    <div className="text-center">
-      <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <img
-          src={logo}
-          className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite] mb-8"
-          alt="logo"
-        />
-        <p className="mb-8">
-          Edit <code>src/routes/index.tsx</code> and save to reload.
-        </p>
+    <div className="min-h-[calc(100vh-64px)]">
+      {/* Hero Section */}
+      <div className="hero min-h-[calc(100vh-64px)] bg-base-100">
+        <div className="hero-content text-center">
+          <div className="max-w-4xl">
+            <h1 className="text-6xl font-bold text-base-content mb-6">
+              Learnysvia
+            </h1>
+            <p className="text-3xl font-bold text-base-content mb-6">
+              Teach vibrant, memorable lessons — real-time canvas boards that
+              assemble as you teach.
+            </p>
+            <p className="text-xl mb-8 max-w-2xl mx-auto">
+              A colourful, professional platform built for instructors and
+              learners — live practice, instant feedback and industry-aligned
+              training.
+            </p>
 
-        {session ? (
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-4">Current Session:</h3>
-            <pre className="bg-gray-800 p-4 rounded-lg text-left text-sm overflow-auto max-w-2xl mx-auto">
-              {JSON.stringify(session, null, 2)}
-            </pre>
-          </div>
-        ) : (
-          <div className="mb-8">
-            <Link
-              to="/signin"
-              className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200"
-            >
-              Sign In / Sign Up
-            </Link>
-          </div>
-        )}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+              <Link to="/auth" className="btn btn-primary btn-lg">
+                Start Teaching
+              </Link>
+              <button className="btn btn-outline btn-lg">Learn More</button>
+            </div>
 
-        <div className="space-y-4">
-          <a
-            className="text-[#61dafb] hover:underline block"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          <a
-            className="text-[#61dafb] hover:underline block"
-            href="https://tanstack.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn TanStack
-          </a>
+            {/* Feature highlights */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+              <div className="card bg-base-100">
+                <div className="card-body text-center">
+                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Icon
+                      icon="lineicons:brush"
+                      className="size-10 text-primary-content"
+                    />
+                  </div>
+                  <h2 className="card-title">Auto-Assembling Canvas</h2>
+                  <p>
+                    Watch your teaching canvas build automatically as you speak
+                    and draw in real-time
+                  </p>
+                </div>
+              </div>
+
+              <div className="card bg-base-100">
+                <div className="card-body text-center">
+                  <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Icon
+                      icon="lineicons:users"
+                      className="size-10 text-secondary-content"
+                    />
+                  </div>
+                  <h2 className="card-title">Live Collaboration</h2>
+                  <p>
+                    Students see your whiteboard updates instantly and can
+                    participate interactively
+                  </p>
+                </div>
+              </div>
+
+              <div className="card bg-base-100">
+                <div className="card-body text-center">
+                  <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Icon
+                      icon="lineicons:pallet"
+                      className="size-10 text-accent-content"
+                    />
+                  </div>
+                  <h2 className="card-title">Vibrant Teaching Tools</h2>
+                  <p>
+                    Use advanced drawing tools, colors, and multimedia to create
+                    memorable lessons
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </header>
+      </div>
     </div>
-  )
+  );
 }
