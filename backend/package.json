@@ -6,10 +6,17 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
-    "elysia": "latest"
+    "@libsql/client": "^0.15.15",
+    "@t3-oss/env-core": "^0.13.8",
+    "dotenv": "^17.2.2",
+    "drizzle-orm": "^0.44.5",
+    "elysia": "latest",
+    "zod": "^4.1.8"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "drizzle-kit": "^0.31.4",
+    "tsx": "^4.20.5"
   },
   "module": "src/index.js"
 }
