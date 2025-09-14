@@ -5,13 +5,15 @@ export const env = createEnv({
   server: {
     TURSO_DATABASE_URL: z.url(),
     TURSO_AUTH_TOKEN: z.string().min(1),
+    CLIENT_URL: z.url(),
+    
   },
 
   /**
    * What object holds the environment variables at runtime. This is usually
    * `process.env` or `import.meta.env`.
    */
-  runtimeEnv: Bun.env,
+  runtimeEnv: process.env,
 
   /**
    * By default, this library will feed the environment variables directly to
