@@ -6,7 +6,7 @@ export const Route = createFileRoute("/auth")({
   component: Signin,
 });
 
-export default function Signin() {
+function Signin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -34,7 +34,7 @@ export default function Signin() {
         });
       }
 
-      router.navigate({ to: "/", replace: true });
+      router.navigate({ to: "/dashboard", replace: true });
     } catch (err: any) {
       // Normalize common error shapes
       const message =
