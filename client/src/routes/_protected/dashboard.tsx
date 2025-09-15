@@ -102,8 +102,6 @@ function Dashboard() {
     )?.showModal();
   };
 
-
-
   const handleDateClick = (date: Date) => {
     setScheduledDate(date.toISOString().split("T")[0]);
     (
@@ -137,7 +135,7 @@ function Dashboard() {
 
         {/* Create Lesson Modal */}
         <dialog id="create-lesson-modal" className="modal">
-          <div className="modal-box max-w-md">
+          <div className="modal-box max-w-md shadow-none">
             <h2 className="text-lg font-bold">Create New Lesson</h2>
             <form onSubmit={handleFormSubmit} className="space-y-4 mt-4">
               <div className="form-control flex flex-col gap-2">
@@ -271,7 +269,7 @@ function Dashboard() {
           {/* Calendar Section - Full Width */}
           <div>
             {lessonsLoading ? (
-              <div className="card bg-base-100 border border-base-300">
+              <div className="card bg-base-100 border border-base-300 shadow-none">
                 <div className="card-body">
                   <div className="skeleton h-8 w-48 mb-4"></div>
                   <div className="skeleton h-96 w-full"></div>

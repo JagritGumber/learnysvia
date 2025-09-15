@@ -65,7 +65,7 @@ function MiniCalendar({
   };
 
   return (
-    <div className="card bg-base-100 border border-base-300">
+    <div className="card bg-base-100 border border-base-300 shadow-none">
       <div className="card-body p-4">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-bold text-lg">{format(currentMonth, "MMMM yyyy")}</h3>
@@ -153,7 +153,7 @@ function DaySchedule({
     });
 
   return (
-    <div className="card bg-base-100 border border-base-300 shadow-xl">
+    <div className="card bg-base-100 border border-base-300 shadow-none">
       <div className="card-body p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="text-2xl font-bold">
@@ -178,7 +178,7 @@ function DaySchedule({
             {dayLessons.map((lesson) => (
               <div
                 key={lesson.id}
-                className="card bg-base-50 border border-base-300 cursor-pointer hover:shadow-md transition-all duration-200"
+                className="card bg-base-50 border border-base-300 cursor-pointer transition-all duration-200"
                 onClick={() => onLessonClick(lesson)}
               >
                 <div className="card-body p-4">
