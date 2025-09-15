@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import api from "@/utils/api";
 
-export const Route = createFileRoute("/dashboard")({
+export const Route = createFileRoute("/_protected/dashboard")({
   component: Dashboard,
 });
 
