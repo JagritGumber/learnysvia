@@ -175,57 +175,56 @@ function LessonListItem({
 
   return (
     <div className="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-all duration-200">
-      <div className="card-body p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
+      <div className="card-body p-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-semibold text-xl text-base-content">
+              <h3 className="font-semibold text-lg text-base-content truncate">
                 {lesson.name}
               </h3>
               {!lesson.scheduledDate && (
-                <span className="badge badge-primary badge-sm">Immediate</span>
+                <span className="badge badge-primary badge-xs">Immediate</span>
               )}
             </div>
-            <p className="text-base-content/70 mb-3 leading-relaxed">
-              {truncateDescription(lesson.description)}
+            <p className="text-base-content/70 mb-2 leading-relaxed text-sm">
+              {truncateDescription(lesson.description, 120)}
             </p>
-            <div className="flex items-center gap-4 text-sm text-base-content/60">
+            <div className="flex items-center gap-4 text-xs text-base-content/60">
               {formatDateTime() && (
                 <div className="flex items-center gap-1">
-                  <Icon icon="heroicons:calendar-days" className="size-4" />
+                  <Icon icon="heroicons:calendar-days" className="size-3" />
                   {formatDateTime()}
                 </div>
               )}
               <div className="flex items-center gap-1">
-                <Icon icon="heroicons:clock" className="size-4" />
+                <Icon icon="heroicons:clock" className="size-3" />
                 {lesson.duration} min
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="flex gap-3">
-          <button
-            className="btn btn-primary btn-sm flex-1"
-            onClick={handleStartLesson}
-          >
-            <Icon icon="heroicons:play" className="size-4" />
-            Start Lesson
-          </button>
-          <button
-            className="btn btn-outline btn-sm"
-            onClick={handleCopyLink}
-            title="Copy lesson link"
-          >
-            <Icon icon="heroicons:link" className="size-4" />
-          </button>
-          <button
-            className="btn btn-ghost btn-sm"
-            onClick={() => onLessonClick(lesson)}
-            title="View lesson details"
-          >
-            <Icon icon="heroicons:eye" className="size-4" />
-          </button>
+          <div className="flex gap-2">
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={handleStartLesson}
+            >
+              <Icon icon="heroicons:play" className="size-4" />
+              Start Lesson
+            </button>
+            <button
+              className="btn btn-outline btn-sm btn-circle"
+              onClick={handleCopyLink}
+              title="Copy lesson link"
+            >
+              <Icon icon="heroicons:link" className="size-4" />
+            </button>
+            <button
+              className="btn btn-ghost btn-sm btn-circle"
+              onClick={() => onLessonClick(lesson)}
+              title="View lesson details"
+            >
+              <Icon icon="heroicons:eye" className="size-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
