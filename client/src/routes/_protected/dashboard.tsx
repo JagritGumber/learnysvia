@@ -47,74 +47,91 @@ function Dashboard() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-base-100">
-      <div className="container mx-auto py-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-6">Dashboard</h1>
-          <p className="text-lg text-base-content/70 mb-8">
-            Welcome to your teaching dashboard. Here you can manage your
-            classes, create lessons, and track student progress.
-          </p>
+      <div className="py-8 px-6">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
+            <p className="text-lg text-base-content/70">
+              Manage your lessons and track student progress
+            </p>
+          </div>
+          <button
+            className="btn btn-primary"
+            onClick={() =>
+              (
+                document.getElementById(
+                  "create-lesson-modal"
+                ) as HTMLDialogElement
+              )?.showModal()
+            }
+          >
+            Create Lesson
+          </button>
+        </div>
 
-          {/* Create Lesson Modal */}
-          <dialog id="create-lesson-modal" className="modal">
-            <div className="modal-box">
-              <h2 className="text-lg font-bold">Create New Lesson</h2>
-              <form onSubmit={handleFormSubmit} className="space-y-4 mt-4">
-                <div className="form-control flex flex-col gap-2">
-                  <label className="label">
-                    <span className="label-text">Lesson Name</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter lesson name"
-                    className="input input-bordered w-full"
-                    value={lessonName}
-                    onChange={(e) => setLessonName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-control flex flex-col gap-2">
-                  <label className="label">
-                    <span className="label-text">
-                      What is the lesson about?
-                    </span>
-                  </label>
-                  <textarea
-                    placeholder="Describe what this lesson will cover..."
-                    className="textarea textarea-bordered w-full"
-                    rows={4}
-                    value={lessonDescription}
-                    onChange={(e) => setLessonDescription(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="modal-action">
-                  <form method="dialog">
-                    <button
-                      type="button"
-                      className="btn btn-ghost"
-                      onClick={handleCancel}
-                    >
-                      Cancel
-                    </button>
-                  </form>
-                  <button type="submit" className="btn btn-primary">
-                    Create Lesson
+        {/* Create Lesson Modal */}
+        <dialog id="create-lesson-modal" className="modal">
+          <div className="modal-box">
+            <h2 className="text-lg font-bold">Create New Lesson</h2>
+            <form onSubmit={handleFormSubmit} className="space-y-4 mt-4">
+              <div className="form-control flex flex-col gap-2">
+                <label className="label">
+                  <span className="label-text">Lesson Name</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter lesson name"
+                  className="input input-bordered w-full"
+                  value={lessonName}
+                  onChange={(e) => setLessonName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-control flex flex-col gap-2">
+                <label className="label">
+                  <span className="label-text">What is the lesson about?</span>
+                </label>
+                <textarea
+                  placeholder="Describe what this lesson will cover..."
+                  className="textarea textarea-bordered w-full"
+                  rows={4}
+                  value={lessonDescription}
+                  onChange={(e) => setLessonDescription(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="modal-action">
+                <form method="dialog">
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    onClick={handleCancel}
+                  >
+                    Cancel
                   </button>
-                </div>
-              </form>
-            </div>
-          </dialog>
+                </form>
+                <button type="submit" className="btn btn-primary">
+                  Create Lesson
+                </button>
+              </div>
+            </form>
+          </div>
+        </dialog>
 
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="card bg-base-100 border border-base-300">
-              <div className="card-body">
-                <h2 className="card-title">Create Lesson</h2>
-                <p>
-                  Start a new interactive lesson with auto-assembling canvas
-                </p>
-                <div className="card-actions justify-end">
+        {/* Main Content */}
+        <div className="space-y-6">
+          {/* Upcoming Lessons Schedule */}
+          <div className="card bg-base-100 border border-base-300">
+            <div className="card-body">
+              <h2 className="card-title">Upcoming Lessons</h2>
+              <div className="space-y-4">
+                {/* Empty state for schedule */}
+                <div className="text-center py-12 text-base-content/60">
+                  <div className="text-6xl mb-4">📅</div>
+                  <p className="text-lg font-medium">No lessons scheduled</p>
+                  <p className="text-sm mb-4">
+                    Create your first lesson to see it in the schedule
+                  </p>
                   <button
                     className="btn btn-primary"
                     onClick={() =>
@@ -125,46 +142,8 @@ function Dashboard() {
                       )?.showModal()
                     }
                   >
-                    Create
+                    Create Your First Lesson
                   </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="card bg-base-100 border border-base-300">
-              <div className="card-body">
-                <h2 className="card-title">My Classes</h2>
-                <p>View and manage your teaching classes</p>
-                <div className="card-actions justify-end">
-                  <button className="btn btn-secondary">View</button>
-                </div>
-              </div>
-            </div>
-
-            <div className="card bg-base-100 border border-base-300">
-              <div className="card-body">
-                <h2 className="card-title">Student Progress</h2>
-                <p>Track student engagement and performance</p>
-                <div className="card-actions justify-end">
-                  <button className="btn btn-accent">Track</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Recent Activity */}
-          <div className="card bg-base-100 border border-base-300">
-            <div className="card-body">
-              <h2 className="card-title">Recent Activity</h2>
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 p-4 bg-base-200 rounded-lg">
-                  <div className="w-2 h-2 bg-primary rounded-full"></div>
-                  <div>
-                    <p className="font-medium">Welcome to Learnysvia!</p>
-                    <p className="text-sm text-base-content/70">
-                      Your account has been created successfully
-                    </p>
-                  </div>
                 </div>
               </div>
             </div>
