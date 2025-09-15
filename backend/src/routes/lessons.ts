@@ -10,7 +10,7 @@ export const lessonsRouter = new Elysia({ prefix: "/lessons" })
   .post(
     "/create",
     async ({ body, user }) => {
-      const { name, description } = body;
+      const { name, description, scheduledDate, scheduledTime, duration } = body;
 
       const newLesson = await db
         .insert(lesson)
@@ -19,6 +19,9 @@ export const lessonsRouter = new Elysia({ prefix: "/lessons" })
           name,
           description,
           userId: user.id,
+          scheduledDate: scheduledDate ? new Date(scheduledDate) : null,
+          scheduledTime,
+          duration,
         })
         .returning();
 
@@ -32,6 +35,9 @@ export const lessonsRouter = new Elysia({ prefix: "/lessons" })
       body: z.object({
         name: z.string().min(1),
         description: z.string().min(1),
+        scheduledDate: z.string().optional(),
+        scheduledTime: z.string().optional(),
+        duration: z.number().min(15).max(480).default(60),
       }),
     }
   )

@@ -8,6 +8,9 @@ export const lesson = sqliteTable("lesson", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  scheduledDate: integer("scheduled_date", { mode: "timestamp" }),
+  scheduledTime: text("scheduled_time"), // HH:MM format
+  duration: integer("duration").default(60), // duration in minutes
   createdAt: integer("created_at", { mode: "timestamp" })
     .defaultNow()
     .notNull(),
