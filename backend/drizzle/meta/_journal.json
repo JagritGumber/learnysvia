@@ -15,6 +15,13 @@
       "when": 1757878965070,
       "tag": "0001_lively_prowler",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1757971212546,
+      "tag": "0002_wealthy_catseye",
+      "breakpoints": true
     }
   ]
 }
