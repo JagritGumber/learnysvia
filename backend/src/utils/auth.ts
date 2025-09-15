@@ -5,7 +5,6 @@ import * as schema from "../database/schemas";
 import { env } from "@/env";
 
 export const auth = betterAuth({
-  basePath: "/auth",
   database: drizzleAdapter(db, {
     provider: "sqlite",
     schema,
@@ -14,4 +13,6 @@ export const auth = betterAuth({
     enabled: true,
   },
   trustedOrigins: [env.CLIENT_URL],
+  secret: env.BETTER_AUTH_SECRET,
+  baseURL: env.BETTER_AUTH_URL,
 });

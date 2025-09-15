@@ -1,5 +1,4 @@
 import { createRouter as createTanstackRouter } from '@tanstack/react-router'
-import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 import * as TanstackQuery from './integrations/tanstack-query/root-provider'
 
 // Import the generated route tree
@@ -22,10 +21,9 @@ export const createRouter = () => {
     },
   })
 
-  setupRouterSsrQueryIntegration({ router, queryClient: rqContext.queryClient })
-
   return router
 }
+
 
 // Register the router instance for type safety
 declare module '@tanstack/react-router' {
