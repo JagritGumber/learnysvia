@@ -138,7 +138,7 @@ function Dashboard() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-base-100">
-      <div className="py-8 px-6">
+      <div className="pb-8 px-6 pt-0">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
@@ -292,14 +292,14 @@ function Dashboard() {
         </dialog>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Calendar Section */}
-          <div className="lg:col-span-2">
+        <div className="space-y-6">
+          {/* Calendar Section - Full Width */}
+          <div>
             {lessonsLoading ? (
               <div className="card bg-base-100 border border-base-300">
                 <div className="card-body">
                   <div className="skeleton h-8 w-48 mb-4"></div>
-                  <div className="skeleton h-64 w-full"></div>
+                  <div className="skeleton h-96 w-full"></div>
                 </div>
               </div>
             ) : (
@@ -312,7 +312,7 @@ function Dashboard() {
           </div>
 
           {/* Students Section */}
-          <div className="lg:col-span-1">
+          <div>
             {studentsLoading ? (
               <div className="card bg-base-100 border border-base-300">
                 <div className="card-body">
