@@ -1,40 +1,65 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { authClient } from "../utils/auth-client";
+import { useAuth } from "../hooks/useAuth";
 
 export const Route = createFileRoute("/auth")({
   component: Signin,
 });
 
 function Signin() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const navigate = Route.useNavigate();
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      navigate({ to: "/dashboard", replace: true });
+    }
+  }, [isAuthenticated, isLoading, navigate]);
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-[calc(100svh-64px)] flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg"></div>
+      </div>
+    );
+  }
+
+  // Don't render auth form if user is authenticated
+  if (isAuthenticated) {
+    return null;
+  }
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
+    let session
     try {
       if (isSignUp) {
-        await authClient.signUp.email({
+        session = await authClient.signUp.email({
           email,
           password,
           name: name || email.split("@")[0],
         });
       } else {
-        await authClient.signIn.email({
+        session = await authClient.signIn.email({
           email,
           password,
         });
       }
 
-      router.navigate({ to: "/dashboard", replace: true });
+     
+      navigate({ to: "/dashboard", replace: true });
     } catch (err: any) {
       // Normalize common error shapes
       const message =
