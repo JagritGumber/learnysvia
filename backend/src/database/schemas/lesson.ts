@@ -20,5 +20,22 @@ export const lesson = sqliteTable("lesson", {
     .notNull(),
 });
 
+// Enrollment schema to track which students are enrolled in which lessons
+export const enrollment = sqliteTable("enrollment", {
+  id: text("id").primaryKey(),
+  lessonId: text("lesson_id")
+    .notNull()
+    .references(() => lesson.id, { onDelete: "cascade" }),
+  studentId: text("student_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  enrolledAt: integer("enrolled_at", { mode: "timestamp" })
+    .defaultNow()
+    .notNull(),
+  status: text("status").default("active").notNull(), // active, completed, cancelled
+});
+
 export type InsertLesson = typeof lesson.$inferInsert;
 export type SelectLesson = typeof lesson.$inferSelect;
+export type InsertEnrollment = typeof enrollment.$inferInsert;
+export type SelectEnrollment = typeof enrollment.$inferSelect;

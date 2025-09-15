@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/utils/api";
 import { CalendarView } from "@/components/CalendarView";
-import { StudentList } from "@/components/StudentList";
 
 interface Lesson {
   id: string;
@@ -15,14 +14,6 @@ interface Lesson {
   userId: string;
   createdAt: Date;
   updatedAt: Date;
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  image: string | null;
-  createdAt: Date;
 }
 
 export const Route = createFileRoute("/_protected/dashboard")({
@@ -57,20 +48,7 @@ function Dashboard() {
     },
   });
 
-  // Fetch students
-  const { data: studentsData, isLoading: studentsLoading } = useQuery({
-    queryKey: ["students"],
-    queryFn: async () => {
-      const response = await api.get("/api/users");
-      return response.data.users.map((user: any) => ({
-        ...user,
-        createdAt: new Date(user.createdAt),
-      }));
-    },
-  });
-
   const lessons = lessonsData || [];
-  const students = studentsData || [];
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,10 +102,7 @@ function Dashboard() {
     )?.showModal();
   };
 
-  const handleStudentClick = (student: User) => {
-    // TODO: Show student details or navigate to student profile
-    console.log("Student clicked:", student);
-  };
+
 
   const handleDateClick = (date: Date) => {
     setScheduledDate(date.toISOString().split("T")[0]);
@@ -307,33 +282,6 @@ function Dashboard() {
                 lessons={lessons}
                 onLessonClick={handleLessonClick}
                 onDateClick={handleDateClick}
-              />
-            )}
-          </div>
-
-          {/* Students Section */}
-          <div>
-            {studentsLoading ? (
-              <div className="card bg-base-100 border border-base-300">
-                <div className="card-body">
-                  <div className="skeleton h-8 w-32 mb-4"></div>
-                  <div className="space-y-3">
-                    {[...Array(5)].map((_, i) => (
-                      <div key={i} className="flex items-center gap-3">
-                        <div className="skeleton w-10 h-10 rounded-full"></div>
-                        <div className="flex-1">
-                          <div className="skeleton h-4 w-24 mb-2"></div>
-                          <div className="skeleton h-3 w-32"></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <StudentList
-                students={students}
-                onStudentClick={handleStudentClick}
               />
             )}
           </div>

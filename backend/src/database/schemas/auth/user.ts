@@ -1,4 +1,6 @@
+import { relations } from "drizzle-orm";
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { enrollment } from "../lesson";
 
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
@@ -16,6 +18,10 @@ export const user = sqliteTable("user", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+export const userRelations = relations(user, ({ one, many }) => ({
+  enrollment: many(enrollment),
+}));
 
 export type InsertUser = typeof user.$inferInsert;
 export type SelectUser = typeof user.$inferSelect;
