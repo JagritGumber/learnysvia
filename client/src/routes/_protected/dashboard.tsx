@@ -26,6 +26,7 @@ function Dashboard() {
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
   const [duration, setDuration] = useState(60);
+  const [isStartNow, setIsStartNow] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
 
   // Fetch lessons
@@ -70,6 +71,7 @@ function Dashboard() {
       setScheduledDate("");
       setScheduledTime("");
       setDuration(60);
+      setIsStartNow(false);
 
       // Close modal
       (
@@ -90,6 +92,7 @@ function Dashboard() {
     setScheduledDate("");
     setScheduledTime("");
     setDuration(60);
+    setIsStartNow(false);
     (
       document.getElementById("create-lesson-modal") as HTMLDialogElement
     )?.close();
@@ -107,6 +110,24 @@ function Dashboard() {
     (
       document.getElementById("create-lesson-modal") as HTMLDialogElement
     )?.showModal();
+  };
+
+  const handleStartLesson = (lesson: Lesson) => {
+    // For immediate lessons, navigate directly to the lesson
+    // For scheduled lessons, you might want to check if it's time to start
+    const lessonUrl = `/lesson/${lesson.id}`;
+    console.log("Starting lesson:", lesson.name, "URL:", lessonUrl);
+
+    // For now, just log the action. In a real app, you would navigate to the lesson page
+    // You could use React Router's navigate function here
+    // navigate(lessonUrl);
+
+    // For immediate lessons, we could show a different message or behavior
+    if (!lesson.scheduledDate) {
+      console.log("Starting immediate lesson:", lesson.name);
+    } else {
+      console.log("Starting scheduled lesson:", lesson.name);
+    }
   };
 
   return (
@@ -164,30 +185,54 @@ function Dashboard() {
                   required
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="form-control flex flex-col gap-2">
-                  <label className="label">
-                    <span className="label-text">Date</span>
-                  </label>
+
+              {/* Start Now Toggle */}
+              <div className="form-control">
+                <label className="label cursor-pointer">
+                  <span className="label-text">Start lesson immediately</span>
                   <input
-                    type="date"
-                    className="input input-bordered w-full"
-                    value={scheduledDate}
-                    onChange={(e) => setScheduledDate(e.target.value)}
+                    type="checkbox"
+                    className="toggle toggle-primary"
+                    checked={isStartNow}
+                    onChange={(e) => {
+                      setIsStartNow(e.target.checked);
+                      if (e.target.checked) {
+                        // Clear date/time when switching to "Start Now"
+                        setScheduledDate("");
+                        setScheduledTime("");
+                      }
+                    }}
                   />
-                </div>
-                <div className="form-control flex flex-col gap-2">
-                  <label className="label">
-                    <span className="label-text">Time</span>
-                  </label>
-                  <input
-                    type="time"
-                    className="input input-bordered w-full"
-                    value={scheduledTime}
-                    onChange={(e) => setScheduledTime(e.target.value)}
-                  />
-                </div>
+                </label>
               </div>
+
+              {/* Date/Time fields - only show when not "Start Now" */}
+              {!isStartNow && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="form-control flex flex-col gap-2">
+                    <label className="label">
+                      <span className="label-text">Date</span>
+                    </label>
+                    <input
+                      type="date"
+                      className="input input-bordered w-full"
+                      value={scheduledDate}
+                      onChange={(e) => setScheduledDate(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-control flex flex-col gap-2">
+                    <label className="label">
+                      <span className="label-text">Time</span>
+                    </label>
+                    <input
+                      type="time"
+                      className="input input-bordered w-full"
+                      value={scheduledTime}
+                      onChange={(e) => setScheduledTime(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="form-control flex flex-col gap-2">
                 <label className="label">
                   <span className="label-text">Duration (minutes)</span>
@@ -234,8 +279,15 @@ function Dashboard() {
                     {selectedLesson.description}
                   </p>
                 </div>
-                {selectedLesson.scheduledDate && (
-                  <div className="space-y-2">
+                <div className="space-y-2">
+                  {!selectedLesson.scheduledDate ? (
+                    <div className="flex items-center gap-2">
+                      <span className="badge badge-primary">Immediate</span>
+                      <span className="text-sm text-base-content/60">
+                        This lesson can be started right away
+                      </span>
+                    </div>
+                  ) : (
                     <div className="flex gap-4">
                       <div>
                         <span className="font-medium">Date:</span>{" "}
@@ -248,12 +300,12 @@ function Dashboard() {
                         </div>
                       )}
                     </div>
-                    <div>
-                      <span className="font-medium">Duration:</span>{" "}
-                      {selectedLesson.duration} minutes
-                    </div>
+                  )}
+                  <div>
+                    <span className="font-medium">Duration:</span>{" "}
+                    {selectedLesson.duration} minutes
                   </div>
-                )}
+                </div>
               </div>
             )}
             <div className="modal-action">
@@ -280,6 +332,7 @@ function Dashboard() {
                 lessons={lessons}
                 onLessonClick={handleLessonClick}
                 onDateClick={handleDateClick}
+                onStartLesson={handleStartLesson}
               />
             )}
           </div>

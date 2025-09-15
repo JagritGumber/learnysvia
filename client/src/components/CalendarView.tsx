@@ -161,7 +161,7 @@ function LessonListItem({
   };
 
   const formatDateTime = () => {
-    if (!lesson.scheduledDate) return "No date set";
+    if (!lesson.scheduledDate) return null;
     const date = new Date(lesson.scheduledDate);
     const dateStr = format(date, "MMM d, yyyy");
     const timeStr = lesson.scheduledTime || "No time set";
@@ -178,17 +178,24 @@ function LessonListItem({
       <div className="card-body p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <h3 className="font-semibold text-xl mb-2 text-base-content">
-              {lesson.name}
-            </h3>
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="font-semibold text-xl text-base-content">
+                {lesson.name}
+              </h3>
+              {!lesson.scheduledDate && (
+                <span className="badge badge-primary badge-sm">Immediate</span>
+              )}
+            </div>
             <p className="text-base-content/70 mb-3 leading-relaxed">
               {truncateDescription(lesson.description)}
             </p>
             <div className="flex items-center gap-4 text-sm text-base-content/60">
-              <div className="flex items-center gap-1">
-                <Icon icon="heroicons:calendar-days" className="size-4" />
-                {formatDateTime()}
-              </div>
+              {formatDateTime() && (
+                <div className="flex items-center gap-1">
+                  <Icon icon="heroicons:calendar-days" className="size-4" />
+                  {formatDateTime()}
+                </div>
+              )}
               <div className="flex items-center gap-1">
                 <Icon icon="heroicons:clock" className="size-4" />
                 {lesson.duration} min
