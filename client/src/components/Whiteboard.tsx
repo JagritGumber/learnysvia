@@ -12,11 +12,24 @@ interface WhiteboardProps {
 function WhiteboardContent({
   boardId,
   data,
+  onEditorReady,
+  editorRef,
 }: {
   boardId: string;
   data?: string;
+  onEditorReady?: (editor: any) => void;
+  editorRef: React.MutableRefObject<any>;
 }) {
   const editor = useEditor();
+
+  useEffect(() => {
+    if (editor) {
+      editorRef.current = editor;
+      if (onEditorReady) {
+        onEditorReady(editor);
+      }
+    }
+  }, [editor, onEditorReady, editorRef]);
 
   useEffect(() => {
     if (data && editor) {
@@ -66,6 +79,7 @@ export function Whiteboard({ boardId, boardName, data }: WhiteboardProps) {
   const [finalWords, setFinalWords] = useState<string[]>([]);
   const [interimTranscript, setInterimTranscript] = useState("");
   const recognitionRef = useRef<any>(null);
+  const editorRef = useRef<any>(null);
 
   useEffect(() => {
     if (
@@ -80,7 +94,7 @@ export function Whiteboard({ boardId, boardName, data }: WhiteboardProps) {
       recognitionRef.current.interimResults = true;
       recognitionRef.current.lang = "en-US";
 
-      recognitionRef.current.onresult = (event: any) => {
+      recognitionRef.current.onresult = async (event: any) => {
         let newFinal = "";
         let newInterim = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -92,6 +106,30 @@ export function Whiteboard({ boardId, boardName, data }: WhiteboardProps) {
           }
         }
         if (newFinal) {
+          // Send final transcript to backend for Wit.ai processing
+          try {
+            const response = await api.post(`/api/boards/speech/${boardId}`, {
+              transcript: newFinal.trim(),
+            });
+
+            if (
+              response.data.success &&
+              response.data.shapesCreated.length > 0
+            ) {
+              // Refresh the whiteboard data to show new shapes
+              const boardResponse = await api.get(`/api/boards/${boardId}`);
+              if (boardResponse.data.board?.data) {
+                const snapshot = JSON.parse(boardResponse.data.board.data);
+                if (editorRef.current) {
+                  editorRef.current.loadSnapshot(snapshot);
+                }
+              }
+            }
+          } catch (error) {
+            console.error("Failed to process speech:", error);
+          }
+
+          // Update local transcript display
           setFinalWords((prev) => {
             const newWords = newFinal.trim().split(/\s+/);
             const combined = [...prev, ...newWords];
@@ -148,7 +186,7 @@ export function Whiteboard({ boardId, boardName, data }: WhiteboardProps) {
 
       <div className="flex-1 overflow-hidden bg-white relative">
         <Tldraw persistenceKey={boardId} className="w-full h-full">
-          <WhiteboardContent boardId={boardId} data={data} />
+          <WhiteboardContent boardId={boardId} data={data} editorRef={editorRef} />
         </Tldraw>
 
         {/* Subtitles Overlay */}

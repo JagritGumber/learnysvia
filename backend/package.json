@@ -14,9 +14,11 @@
     "drizzle-orm": "^0.44.5",
     "drizzle-zod": "^0.8.3",
     "elysia": "latest",
+    "node-wit": "^6.6.0",
     "zod": "^4.1.8"
   },
   "devDependencies": {
+    "@types/node-wit": "^6.1.0",
     "bun-types": "latest",
     "drizzle-kit": "^0.31.4",
     "tsx": "^4.20.5"

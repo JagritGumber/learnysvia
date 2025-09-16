@@ -4,6 +4,8 @@ import Elysia from "elysia";
 import { eq, and } from "drizzle-orm";
 import { betterAuth } from "@/macros/better-auth";
 import z from "zod";
+import { Wit } from "node-wit";
+import { env } from "@/env";
 
 // Tldraw shape types
 const ShapeSchema = z.object({
@@ -637,6 +639,165 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
       params: z.object({
         boardId: z.string(),
         shapeId: z.string(),
+      }),
+    }
+  )
+  // Speech processing endpoint
+  .post(
+    "/speech/:boardId",
+    async ({ params, body, user }) => {
+      const { boardId } = params;
+      const { transcript } = body;
+
+      // Check access
+      const boardData = await db
+        .select()
+        .from(board)
+        .where(and(eq(board.id, boardId), eq(board.userId, user.id)))
+        .limit(1);
+
+      if (boardData.length === 0) {
+        const collaboratorData = await db
+          .select()
+          .from(boardCollaborator)
+          .where(
+            and(
+              eq(boardCollaborator.boardId, boardId),
+              eq(boardCollaborator.userId, user.id)
+            )
+          )
+          .limit(1);
+
+        if (collaboratorData.length === 0) {
+          throw new Error("Board not found or access denied");
+        }
+      }
+
+      const currentBoard =
+        boardData[0] ||
+        (await db
+          .select()
+          .from(board)
+          .where(eq(board.id, boardId))
+          .limit(1)
+          .then((rows) => rows[0]));
+
+      if (!currentBoard) {
+        throw new Error("Board not found");
+      }
+
+      try {
+        // Send transcript to Wit.ai for processing using fetch
+        const witResponse = await fetch(
+          `https://api.wit.ai/message?v=20250917&q=${encodeURIComponent(
+            transcript
+          )}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${env.WIT_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!witResponse.ok) {
+          throw new Error(`Wit.ai API error: ${witResponse.status}`);
+        }
+
+        const witData = await witResponse.json();
+        console.log("Wit.ai response:", witData);
+
+        // Process intents and create shapes based on utterances
+        const shapesCreated = [];
+
+        // Check for heading intent
+        if (witData.intents && witData.intents.length > 0) {
+          const intent = witData.intents[0];
+
+          if (intent.name === "add_heading" || intent.name === "create_title") {
+            // Extract text from entities or use the full transcript
+            let headingText = transcript;
+
+            // Try to extract specific text from entities
+            if (
+              witData.entities &&
+              witData.entities["wit$message_body:message_body"]
+            ) {
+              const messageBody =
+                witData.entities["wit$message_body:message_body"][0];
+              if (messageBody && messageBody.value) {
+                headingText = messageBody.value;
+              }
+            }
+
+            // Get current snapshot
+            let snapshot: any = { store: { shapes: {} } };
+            if (currentBoard.data) {
+              snapshot = typeof currentBoard.data === 'string'
+                ? JSON.parse(currentBoard.data)
+                : currentBoard.data;
+            }
+
+            // Generate shape ID
+            const shapeId = Bun.randomUUIDv7();
+
+            // Create text shape for heading
+            const newShape = {
+              id: shapeId,
+              type: "text",
+              x: 100,
+              y: 100,
+              props: {
+                text: headingText,
+                fontSize: 24,
+                fontWeight: "bold",
+                color: "black",
+              },
+              parentId: "page",
+              rotation: 0,
+              isLocked: false,
+            };
+
+            // Add shape to snapshot
+            if (!snapshot.store) snapshot.store = { shapes: {} };
+            if (!snapshot.store.shapes) snapshot.store.shapes = {};
+            snapshot.store.shapes[shapeId] = newShape;
+
+            // Save updated snapshot
+            await db
+              .update(board)
+              .set({
+                data: JSON.stringify(snapshot),
+                updatedAt: new Date(),
+              })
+              .where(eq(board.id, boardId));
+
+            shapesCreated.push(newShape);
+          }
+        }
+
+        return {
+          success: true,
+          witData,
+          shapesCreated,
+          message:
+            shapesCreated.length > 0
+              ? "Shapes created successfully"
+              : "No shapes created",
+        };
+      } catch (error) {
+        console.error("Wit.ai processing error:", error);
+        throw new Error("Failed to process speech with Wit.ai");
+      }
+    },
+    {
+      auth: true,
+      params: z.object({
+        boardId: z.string(),
+      }),
+      body: z.object({
+        transcript: z.string().min(1),
       }),
     }
   );
