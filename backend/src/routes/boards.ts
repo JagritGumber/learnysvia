@@ -5,6 +5,37 @@ import { eq, and } from "drizzle-orm";
 import { betterAuth } from "@/macros/better-auth";
 import z from "zod";
 
+// Tldraw shape types
+const ShapeSchema = z.object({
+  id: z.string(),
+  type: z.string(),
+  x: z.number(),
+  y: z.number(),
+  props: z.any().optional(),
+  parentId: z.string().optional(),
+  rotation: z.number().optional(),
+  isLocked: z.boolean().optional(),
+});
+
+const CreateShapeSchema = z.object({
+  type: z.string(),
+  x: z.number(),
+  y: z.number(),
+  props: z.any().optional(),
+  parentId: z.string().optional(),
+  rotation: z.number().optional(),
+  isLocked: z.boolean().optional(),
+});
+
+const UpdateShapeSchema = z.object({
+  x: z.number().optional(),
+  y: z.number().optional(),
+  props: z.record(z.any(), z.any()).optional(),
+  parentId: z.string().optional(),
+  rotation: z.number().optional(),
+  isLocked: z.boolean().optional(),
+});
+
 export const boardsRouter = new Elysia({ prefix: "/boards" })
   .use(betterAuth)
   .post(
@@ -221,6 +252,391 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
       auth: true,
       params: z.object({
         id: z.string(),
+      }),
+    }
+  )
+  // Shape manipulation endpoints
+  .post(
+    "/shapes/:boardId",
+    async ({ params, body, user }) => {
+      const { boardId } = params;
+      const shapeData = body;
+
+      // Check access
+      const boardData = await db
+        .select()
+        .from(board)
+        .where(and(eq(board.id, boardId), eq(board.userId, user.id)))
+        .limit(1);
+
+      if (boardData.length === 0) {
+        const collaboratorData = await db
+          .select()
+          .from(boardCollaborator)
+          .where(
+            and(
+              eq(boardCollaborator.boardId, boardId),
+              eq(boardCollaborator.userId, user.id)
+            )
+          )
+          .limit(1);
+
+        if (collaboratorData.length === 0) {
+          throw new Error("Board not found or access denied");
+        }
+      }
+
+      const currentBoard =
+        boardData[0] ||
+        (await db
+          .select()
+          .from(board)
+          .where(eq(board.id, boardId))
+          .limit(1)
+          .then((rows) => rows[0]));
+
+      if (!currentBoard) {
+        throw new Error("Board not found");
+      }
+
+      // Get current snapshot
+      let snapshot: any = { store: { shapes: {} } };
+      if (currentBoard.data) {
+        snapshot = currentBoard.data;
+      }
+
+      // Generate shape ID
+      const shapeId = Bun.randomUUIDv7();
+
+      // Create shape
+      const newShape = {
+        id: shapeId,
+        type: shapeData.type,
+        x: shapeData.x,
+        y: shapeData.y,
+        props: shapeData.props || {},
+        parentId: shapeData.parentId || "page",
+        rotation: shapeData.rotation || 0,
+        isLocked: shapeData.isLocked || false,
+      };
+
+      // Add shape to snapshot
+      if (!snapshot.store) snapshot.store = { shapes: {} };
+      if (!snapshot.store.shapes) snapshot.store.shapes = {};
+      snapshot.store.shapes[shapeId] = newShape;
+
+      // Save updated snapshot
+      await db
+        .update(board)
+        .set({
+          data: JSON.stringify(snapshot),
+          updatedAt: new Date(),
+        })
+        .where(eq(board.id, boardId));
+
+      return {
+        success: true,
+        shape: newShape,
+      };
+    },
+    {
+      auth: true,
+      params: z.object({
+        boardId: z.string(),
+      }),
+      body: CreateShapeSchema,
+    }
+  )
+  .put(
+    "/shapes/:boardId/:shapeId",
+    async ({ params, body, user }) => {
+      const { boardId, shapeId } = params;
+      const updates = body;
+
+      // Check access
+      const boardData = await db
+        .select()
+        .from(board)
+        .where(and(eq(board.id, boardId), eq(board.userId, user.id)))
+        .limit(1);
+
+      if (boardData.length === 0) {
+        const collaboratorData = await db
+          .select()
+          .from(boardCollaborator)
+          .where(
+            and(
+              eq(boardCollaborator.boardId, boardId),
+              eq(boardCollaborator.userId, user.id)
+            )
+          )
+          .limit(1);
+
+        if (collaboratorData.length === 0) {
+          throw new Error("Board not found or access denied");
+        }
+      }
+
+      const currentBoard =
+        boardData[0] ||
+        (await db
+          .select()
+          .from(board)
+          .where(eq(board.id, boardId))
+          .limit(1)
+          .then((rows) => rows[0]));
+
+      if (!currentBoard) {
+        throw new Error("Board not found");
+      }
+
+      // Get current snapshot
+      let snapshot: any = { store: { shapes: {} } };
+      if (currentBoard.data) {
+        snapshot = currentBoard.data;
+      }
+
+      // Check if shape exists
+      if (!snapshot.store?.shapes?.[shapeId]) {
+        throw new Error("Shape not found");
+      }
+
+      // Update shape
+      const existingShape = snapshot.store.shapes[shapeId];
+      const updatedShape = {
+        ...existingShape,
+        ...updates,
+      };
+
+      snapshot.store.shapes[shapeId] = updatedShape;
+
+      // Save updated snapshot
+      await db
+        .update(board)
+        .set({
+          data: JSON.stringify(snapshot),
+          updatedAt: new Date(),
+        })
+        .where(eq(board.id, boardId));
+
+      return {
+        success: true,
+        shape: updatedShape,
+      };
+    },
+    {
+      auth: true,
+      params: z.object({
+        boardId: z.string(),
+        shapeId: z.string(),
+      }),
+      body: UpdateShapeSchema,
+    }
+  )
+  .delete(
+    "/shapes/:boardId/:shapeId",
+    async ({ params, user }) => {
+      const { boardId, shapeId } = params;
+
+      // Check access
+      const boardData = await db
+        .select()
+        .from(board)
+        .where(and(eq(board.id, boardId), eq(board.userId, user.id)))
+        .limit(1);
+
+      if (boardData.length === 0) {
+        const collaboratorData = await db
+          .select()
+          .from(boardCollaborator)
+          .where(
+            and(
+              eq(boardCollaborator.boardId, boardId),
+              eq(boardCollaborator.userId, user.id)
+            )
+          )
+          .limit(1);
+
+        if (collaboratorData.length === 0) {
+          throw new Error("Board not found or access denied");
+        }
+      }
+
+      const currentBoard =
+        boardData[0] ||
+        (await db
+          .select()
+          .from(board)
+          .where(eq(board.id, boardId))
+          .limit(1)
+          .then((rows) => rows[0]));
+
+      if (!currentBoard) {
+        throw new Error("Board not found");
+      }
+
+      // Get current snapshot
+      let snapshot: any = { store: { shapes: {} } };
+      if (currentBoard.data) {
+        snapshot = currentBoard.data;
+      }
+
+      // Check if shape exists
+      if (!snapshot.store?.shapes?.[shapeId]) {
+        throw new Error("Shape not found");
+      }
+
+      // Delete shape
+      delete snapshot.store.shapes[shapeId];
+
+      // Save updated snapshot
+      await db
+        .update(board)
+        .set({
+          data: JSON.stringify(snapshot),
+          updatedAt: new Date(),
+        })
+        .where(eq(board.id, boardId));
+
+      return {
+        success: true,
+        message: "Shape deleted successfully",
+      };
+    },
+    {
+      auth: true,
+      params: z.object({
+        boardId: z.string(),
+        shapeId: z.string(),
+      }),
+    }
+  )
+  .get(
+    "/shapes/:boardId",
+    async ({ params, user }) => {
+      const { boardId } = params;
+
+      // Check access
+      const boardData = await db
+        .select()
+        .from(board)
+        .where(and(eq(board.id, boardId), eq(board.userId, user.id)))
+        .limit(1);
+
+      if (boardData.length === 0) {
+        const collaboratorData = await db
+          .select()
+          .from(boardCollaborator)
+          .where(
+            and(
+              eq(boardCollaborator.boardId, boardId),
+              eq(boardCollaborator.userId, user.id)
+            )
+          )
+          .limit(1);
+
+        if (collaboratorData.length === 0) {
+          throw new Error("Board not found or access denied");
+        }
+      }
+
+      const currentBoard =
+        boardData[0] ||
+        (await db
+          .select()
+          .from(board)
+          .where(eq(board.id, boardId))
+          .limit(1)
+          .then((rows) => rows[0]));
+
+      if (!currentBoard) {
+        throw new Error("Board not found");
+      }
+
+      // Get current snapshot
+      let snapshot: any = { store: { shapes: {} } };
+      if (currentBoard.data) {
+        snapshot = currentBoard.data;
+      }
+
+      const shapes = snapshot.store?.shapes || {};
+
+      return {
+        success: true,
+        shapes: Object.values(shapes),
+      };
+    },
+    {
+      auth: true,
+      params: z.object({
+        boardId: z.string(),
+      }),
+    }
+  )
+  .get(
+    "/shapes/:boardId/:shapeId",
+    async ({ params, user }) => {
+      const { boardId, shapeId } = params;
+
+      // Check access
+      const boardData = await db
+        .select()
+        .from(board)
+        .where(and(eq(board.id, boardId), eq(board.userId, user.id)))
+        .limit(1);
+
+      if (boardData.length === 0) {
+        const collaboratorData = await db
+          .select()
+          .from(boardCollaborator)
+          .where(
+            and(
+              eq(boardCollaborator.boardId, boardId),
+              eq(boardCollaborator.userId, user.id)
+            )
+          )
+          .limit(1);
+
+        if (collaboratorData.length === 0) {
+          throw new Error("Board not found or access denied");
+        }
+      }
+
+      const currentBoard =
+        boardData[0] ||
+        (await db
+          .select()
+          .from(board)
+          .where(eq(board.id, boardId))
+          .limit(1)
+          .then((rows) => rows[0]));
+
+      if (!currentBoard) {
+        throw new Error("Board not found");
+      }
+
+      // Get current snapshot
+      let snapshot: any = { store: { shapes: {} } };
+      if (currentBoard.data) {
+        snapshot = currentBoard.data;
+      }
+
+      const shape = snapshot.store?.shapes?.[shapeId];
+
+      if (!shape) {
+        throw new Error("Shape not found");
+      }
+
+      return {
+        success: true,
+        shape,
+      };
+    },
+    {
+      auth: true,
+      params: z.object({
+        boardId: z.string(),
+        shapeId: z.string(),
       }),
     }
   );
