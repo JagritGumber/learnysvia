@@ -40,7 +40,7 @@ function BoardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-[calc(100vh-64px)] bg-base-100 flex items-center justify-center">
+      <div className="h-screen bg-base-100 flex items-center justify-center">
         <div className="loading loading-spinner loading-lg"></div>
       </div>
     );
@@ -48,7 +48,7 @@ function BoardPage() {
 
   if (error || !board) {
     return (
-      <div className="min-h-[calc(100vh-64px)] bg-base-100 flex items-center justify-center">
+      <div className="h-screen bg-base-100 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-error mb-2">Board Not Found</h2>
           <p className="text-base-content/70 mb-4">
@@ -63,7 +63,7 @@ function BoardPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-base-100">
+    <div className="h-screen bg-base-100">
       <Whiteboard
         boardId={board.id}
         boardName={board.name}

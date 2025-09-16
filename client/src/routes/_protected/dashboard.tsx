@@ -155,16 +155,16 @@ function Dashboard() {
                 </label>
                 <div className="flex gap-2 justify-between">
                   {[
-                    "#e11d48",
-                    "#f472b6",
-                    "#fb923c",
-                    "#facc15",
-                    "#84cc16",
-                    "#10b981",
-                    "#0ea5e9",
-                    "#3b82f6",
-                    "#8b5cf6",
-                    "#a78bfa",
+                    "#fca5a5",
+                    "#fbcfe8",
+                    "#fed7aa",
+                    "#fef08a",
+                    "#bbf7d0",
+                    "#86efac",
+                    "#bae6fd",
+                    "#bfdbfe",
+                    "#d8b4fe",
+                    "#e9d5ff",
                   ].map((color) => (
                     <button
                       key={color}
