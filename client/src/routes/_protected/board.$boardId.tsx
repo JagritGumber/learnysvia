@@ -67,11 +67,7 @@ function BoardPage() {
 
   return (
     <div className="h-screen bg-base-100">
-      <Whiteboard
-        boardId={board.id}
-        boardName={board.name}
-        data={board.data}
-      />
+      <Whiteboard boardId={board.id} boardName={board.name} data={board.data} />
     </div>
   );
 }
