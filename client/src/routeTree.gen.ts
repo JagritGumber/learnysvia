@@ -13,7 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
-import { Route as ProtectedBoardBoardIdRouteImport } from './routes/_protected/board.$boardId'
+import { Route as ProtectedSchoolSchoolIdRouteImport } from './routes/_protected/school.$schoolId'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -34,9 +34,9 @@ const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
-const ProtectedBoardBoardIdRoute = ProtectedBoardBoardIdRouteImport.update({
-  id: '/board/$boardId',
-  path: '/board/$boardId',
+const ProtectedSchoolSchoolIdRoute = ProtectedSchoolSchoolIdRouteImport.update({
+  id: '/school/$schoolId',
+  path: '/school/$schoolId',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
 
@@ -44,13 +44,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof ProtectedDashboardRoute
-  '/board/$boardId': typeof ProtectedBoardBoardIdRoute
+  '/school/$schoolId': typeof ProtectedSchoolSchoolIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof ProtectedDashboardRoute
-  '/board/$boardId': typeof ProtectedBoardBoardIdRoute
+  '/school/$schoolId': typeof ProtectedSchoolSchoolIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -58,20 +58,20 @@ export interface FileRoutesById {
   '/_protected': typeof ProtectedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_protected/dashboard': typeof ProtectedDashboardRoute
-  '/_protected/board/$boardId': typeof ProtectedBoardBoardIdRoute
+  '/_protected/school/$schoolId': typeof ProtectedSchoolSchoolIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard' | '/board/$boardId'
+  fullPaths: '/' | '/auth' | '/dashboard' | '/school/$schoolId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/board/$boardId'
+  to: '/' | '/auth' | '/dashboard' | '/school/$schoolId'
   id:
     | '__root__'
     | '/'
     | '/_protected'
     | '/auth'
     | '/_protected/dashboard'
-    | '/_protected/board/$boardId'
+    | '/_protected/school/$schoolId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -110,11 +110,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedDashboardRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
-    '/_protected/board/$boardId': {
-      id: '/_protected/board/$boardId'
-      path: '/board/$boardId'
-      fullPath: '/board/$boardId'
-      preLoaderRoute: typeof ProtectedBoardBoardIdRouteImport
+    '/_protected/school/$schoolId': {
+      id: '/_protected/school/$schoolId'
+      path: '/school/$schoolId'
+      fullPath: '/school/$schoolId'
+      preLoaderRoute: typeof ProtectedSchoolSchoolIdRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
   }
@@ -122,12 +122,12 @@ declare module '@tanstack/react-router' {
 
 interface ProtectedRouteRouteChildren {
   ProtectedDashboardRoute: typeof ProtectedDashboardRoute
-  ProtectedBoardBoardIdRoute: typeof ProtectedBoardBoardIdRoute
+  ProtectedSchoolSchoolIdRoute: typeof ProtectedSchoolSchoolIdRoute
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
   ProtectedDashboardRoute: ProtectedDashboardRoute,
-  ProtectedBoardBoardIdRoute: ProtectedBoardBoardIdRoute,
+  ProtectedSchoolSchoolIdRoute: ProtectedSchoolSchoolIdRoute,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(

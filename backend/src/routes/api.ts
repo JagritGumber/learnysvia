@@ -1,7 +1,7 @@
-import { boardsRouter } from "./boards";
+import { schoolsRouter } from "./schools";
 import { usersRouter } from "./users";
 import Elysia from "elysia";
 
 export const apiRouter = new Elysia({ prefix: "/api" })
-  .use(boardsRouter)
+  .use(schoolsRouter)
   .use(usersRouter);
