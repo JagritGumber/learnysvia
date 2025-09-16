@@ -204,6 +204,7 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
         }
       }
 
+      // Store MDX content as plain string (no JSON parsing needed)
       await db
         .update(board)
         .set({
@@ -214,7 +215,7 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
 
       return {
         success: true,
-        message: "Board data saved successfully",
+        message: "Board MDX content saved successfully",
       };
     },
     {
@@ -642,7 +643,7 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
       }),
     }
   )
-  // Speech processing endpoint
+  // Speech processing endpoint for MDX content generation
   .post(
     "/speech/:boardId",
     async ({ params, body, user }) => {
@@ -708,83 +709,83 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
         const witData = await witResponse.json();
         console.log("Wit.ai response:", witData);
 
-        // Process intents and create shapes based on utterances
-        const shapesCreated = [];
+        // Process intents and generate MDX content based on utterances
+        let mdxContent = "";
 
-        // Check for heading intent
+        // Check for various intents and generate appropriate MDX
         if (witData.intents && witData.intents.length > 0) {
           const intent = witData.intents[0];
 
-          if (intent.name === "add_heading" || intent.name === "create_title") {
-            // Extract text from entities or use the full transcript
-            let headingText = transcript;
-
-            // Try to extract specific text from entities
-            if (
-              witData.entities &&
-              witData.entities["wit$message_body:message_body"]
-            ) {
-              const messageBody =
-                witData.entities["wit$message_body:message_body"][0];
-              if (messageBody && messageBody.value) {
-                headingText = messageBody.value;
-              }
+          // Extract text from entities or use the full transcript
+          let contentText = transcript;
+          if (
+            witData.entities &&
+            witData.entities["wit$message_body:message_body"]
+          ) {
+            const messageBody =
+              witData.entities["wit$message_body:message_body"][0];
+            if (messageBody && messageBody.value) {
+              contentText = messageBody.value;
             }
-
-            // Get current snapshot
-            let snapshot: any = { store: { shapes: {} } };
-            if (currentBoard.data) {
-              snapshot = typeof currentBoard.data === 'string'
-                ? JSON.parse(currentBoard.data)
-                : currentBoard.data;
-            }
-
-            // Generate shape ID
-            const shapeId = Bun.randomUUIDv7();
-
-            // Create text shape for heading
-            const newShape = {
-              id: shapeId,
-              type: "text",
-              x: 100,
-              y: 100,
-              props: {
-                text: headingText,
-                fontSize: 24,
-                fontWeight: "bold",
-                color: "black",
-              },
-              parentId: "page",
-              rotation: 0,
-              isLocked: false,
-            };
-
-            // Add shape to snapshot
-            if (!snapshot.store) snapshot.store = { shapes: {} };
-            if (!snapshot.store.shapes) snapshot.store.shapes = {};
-            snapshot.store.shapes[shapeId] = newShape;
-
-            // Save updated snapshot
-            await db
-              .update(board)
-              .set({
-                data: JSON.stringify(snapshot),
-                updatedAt: new Date(),
-              })
-              .where(eq(board.id, boardId));
-
-            shapesCreated.push(newShape);
           }
+
+          switch (intent.name) {
+            case "add_heading":
+            case "create_title":
+              mdxContent = `# ${contentText}\n\n`;
+              break;
+
+            case "add_subheading":
+              mdxContent = `## ${contentText}\n\n`;
+              break;
+
+            case "add_paragraph":
+            case "add_text":
+              mdxContent = `${contentText}\n\n`;
+              break;
+
+            case "add_list":
+            case "create_list":
+              // Try to extract list items from the transcript
+              const listItems = contentText
+                .split(/[,;]|\sand\s|or\s/)
+                .map(item => item.trim())
+                .filter(item => item.length > 0)
+                .map(item => `- ${item}`)
+                .join('\n');
+              mdxContent = `${listItems}\n\n`;
+              break;
+
+            case "add_code":
+            case "create_code":
+              mdxContent = "```javascript\n// Your code here\n```\n\n";
+              break;
+
+            case "add_diagram":
+            case "create_diagram":
+              mdxContent = "```mermaid\ngraph TD\n    A[Start] --> B[Process]\n    B --> C[End]\n```\n\n";
+              break;
+
+            case "add_quiz":
+            case "create_quiz":
+              mdxContent = "<Quiz question=\"What is 2+2?\" options={['3', '4', '5']} correct={1} />\n\n";
+              break;
+
+            default:
+              // Default to adding as regular text
+              mdxContent = `${contentText}\n\n`;
+              break;
+          }
+        } else {
+          // No specific intent detected, add as regular text
+          mdxContent = `${transcript}\n\n`;
         }
 
         return {
           success: true,
           witData,
-          shapesCreated,
-          message:
-            shapesCreated.length > 0
-              ? "Shapes created successfully"
-              : "No shapes created",
+          mdxContent,
+          message: mdxContent ? "MDX content generated successfully" : "No content generated",
         };
       } catch (error) {
         console.error("Wit.ai processing error:", error);

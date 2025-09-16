@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/utils/api";
-import { Whiteboard } from "@/components/Whiteboard";
+import { MDXEditorComponent } from "@/components/MDXEditor";
 
 interface Board {
   id: string;
@@ -67,7 +67,11 @@ function BoardPage() {
 
   return (
     <div className="h-screen bg-base-100">
-      <Whiteboard boardId={board.id} boardName={board.name} data={board.data} />
+      <MDXEditorComponent
+        boardId={board.id}
+        boardName={board.name}
+        initialContent={board.data || ""}
+      />
     </div>
   );
 }
