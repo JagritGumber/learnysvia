@@ -9,7 +9,6 @@ export const board = sqliteTable("board", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   isPublic: integer("is_public", { mode: "boolean" }).default(false),
-  backgroundColor: text("background_color").default("#ffffff"),
   data: text("data", { mode: "json" }), // Store tldraw snapshot data
   createdAt: integer("created_at", { mode: "timestamp" })
     .defaultNow()

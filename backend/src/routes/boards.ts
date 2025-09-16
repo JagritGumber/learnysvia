@@ -10,7 +10,7 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
   .post(
     "/create",
     async ({ body, user }) => {
-      const { name, description, isPublic, backgroundColor } = body;
+      const { name, description, isPublic } = body;
 
       const newBoard = await db
         .insert(board)
@@ -20,7 +20,6 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
           description,
           userId: user.id,
           isPublic: isPublic || false,
-          backgroundColor: backgroundColor || "#ffffff",
         })
         .returning();
 
@@ -35,7 +34,6 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
         name: z.string().min(1),
         description: z.string().optional(),
         isPublic: z.boolean().optional(),
-        backgroundColor: z.string().optional(),
       }),
     }
   )
@@ -72,7 +70,12 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
         const collaboratorData = await db
           .select()
           .from(boardCollaborator)
-          .where(and(eq(boardCollaborator.boardId, id), eq(boardCollaborator.userId, user.id)))
+          .where(
+            and(
+              eq(boardCollaborator.boardId, id),
+              eq(boardCollaborator.userId, user.id)
+            )
+          )
           .limit(1);
 
         if (collaboratorData.length === 0) {
@@ -96,7 +99,7 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
     "/:id",
     async ({ params, body, user }) => {
       const { id } = params;
-      const { name, description, isPublic, backgroundColor } = body;
+      const { name, description, isPublic } = body;
 
       // Check if user owns the board
       const existingBoard = await db
@@ -115,7 +118,6 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
           name,
           description,
           isPublic,
-          backgroundColor,
           updatedAt: new Date(),
         })
         .where(eq(board.id, id))
@@ -135,7 +137,6 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
         name: z.string().min(1),
         description: z.string().optional(),
         isPublic: z.boolean().optional(),
-        backgroundColor: z.string().optional(),
       }),
     }
   )
@@ -157,7 +158,12 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
         const collaboratorData = await db
           .select()
           .from(boardCollaborator)
-          .where(and(eq(boardCollaborator.boardId, id), eq(boardCollaborator.userId, user.id)))
+          .where(
+            and(
+              eq(boardCollaborator.boardId, id),
+              eq(boardCollaborator.userId, user.id)
+            )
+          )
           .limit(1);
 
         if (collaboratorData.length === 0) {

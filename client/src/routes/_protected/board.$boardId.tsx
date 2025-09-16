@@ -8,7 +8,6 @@ interface Board {
   name: string;
   description: string | null;
   isPublic: boolean;
-  backgroundColor: string;
   userId: string;
   data: string;
   createdAt: string;
@@ -51,9 +50,12 @@ function BoardPage() {
     return (
       <div className="h-screen bg-base-100 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-error mb-2">Board Not Found</h2>
+          <h2 className="text-2xl font-bold text-error mb-2">
+            Board Not Found
+          </h2>
           <p className="text-base-content/70 mb-4">
-            The board you're looking for doesn't exist or you don't have access to it.
+            The board you're looking for doesn't exist or you don't have access
+            to it.
           </p>
           <a href="/dashboard" className="btn btn-primary">
             Back to Dashboard
@@ -68,7 +70,6 @@ function BoardPage() {
       <Whiteboard
         boardId={board.id}
         boardName={board.name}
-        backgroundColor={board.backgroundColor}
         data={board.data}
       />
     </div>

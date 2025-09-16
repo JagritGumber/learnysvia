@@ -12,7 +12,6 @@ function Dashboard() {
   const [boardName, setBoardName] = useState("");
   const [boardDescription, setBoardDescription] = useState("");
   const [isPublic, setIsPublic] = useState(false);
-  const [backgroundColor, setBackgroundColor] = useState("#ffffff");
 
   // Fetch boards
   const {
@@ -35,7 +34,6 @@ function Dashboard() {
       name: string;
       description: string;
       isPublic: boolean;
-      backgroundColor: string;
     }) => {
       const response = await api.post("/api/boards/create", boardData);
       return response.data.board;
@@ -45,7 +43,6 @@ function Dashboard() {
       setBoardName("");
       setBoardDescription("");
       setIsPublic(false);
-      setBackgroundColor("#ffffff");
       (
         document.getElementById("create-board-modal") as HTMLDialogElement
       )?.close();
@@ -74,7 +71,6 @@ function Dashboard() {
       name: boardName,
       description: boardDescription,
       isPublic,
-      backgroundColor,
     });
   };
 
@@ -82,7 +78,6 @@ function Dashboard() {
     setBoardName("");
     setBoardDescription("");
     setIsPublic(false);
-    setBackgroundColor("#ffffff");
     (
       document.getElementById("create-board-modal") as HTMLDialogElement
     )?.close();
@@ -148,48 +143,14 @@ function Dashboard() {
                 </span>
               </div>
 
-              {/* Background Color */}
-              <div className="form-control flex flex-col gap-2">
-                <label className="label">
-                  <span className="label-text">Background Color</span>
-                </label>
-                <div className="flex gap-2 justify-between">
-                  {[
-                    "#fca5a5",
-                    "#fbcfe8",
-                    "#fed7aa",
-                    "#fef08a",
-                    "#bbf7d0",
-                    "#86efac",
-                    "#bae6fd",
-                    "#bfdbfe",
-                    "#d8b4fe",
-                    "#e9d5ff",
-                  ].map((color) => (
-                    <button
-                      key={color}
-                      type="button"
-                      className={`flex-1 w-6 aspect-square rounded-lg border-none outline-none cursor-pointer ${
-                        backgroundColor === color ? "ring-3 ring-secondary" : ""
-                      }`}
-                      style={{ backgroundColor: color }}
-                      onClick={() => setBackgroundColor(color)}
-                      title={color.toUpperCase()}
-                    ></button>
-                  ))}
-                </div>
-              </div>
-
               <div className="modal-action">
-                <form method="dialog">
-                  <button
-                    type="button"
-                    className="btn btn-ghost"
-                    onClick={handleCancel}
-                  >
-                    Cancel
-                  </button>
-                </form>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </button>
                 <button
                   type="submit"
                   className="btn btn-primary"

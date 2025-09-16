@@ -6,7 +6,6 @@ interface Board {
   name: string;
   description: string | null;
   isPublic: boolean;
-  backgroundColor: string;
   userId: string;
   createdAt: string;
   updatedAt: string;
@@ -30,11 +29,7 @@ export function BoardGallery({
   });
 
   // Board Card Component
-  function BoardCard({
-    board,
-  }: {
-    board: Board;
-  }) {
+  function BoardCard({ board }: { board: Board }) {
     const handleDelete = (e: React.MouseEvent) => {
       e.stopPropagation();
       if (confirm(`Are you sure you want to delete "${board.name}"?`)) {
@@ -58,10 +53,7 @@ export function BoardGallery({
       >
         <div className="card-body p-4">
           {/* Board Preview */}
-          <div
-            className="w-full h-32 rounded-lg mb-3 border border-base-300"
-            style={{ backgroundColor: board.backgroundColor }}
-          >
+          <div className="w-full h-32 rounded-lg mb-3 border border-base-300 bg-base-200">
             <div className="w-full h-full flex items-center justify-center">
               <Icon
                 icon="heroicons:document-text"
@@ -143,10 +135,7 @@ export function BoardGallery({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {sortedBoards.map((board) => (
-            <BoardCard
-              key={board.id}
-              board={board}
-            />
+            <BoardCard key={board.id} board={board} />
           ))}
         </div>
       )}

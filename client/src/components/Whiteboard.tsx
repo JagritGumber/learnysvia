@@ -6,11 +6,16 @@ import api from "@/utils/api";
 interface WhiteboardProps {
   boardId: string;
   boardName: string;
-  backgroundColor?: string;
   data?: string;
 }
 
-function WhiteboardContent({ boardId, data }: { boardId: string; data?: string }) {
+function WhiteboardContent({
+  boardId,
+  data,
+}: {
+  boardId: string;
+  data?: string;
+}) {
   const editor = useEditor();
 
   useEffect(() => {
@@ -45,11 +50,11 @@ function WhiteboardContent({ boardId, data }: { boardId: string; data?: string }
       timeoutId = setTimeout(saveData, 1000); // Save after 1 second of no changes
     };
 
-    editor.on('change', handleChange);
+    editor.on("change", handleChange);
 
     return () => {
       clearTimeout(timeoutId);
-      editor.off('change', handleChange);
+      editor.off("change", handleChange);
     };
   }, [editor, boardId]);
 
@@ -59,7 +64,6 @@ function WhiteboardContent({ boardId, data }: { boardId: string; data?: string }
 export function Whiteboard({
   boardId,
   boardName,
-  backgroundColor = "#ffffff",
   data,
 }: WhiteboardProps) {
   return (
@@ -70,11 +74,8 @@ export function Whiteboard({
       </div>
 
       {/* Tldraw Canvas */}
-      <div className="flex-1 overflow-hidden" style={{ backgroundColor }}>
-        <Tldraw
-          persistenceKey={boardId}
-          className="w-full h-full"
-        >
+      <div className="flex-1 overflow-hidden bg-white">
+        <Tldraw persistenceKey={boardId} className="w-full h-full">
           <WhiteboardContent boardId={boardId} data={data} />
         </Tldraw>
       </div>
