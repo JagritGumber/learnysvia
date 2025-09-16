@@ -13,16 +13,15 @@ function App() {
         <div className="hero-content text-center">
           <div className="max-w-4xl">
             <h1 className="text-6xl font-bold text-base-content mb-6">
-              Learnysvia
+              Rewiredu
             </h1>
             <p className="text-3xl font-bold text-base-content mb-6">
-              Teach vibrant, memorable lessons — real-time canvas boards that
-              assemble as you teach.
+              Discord/Slack for online classrooms — real-time collaborative and
+              interactive learning.
             </p>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
-              A colourful, professional platform built for instructors and
-              learners — live practice, instant feedback and industry-aligned
-              training.
+              A modern platform for educators and students,
+              instant messaging, and seamless classroom management.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">

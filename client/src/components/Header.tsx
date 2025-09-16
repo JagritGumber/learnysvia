@@ -34,7 +34,7 @@ export default function Header() {
           </ul>
         </div>
         <Link to="/" className="btn btn-ghost text-xl">
-          Learnysvia
+          Rewiredu
         </Link>
       </div>
       <div className="navbar-center hidden lg:flex">

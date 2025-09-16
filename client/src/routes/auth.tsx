@@ -220,7 +220,7 @@ function Signin() {
           </div>
 
           <p className="text-xs text-center text-base-content/60 mt-3">
-            Learnysvia — live teaching, instant feedback.
+            Rewiredu — Discord/Slack for online classrooms.
           </p>
         </div>
       </div>
