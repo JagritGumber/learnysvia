@@ -10,6 +10,7 @@ export const board = sqliteTable("board", {
     .references(() => user.id, { onDelete: "cascade" }),
   isPublic: integer("is_public", { mode: "boolean" }).default(false),
   backgroundColor: text("background_color").default("#ffffff"),
+  data: text("data", { mode: "json" }), // Store tldraw snapshot data
   createdAt: integer("created_at", { mode: "timestamp" })
     .defaultNow()
     .notNull(),
@@ -29,9 +30,7 @@ export const boardCollaborator = sqliteTable("board_collaborator", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   role: text("role").default("editor").notNull(), // editor, viewer
-  addedAt: integer("added_at", { mode: "timestamp" })
-    .defaultNow()
-    .notNull(),
+  addedAt: integer("added_at", { mode: "timestamp" }).defaultNow().notNull(),
 });
 
 export type InsertBoard = typeof board.$inferInsert;

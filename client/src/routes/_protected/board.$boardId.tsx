@@ -10,6 +10,7 @@ interface Board {
   isPublic: boolean;
   backgroundColor: string;
   userId: string;
+  data: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -68,6 +69,7 @@ function BoardPage() {
         boardId={board.id}
         boardName={board.name}
         backgroundColor={board.backgroundColor}
+        data={board.data}
       />
     </div>
   );

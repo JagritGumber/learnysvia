@@ -139,6 +139,55 @@ export const boardsRouter = new Elysia({ prefix: "/boards" })
       }),
     }
   )
+  .put(
+    "/:id/data",
+    async ({ params, body, user }) => {
+      const { id } = params;
+      const { data } = body;
+
+      // Check if user owns the board or is a collaborator
+      const boardData = await db
+        .select()
+        .from(board)
+        .where(and(eq(board.id, id), eq(board.userId, user.id)))
+        .limit(1);
+
+      if (boardData.length === 0) {
+        // Check if user is a collaborator
+        const collaboratorData = await db
+          .select()
+          .from(boardCollaborator)
+          .where(and(eq(boardCollaborator.boardId, id), eq(boardCollaborator.userId, user.id)))
+          .limit(1);
+
+        if (collaboratorData.length === 0) {
+          throw new Error("Board not found or access denied");
+        }
+      }
+
+      await db
+        .update(board)
+        .set({
+          data,
+          updatedAt: new Date(),
+        })
+        .where(eq(board.id, id));
+
+      return {
+        success: true,
+        message: "Board data saved successfully",
+      };
+    },
+    {
+      auth: true,
+      params: z.object({
+        id: z.string(),
+      }),
+      body: z.object({
+        data: z.string(),
+      }),
+    }
+  )
   .delete(
     "/:id",
     async ({ params, user }) => {
