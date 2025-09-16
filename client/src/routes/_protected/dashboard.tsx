@@ -3,18 +3,6 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import api from "@/utils/api";
 import { BoardGallery } from "@/components/BoardGallery";
-import { Whiteboard } from "@/components/Whiteboard";
-
-interface Board {
-  id: string;
-  name: string;
-  description: string | null;
-  isPublic: boolean;
-  backgroundColor: string;
-  userId: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export const Route = createFileRoute("/_protected/dashboard")({
   component: Dashboard,
@@ -25,8 +13,6 @@ function Dashboard() {
   const [boardDescription, setBoardDescription] = useState("");
   const [isPublic, setIsPublic] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
-  const [selectedBoard, setSelectedBoard] = useState<Board | null>(null);
-  const [viewMode, setViewMode] = useState<"gallery" | "whiteboard">("gallery");
 
   // Fetch boards
   const {
@@ -76,10 +62,6 @@ function Dashboard() {
     },
     onSuccess: () => {
       refetchBoards();
-      if (selectedBoard?.id === deleteBoardMutation.variables) {
-        setSelectedBoard(null);
-        setViewMode("gallery");
-      }
     },
     onError: (error) => {
       console.error("Error deleting board:", error);
@@ -106,11 +88,6 @@ function Dashboard() {
     )?.close();
   };
 
-  const handleBoardClick = (board: Board) => {
-    setSelectedBoard(board);
-    setViewMode("whiteboard");
-  };
-
   const handleCreateBoard = () => {
     (
       document.getElementById("create-board-modal") as HTMLDialogElement
@@ -121,21 +98,9 @@ function Dashboard() {
     deleteBoardMutation.mutate(boardId);
   };
 
-  const handleBackToGallery = () => {
-    setSelectedBoard(null);
-    setViewMode("gallery");
-  };
-
   return (
     <div className="min-h-[calc(100vh-64px)] bg-base-100">
       <div className="pb-8 px-4 pt-0">
-        {/* Header */}
-        {viewMode === "whiteboard" && (
-          <button className="btn btn-ghost" onClick={handleBackToGallery}>
-            ← Back to Boards
-          </button>
-        )}
-
         {/* Create Board Modal */}
         <dialog id="create-board-modal" className="modal">
           <div className="modal-box max-w-md shadow-none">
@@ -241,40 +206,27 @@ function Dashboard() {
 
         {/* Main Content */}
         <div className="space-y-6">
-          {viewMode === "gallery" ? (
-            <div>
-              {boardsLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {[...Array(8)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="card bg-base-100 border border-base-300 shadow-sm"
-                    >
-                      <div className="card-body p-4">
-                        <div className="skeleton h-32 w-full mb-3"></div>
-                        <div className="skeleton h-4 w-3/4 mb-2"></div>
-                        <div className="skeleton h-3 w-1/2"></div>
-                      </div>
-                    </div>
-                  ))}
+          {boardsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="card bg-base-100 border border-base-300 shadow-sm"
+                >
+                  <div className="card-body p-4">
+                    <div className="skeleton h-32 w-full mb-3"></div>
+                    <div className="skeleton h-4 w-3/4 mb-2"></div>
+                    <div className="skeleton h-3 w-1/2"></div>
+                  </div>
                 </div>
-              ) : (
-                <BoardGallery
-                  boards={boards}
-                  onBoardClick={handleBoardClick}
-                  onCreateBoard={handleCreateBoard}
-                  onDeleteBoard={handleDeleteBoard}
-                />
-              )}
+              ))}
             </div>
           ) : (
-            selectedBoard && (
-              <Whiteboard
-                boardId={selectedBoard.id}
-                boardName={selectedBoard.name}
-                backgroundColor={selectedBoard.backgroundColor}
-              />
-            )
+            <BoardGallery
+              boards={boards}
+              onCreateBoard={handleCreateBoard}
+              onDeleteBoard={handleDeleteBoard}
+            />
           )}
         </div>
       </div>
