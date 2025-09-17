@@ -113,17 +113,17 @@ function SchoolDetail() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-base-100 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-[calc(100vh-64px)] bg-base-100 p-4 md:p-6 lg:p-8">
+      <div className="w-full">
         {/* School Header */}
         <div className="mb-8">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h1 className="text-4xl font-bold text-base-content mb-2">{school.name}</h1>
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4">
+            <div className="flex-1">
+              <h1 className="text-3xl md:text-4xl font-bold text-base-content mb-2">{school.name}</h1>
               {school.description && (
-                <p className="text-base-content/70 text-lg">{school.description}</p>
+                <p className="text-base-content/70 text-base md:text-lg">{school.description}</p>
               )}
-              <div className="flex items-center gap-4 mt-2">
+              <div className="flex flex-wrap items-center gap-4 mt-2">
                 <div className={`badge ${membership?.role === 'owner' ? 'badge-primary' : 'badge-secondary'}`}>
                   {membership?.role}
                 </div>
@@ -136,7 +136,7 @@ function SchoolDetail() {
             </div>
             {canCreateClass && (
               <button
-                className="btn btn-primary"
+                className="btn btn-primary w-full lg:w-auto"
                 onClick={() => setShowCreateForm(true)}
               >
                 Create Class
@@ -150,10 +150,10 @@ function SchoolDetail() {
           <h2 className="text-2xl font-semibold text-base-content mb-6">Classes</h2>
 
           {classes.length === 0 ? (
-            <div className="text-center py-12 bg-base-200 rounded-lg">
+            <div className="text-center py-12 px-4 bg-base-200 rounded-lg">
               <div className="text-4xl mb-4">📚</div>
               <h3 className="text-xl font-semibold text-base-content mb-2">No classes yet</h3>
-              <p className="text-base-content/70 mb-6">
+              <p className="text-base-content/70 mb-6 max-w-md mx-auto">
                 {canCreateClass
                   ? "Create your first class to start teaching"
                   : "Classes will appear here once they're created"
@@ -169,19 +169,19 @@ function SchoolDetail() {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">
               {classes
                 .filter(cls => !cls.isArchived)
                 .map((cls) => (
                   <div
                     key={cls.id}
-                    className="card bg-base-200 hover:bg-base-300 transition-colors cursor-pointer"
+                    className="card bg-base-200 hover:bg-base-300 transition-all duration-200 cursor-pointer hover:shadow-lg"
                     onClick={() => handleClassClick(cls.id)}
                   >
-                    <div className="card-body">
-                      <h3 className="card-title text-lg">{cls.name}</h3>
+                    <div className="card-body p-4 md:p-6">
+                      <h3 className="card-title text-base md:text-lg leading-tight">{cls.name}</h3>
                       {cls.description && (
-                        <p className="text-base-content/70 text-sm mb-3">{cls.description}</p>
+                        <p className="text-base-content/70 text-sm mb-3 line-clamp-2">{cls.description}</p>
                       )}
                       <div className="text-xs text-base-content/50">
                         Created {new Date(cls.createdAt).toLocaleDateString()}

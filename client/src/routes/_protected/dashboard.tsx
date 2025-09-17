@@ -84,11 +84,11 @@ function Dashboard() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-base-100 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+    <div className="min-h-[calc(100vh-64px)] bg-base-100 p-4 md:p-6 lg:p-8">
+      <div className="w-full">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-base-content mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-base-content mb-2">
               Your Schools
             </h1>
             <p className="text-base-content/70">
@@ -96,7 +96,7 @@ function Dashboard() {
             </p>
           </div>
           <button
-            className="btn btn-primary"
+            className="btn btn-primary w-full md:w-auto"
             onClick={() => setShowCreateForm(true)}
           >
             Create School
@@ -104,12 +104,12 @@ function Dashboard() {
         </div>
 
         {schools.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-12 px-4">
             <div className="text-6xl mb-4">🏫</div>
             <h2 className="text-2xl font-semibold text-base-content mb-2">
               No schools yet
             </h2>
-            <p className="text-base-content/70 mb-6">
+            <p className="text-base-content/70 mb-6 max-w-md mx-auto">
               Create your first school to get started with online classrooms
             </p>
             <button
@@ -120,24 +120,24 @@ function Dashboard() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">
             {schools.map(({ school, role }) => (
               <div
                 key={school.id}
-                className="card bg-base-200 hover:bg-base-300 transition-colors cursor-pointer"
+                className="card bg-base-200 hover:bg-base-300 transition-all duration-200 cursor-pointer hover:shadow-lg"
                 onClick={() => handleSchoolClick(school.id)}
               >
-                <div className="card-body">
+                <div className="card-body p-4 md:p-6">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="card-title text-lg">{school.name}</h3>
+                    <h3 className="card-title text-base md:text-lg leading-tight">{school.name}</h3>
                     <div
-                      className={`badge ${role === "owner" ? "badge-primary" : "badge-secondary"}`}
+                      className={`badge badge-sm ${role === "owner" ? "badge-primary" : "badge-secondary"}`}
                     >
                       {role}
                     </div>
                   </div>
                   {school.description && (
-                    <p className="text-base-content/70 text-sm mb-3">
+                    <p className="text-base-content/70 text-sm mb-3 line-clamp-2">
                       {school.description}
                     </p>
                   )}
