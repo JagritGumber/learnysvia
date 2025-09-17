@@ -43,7 +43,7 @@ function Signin() {
     setLoading(true);
     setError("");
 
-    let session
+    let session: ReturnType<typeof authClient.signIn.email> | null = null;
     try {
       if (isSignUp) {
         session = await authClient.signUp.email({
@@ -57,8 +57,10 @@ function Signin() {
           password,
         });
       }
+      if (!session) {
+        throw new Error("No session returned");
+      }
 
-     
       navigate({ to: "/dashboard", replace: true });
     } catch (err: any) {
       // Normalize common error shapes

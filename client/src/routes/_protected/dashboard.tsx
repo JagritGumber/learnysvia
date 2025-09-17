@@ -27,6 +27,7 @@ function Dashboard() {
     domain: "",
   });
   const [creating, setCreating] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,6 +52,8 @@ function Dashboard() {
     if (!createForm.name.trim()) return;
 
     setCreating(true);
+    setError("");
+
     try {
       const response = await api.post("/api/schools/create", createForm);
       if (response.data.success) {
@@ -63,9 +66,16 @@ function Dashboard() {
         ]);
         setShowCreateForm(false);
         setCreateForm({ name: "", description: "", domain: "" });
+        setError("");
       }
-    } catch (error) {
-      console.error("Failed to create school:", error);
+    } catch (err: any) {
+      // Normalize common error shapes
+      const message =
+        err?.message ||
+        err?.error ||
+        (typeof err === "string" ? err : null) ||
+        "An unexpected error occurred";
+      setError(message);
     } finally {
       setCreating(false);
     }
@@ -129,7 +139,9 @@ function Dashboard() {
               >
                 <div className="card-body p-4 md:p-6">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="card-title text-base md:text-lg leading-tight">{school.name}</h3>
+                    <h3 className="card-title text-base md:text-lg leading-tight">
+                      {school.name}
+                    </h3>
                     <div
                       className={`badge badge-sm ${role === "owner" ? "badge-primary" : "badge-secondary"}`}
                     >
@@ -158,16 +170,43 @@ function Dashboard() {
         {/* Create School Modal */}
         {showCreateForm && (
           <div className="modal modal-open">
-            <div className="modal-box">
-              <h3 className="font-bold text-lg mb-4">Create New School</h3>
-              <form onSubmit={handleCreateSchool}>
-                <div className="form-control mb-4">
+            <div className="modal-box max-w-md">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold mb-2">Create New School</h2>
+                  <p className="text-sm text-base-content/70">
+                    Set up your educational institution
+                  </p>
+                </div>
+              </div>
+
+              <form className="space-y-4" onSubmit={handleCreateSchool}>
+                {error && (
+                  <div className="alert alert-error shadow-sm">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="stroke-current shrink-0 h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                <div className="form-control flex flex-col gap-2">
                   <label className="label">
                     <span className="label-text">School Name *</span>
                   </label>
                   <input
                     type="text"
-                    className="input input-bordered"
+                    className="input input-bordered w-full"
                     value={createForm.name}
                     onChange={(e) =>
                       setCreateForm((prev) => ({
@@ -179,12 +218,13 @@ function Dashboard() {
                     required
                   />
                 </div>
-                <div className="form-control mb-4">
+
+                <div className="form-control flex flex-col gap-2">
                   <label className="label">
                     <span className="label-text">Description</span>
                   </label>
                   <textarea
-                    className="textarea textarea-bordered"
+                    className="textarea textarea-bordered w-full"
                     value={createForm.description}
                     onChange={(e) =>
                       setCreateForm((prev) => ({
@@ -196,13 +236,14 @@ function Dashboard() {
                     rows={3}
                   />
                 </div>
-                <div className="form-control mb-6">
+
+                <div className="form-control flex flex-col gap-2">
                   <label className="label">
                     <span className="label-text">Domain (optional)</span>
                   </label>
                   <input
                     type="text"
-                    className="input input-bordered"
+                    className="input input-bordered w-full"
                     value={createForm.domain}
                     onChange={(e) =>
                       setCreateForm((prev) => ({
@@ -218,25 +259,32 @@ function Dashboard() {
                     </span>
                   </label>
                 </div>
-                <div className="modal-action">
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={creating || !createForm.name.trim()}
+                    className="btn btn-primary btn-block btn-lg"
+                  >
+                    {creating ? (
+                      <>
+                        <span className="loading loading-spinner loading-sm mr-2"></span>
+                        Creating...
+                      </>
+                    ) : (
+                      "Create School"
+                    )}
+                  </button>
+                </div>
+
+                <div className="text-center">
                   <button
                     type="button"
-                    className="btn"
+                    className="btn btn-ghost btn-sm"
                     onClick={() => setShowCreateForm(false)}
                     disabled={creating}
                   >
                     Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={creating || !createForm.name.trim()}
-                  >
-                    {creating ? (
-                      <span className="loading loading-spinner loading-sm"></span>
-                    ) : (
-                      "Create School"
-                    )}
                   </button>
                 </div>
               </form>
