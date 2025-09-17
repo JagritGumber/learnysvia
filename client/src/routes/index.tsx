@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Icon } from "@iconify/react";
+import { authClient } from "@/utils/auth-client";
 
 export const Route = createFileRoute("/")({
   component: App,
 });
 
 function App() {
+  const { data: session } = authClient.useSession();
+
   return (
     <div className="min-h-[calc(100vh-64px)]">
       {/* Hero Section */}
@@ -25,7 +28,10 @@ function App() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Link to="/auth" className="btn btn-primary btn-lg">
+              <Link
+                to={session?.user ? "/dashboard" : "/auth"}
+                className="btn btn-primary btn-lg"
+              >
                 Start Teaching
               </Link>
               <button className="btn btn-outline btn-lg">Learn More</button>
@@ -41,12 +47,10 @@ function App() {
                       className="size-10 text-primary-content"
                     />
                   </div>
-                  <h2 className="card-title justify-center">
-                    Room Management
-                  </h2>
+                  <h2 className="card-title justify-center">Room Management</h2>
                   <p>
-                    Create secure rooms and share links with students.
-                    Manage participants and control poll sessions effortlessly.
+                    Create secure rooms and share links with students. Manage
+                    participants and control poll sessions effortlessly.
                   </p>
                 </div>
               </div>
@@ -59,12 +63,11 @@ function App() {
                       className="size-10 text-secondary-content"
                     />
                   </div>
-                  <h2 className="card-title justify-center">
-                    Real-Time Polls
-                  </h2>
+                  <h2 className="card-title justify-center">Real-Time Polls</h2>
                   <p>
                     Launch polls with configurable time limits (default 2 mins).
-                    Get instant feedback on student comprehension and understanding.
+                    Get instant feedback on student comprehension and
+                    understanding.
                   </p>
                 </div>
               </div>
@@ -81,8 +84,8 @@ function App() {
                     Question Catalogs
                   </h2>
                   <p>
-                    Build comprehensive question libraries and use NLP-powered search
-                    to find the perfect assessment questions instantly.
+                    Build comprehensive question libraries and use NLP-powered
+                    search to find the perfect assessment questions instantly.
                   </p>
                 </div>
               </div>
