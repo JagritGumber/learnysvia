@@ -13,15 +13,15 @@ function App() {
         <div className="hero-content text-center">
           <div className="max-w-4xl">
             <h1 className="text-6xl font-bold text-base-content mb-6">
-              Rewiredu
+              Teacher's Assistant
             </h1>
             <p className="text-3xl font-bold text-base-content mb-6">
-              Discord/Slack for online classrooms — real-time collaborative and
-              interactive learning.
+              Real-time polls for instant student comprehension insights.
             </p>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
-              A modern platform for educators and students,
-              instant messaging, and seamless classroom management.
+              Create rooms, launch polls, and get immediate feedback on student
+              understanding. Build question catalogs and use NLP-powered search
+              to find the perfect assessment questions.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -37,14 +37,16 @@ function App() {
                 <div className="card-body text-center">
                   <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
                     <Icon
-                      icon="lineicons:brush"
+                      icon="lineicons:signal"
                       className="size-10 text-primary-content"
                     />
                   </div>
-                  <h2 className="card-title">Auto-Assembling Canvas</h2>
+                  <h2 className="card-title justify-center">
+                    Room Management
+                  </h2>
                   <p>
-                    Watch your teaching canvas build automatically as you speak
-                    and draw in real-time
+                    Create secure rooms and share links with students.
+                    Manage participants and control poll sessions effortlessly.
                   </p>
                 </div>
               </div>
@@ -53,14 +55,16 @@ function App() {
                 <div className="card-body text-center">
                   <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
                     <Icon
-                      icon="lineicons:users"
+                      icon="lineicons:bar-chart"
                       className="size-10 text-secondary-content"
                     />
                   </div>
-                  <h2 className="card-title">Live Collaboration</h2>
+                  <h2 className="card-title justify-center">
+                    Real-Time Polls
+                  </h2>
                   <p>
-                    Students see your whiteboard updates instantly and can
-                    participate interactively
+                    Launch polls with configurable time limits (default 2 mins).
+                    Get instant feedback on student comprehension and understanding.
                   </p>
                 </div>
               </div>
@@ -69,14 +73,16 @@ function App() {
                 <div className="card-body text-center">
                   <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
                     <Icon
-                      icon="lineicons:pallet"
+                      icon="lineicons:search"
                       className="size-10 text-accent-content"
                     />
                   </div>
-                  <h2 className="card-title">Vibrant Teaching Tools</h2>
+                  <h2 className="card-title justify-center">
+                    Question Catalogs
+                  </h2>
                   <p>
-                    Use advanced drawing tools, colors, and multimedia to create
-                    memorable lessons
+                    Build comprehensive question libraries and use NLP-powered search
+                    to find the perfect assessment questions instantly.
                   </p>
                 </div>
               </div>
