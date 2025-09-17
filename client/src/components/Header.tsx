@@ -1,8 +1,18 @@
 import { Link } from "@tanstack/react-router";
-import { useAuth } from "../hooks/useAuth";
+import { authClient } from "../utils/auth-client";
 
 export default function Header() {
-  const { user, isAuthenticated, signOut } = useAuth();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+  const isAuthenticated = !!session?.user;
+
+  const signOut = async () => {
+    try {
+      await authClient.signOut();
+    } catch (error) {
+      console.error("Sign out failed:", error);
+    }
+  };
 
   return (
     <div className="navbar bg-base-100">

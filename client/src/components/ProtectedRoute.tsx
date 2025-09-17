@@ -1,4 +1,4 @@
-import { useAuth } from "../hooks/useAuth";
+import { authClient } from "../utils/auth-client";
 import { Navigate } from "@tanstack/react-router";
 import { ReactNode } from "react";
 
@@ -7,9 +7,9 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { data: session, isPending } = authClient.useSession();
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="min-h-[calc(100vh-64px)] flex items-center justify-center">
         <div className="loading loading-spinner loading-lg"></div>
@@ -17,7 +17,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!session?.user) {
     // Redirect to landing page if not authenticated
     return <Navigate to="/" replace />;
   }

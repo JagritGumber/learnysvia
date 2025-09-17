@@ -19,11 +19,14 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 function RootComponent() {
   const location = useLocation();
   const isBoardRoute = location.pathname.startsWith('/board/');
+  const isAuthRoute = location.pathname === '/auth';
 
   return (
-    <>
-      {!isBoardRoute && <Header />}
-      <Outlet />
+    <div className="min-h-screen bg-base-100">
+      {!isBoardRoute && !isAuthRoute && <Header />}
+      <main className={isAuthRoute ? "" : "container mx-auto"}>
+        <Outlet />
+      </main>
       <TanstackDevtools
         config={{
           position: "bottom-left",
@@ -36,6 +39,6 @@ function RootComponent() {
           TanStackQueryDevtools,
         ]}
       />
-    </>
+    </div>
   );
 }
