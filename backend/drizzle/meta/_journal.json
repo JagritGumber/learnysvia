@@ -57,6 +57,13 @@
       "when": 1758144917445,
       "tag": "0007_late_vulture",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1758146219391,
+      "tag": "0008_productive_puppet_master",
+      "breakpoints": true
     }
   ]
 }
