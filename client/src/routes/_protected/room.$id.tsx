@@ -121,7 +121,7 @@ function RoomPage() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-base-100">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pt-0">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
@@ -223,7 +223,10 @@ function RoomPage() {
 
             {participants.length === 0 ? (
               <div className="text-center py-8">
-                <Icon icon="lineicons:user" className="text-4xl mb-4 text-base-content/50" />
+                <Icon
+                  icon="lineicons:user"
+                  className="text-4xl mb-4 text-base-content/50"
+                />
                 <p className="text-base-content/70">No participants yet</p>
               </div>
             ) : (

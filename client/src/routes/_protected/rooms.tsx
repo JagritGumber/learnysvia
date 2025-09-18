@@ -64,7 +64,7 @@ function Rooms() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-base-100">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pt-0">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -87,7 +87,10 @@ function Rooms() {
         {/* Rooms Grid */}
         {rooms.length === 0 ? (
           <div className="text-center py-16">
-            <Icon icon="lineicons:home-4" className="text-8xl mb-6 text-base-content/50" />
+            <Icon
+              icon="lineicons:home-4"
+              className="text-8xl mb-6 text-base-content/50"
+            />
             <h2 className="text-2xl font-semibold text-base-content mb-4">
               No rooms yet
             </h2>
