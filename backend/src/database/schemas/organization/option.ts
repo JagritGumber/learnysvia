@@ -11,10 +11,10 @@ export const options = sqliteTable("options", {
     .references(() => questions.id)
     .notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })
-    .defaultNow()
+    .$default(() => new Date())
     .notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" })
-    .defaultNow()
+    .$default(() => new Date())
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });

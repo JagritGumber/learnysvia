@@ -20,7 +20,7 @@ export const account = sqliteTable("account", {
   scope: text("scope"),
   password: text("password"),
   createdAt: integer("created_at", { mode: "timestamp" })
-    .defaultNow()
+    .$default(() => new Date())
     .notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .$onUpdate(() => /* @__PURE__ */ new Date())

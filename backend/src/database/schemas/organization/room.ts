@@ -6,30 +6,49 @@ export const room = sqliteTable("room", {
   code: text("code").notNull().unique(),
   name: text("name").notNull(),
   description: text("description"),
-  createdBy: text("created_by").references(() => user.id).notNull(),
+  createdBy: text("created_by")
+    .references(() => user.id)
+    .notNull(),
   isPublic: integer("is_public", { mode: "boolean" }).default(true).notNull(),
   maxParticipants: integer("max_participants").default(50),
-  allowAnonymous: integer("allow_anonymous", { mode: "boolean" }).default(true).notNull(),
+  allowAnonymous: integer("allow_anonymous", { mode: "boolean" })
+    .default(true)
+    .notNull(),
   expiresAt: integer("expires_at", { mode: "timestamp" }),
-  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow().notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).defaultNow().$onUpdate(() => /* @__PURE__ */ new Date()).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .$default(() => new Date())
+    .notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .$default(() => new Date())
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const roomParticipant = sqliteTable("room_participant", {
   id: text("id").primaryKey(),
-  roomId: text("room_id").references(() => room.id).notNull(),
+  roomId: text("room_id")
+    .references(() => room.id)
+    .notNull(),
   userId: text("user_id").references(() => user.id),
   displayName: text("display_name"),
   role: text("role").default("participant").notNull(),
-  joinedAt: integer("joined_at", { mode: "timestamp" }).defaultNow().notNull(),
+  joinedAt: integer("joined_at", { mode: "timestamp" })
+    .$default(() => new Date())
+    .notNull(),
 });
 
 export const roomSettings = sqliteTable("room_settings", {
   id: text("id").primaryKey(),
-  roomId: text("room_id").references(() => room.id).notNull(),
+  roomId: text("room_id")
+    .references(() => room.id)
+    .notNull(),
   allowChat: integer("allow_chat", { mode: "boolean" }).default(true).notNull(),
-  allowFileSharing: integer("allow_file_sharing", { mode: "boolean" }).default(true).notNull(),
-  requireApproval: integer("require_approval", { mode: "boolean" }).default(false).notNull(),
+  allowFileSharing: integer("allow_file_sharing", { mode: "boolean" })
+    .default(true)
+    .notNull(),
+  requireApproval: integer("require_approval", { mode: "boolean" })
+    .default(false)
+    .notNull(),
   customSettings: text("custom_settings"),
 });
 

@@ -139,7 +139,30 @@ function RoomPage() {
                 <div className="text-3xl">⏰</div>
                 <div>
                   <div className="text-2xl font-bold">
-                    {new Date(room.createdAt).toLocaleDateString()}
+                    {(() => {
+                      const timestamp = room.createdAt;
+                      let date;
+
+                      // Handle different timestamp formats
+                      if (typeof timestamp === 'string') {
+                        // If it's an ISO string, parse it directly
+                        if (timestamp.includes('T')) {
+                          date = new Date(timestamp);
+                        } else {
+                          // If it's a numeric string, convert to number and check if it's in microseconds
+                          const num = parseInt(timestamp);
+                          // If timestamp is > 10^12, it's likely in microseconds
+                          date = new Date(num > 1e12 ? num / 1000 : num);
+                        }
+                      } else if (typeof timestamp === 'number') {
+                        // If it's a number, check if it's in microseconds
+                        date = new Date(timestamp > 1e12 ? timestamp / 1000 : timestamp);
+                      } else {
+                        date = new Date(timestamp);
+                      }
+
+                      return date.toLocaleDateString();
+                    })()}
                   </div>
                   <div className="text-sm text-base-content/70">Created</div>
                 </div>
@@ -186,7 +209,30 @@ function RoomPage() {
                     </div>
 
                     <div className="text-sm text-base-content/70">
-                      {new Date(participant.joinedAt).toLocaleDateString()}
+                      {(() => {
+                        const timestamp = participant.joinedAt;
+                        let date;
+
+                        // Handle different timestamp formats
+                        if (typeof timestamp === 'string') {
+                          // If it's an ISO string, parse it directly
+                          if (timestamp.includes('T')) {
+                            date = new Date(timestamp);
+                          } else {
+                            // If it's a numeric string, convert to number and check if it's in microseconds
+                            const num = parseInt(timestamp);
+                            // If timestamp is > 10^12, it's likely in microseconds
+                            date = new Date(num > 1e12 ? num / 1000 : num);
+                          }
+                        } else if (typeof timestamp === 'number') {
+                          // If it's a number, check if it's in microseconds
+                          date = new Date(timestamp > 1e12 ? timestamp / 1000 : timestamp);
+                        } else {
+                          date = new Date(timestamp);
+                        }
+
+                        return date.toLocaleDateString();
+                      })()}
                     </div>
                   </div>
                 ))}

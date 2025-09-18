@@ -6,7 +6,7 @@ export const session = sqliteTable("session", {
   expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
   token: text("token").notNull().unique(),
   createdAt: integer("created_at", { mode: "timestamp" })
-    .defaultNow()
+    .$default(() => new Date())
     .notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .$onUpdate(() => /* @__PURE__ */ new Date())
