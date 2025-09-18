@@ -14,6 +14,7 @@ import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedRoomsRouteImport } from './routes/_protected/rooms'
 import { Route as ProtectedCatalogRouteImport } from './routes/_protected/catalog'
+import { Route as ProtectedRoomIdRouteImport } from './routes/_protected/room.$id'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -39,18 +40,25 @@ const ProtectedCatalogRoute = ProtectedCatalogRouteImport.update({
   path: '/catalog',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
+const ProtectedRoomIdRoute = ProtectedRoomIdRouteImport.update({
+  id: '/room/$id',
+  path: '/room/$id',
+  getParentRoute: () => ProtectedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/catalog': typeof ProtectedCatalogRoute
   '/rooms': typeof ProtectedRoomsRoute
+  '/room/$id': typeof ProtectedRoomIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/catalog': typeof ProtectedCatalogRoute
   '/rooms': typeof ProtectedRoomsRoute
+  '/room/$id': typeof ProtectedRoomIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -59,12 +67,13 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_protected/catalog': typeof ProtectedCatalogRoute
   '/_protected/rooms': typeof ProtectedRoomsRoute
+  '/_protected/room/$id': typeof ProtectedRoomIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/catalog' | '/rooms'
+  fullPaths: '/' | '/auth' | '/catalog' | '/rooms' | '/room/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/catalog' | '/rooms'
+  to: '/' | '/auth' | '/catalog' | '/rooms' | '/room/$id'
   id:
     | '__root__'
     | '/'
@@ -72,6 +81,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_protected/catalog'
     | '/_protected/rooms'
+    | '/_protected/room/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,17 +127,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedCatalogRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
+    '/_protected/room/$id': {
+      id: '/_protected/room/$id'
+      path: '/room/$id'
+      fullPath: '/room/$id'
+      preLoaderRoute: typeof ProtectedRoomIdRouteImport
+      parentRoute: typeof ProtectedRouteRoute
+    }
   }
 }
 
 interface ProtectedRouteRouteChildren {
   ProtectedCatalogRoute: typeof ProtectedCatalogRoute
   ProtectedRoomsRoute: typeof ProtectedRoomsRoute
+  ProtectedRoomIdRoute: typeof ProtectedRoomIdRoute
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
   ProtectedCatalogRoute: ProtectedCatalogRoute,
   ProtectedRoomsRoute: ProtectedRoomsRoute,
+  ProtectedRoomIdRoute: ProtectedRoomIdRoute,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(

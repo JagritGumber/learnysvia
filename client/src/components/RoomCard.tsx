@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { type Room } from "../utils/rooms-api";
 import { ShareRoomModal } from "./ShareRoomModal";
+import { roomsApi } from "../utils/rooms-api";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "@tanstack/react-router";
 
 interface RoomCardProps {
   room: Room;
@@ -10,6 +13,8 @@ interface RoomCardProps {
 export function RoomCard({ room, onDelete }: RoomCardProps) {
   const [showShareModal, setShowShareModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [joining, setJoining] = useState(false);
+  const navigate = useNavigate();
 
   const handleDelete = async () => {
     if (!confirm(`Are you sure you want to delete "${room.name}"?`)) return;
@@ -19,6 +24,21 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
       await onDelete(room.id);
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleJoin = async () => {
+    setJoining(true);
+    try {
+      const result = await roomsApi.joinRoom(room.code);
+      toast.success(`Successfully joined room "${room.name}"!`);
+      // Navigate to room management interface
+      navigate({ to: '/room/$id', params: { id: result.room.id } });
+    } catch (error) {
+      console.error('Failed to join room:', error);
+      toast.error('Failed to join room. Please try again.');
+    } finally {
+      setJoining(false);
     }
   };
 
@@ -215,7 +235,31 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
           </div>
 
           {/* Actions */}
-          <div className="card-actions justify-end">
+          <div className="card-actions justify-end gap-2">
+            <button
+              className="btn btn-success btn-sm"
+              onClick={handleJoin}
+              disabled={joining}
+            >
+              {joining ? (
+                <div className="loading loading-spinner loading-sm"></div>
+              ) : (
+                <svg
+                  className="w-4 h-4 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                  />
+                </svg>
+              )}
+              {joining ? 'Joining...' : 'Join'}
+            </button>
             <button
               className="btn btn-primary btn-sm"
               onClick={() => setShowShareModal(true)}
