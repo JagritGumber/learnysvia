@@ -4,6 +4,7 @@ import { roomsApi, type Room } from "../../utils/rooms-api";
 import { CreateRoomModal } from "../../components/CreateRoomModal";
 import { RoomCard } from "../../components/RoomCard";
 import { toast } from "react-hot-toast";
+import { Icon } from "@iconify/react";
 
 export const Route = createFileRoute("/_protected/rooms")({
   component: Rooms,
@@ -78,19 +79,7 @@ function Rooms() {
             className="btn btn-primary btn-lg"
             onClick={() => setShowCreateModal(true)}
           >
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
+            <Icon icon="lineicons:plus" className="w-5 h-5 mr-2" />
             Create Room
           </button>
         </div>
@@ -98,7 +87,7 @@ function Rooms() {
         {/* Rooms Grid */}
         {rooms.length === 0 ? (
           <div className="text-center py-16">
-            <div className="text-8xl mb-6">🏠</div>
+            <Icon icon="lineicons:home-4" className="text-8xl mb-6 text-base-content/50" />
             <h2 className="text-2xl font-semibold text-base-content mb-4">
               No rooms yet
             </h2>

@@ -8,6 +8,7 @@ import {
 import { ShareRoomModal } from "../../components/ShareRoomModal";
 import { toast } from "react-hot-toast";
 import { formatDate } from "date-fns";
+import { Icon } from "@iconify/react";
 
 export const Route = createFileRoute("/_protected/room/$id")({
   component: RoomPage,
@@ -105,7 +106,7 @@ function RoomPage() {
     return (
       <div className="min-h-[calc(100vh-64px)] bg-base-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-8xl mb-6">🚫</div>
+          <Icon icon="lineicons:ban" className="text-8xl mb-6 text-error" />
           <h2 className="text-2xl font-semibold text-base-content mb-4">
             {error || "Room not found"}
           </h2>
@@ -128,19 +129,7 @@ function RoomPage() {
               className="btn btn-ghost btn-sm"
               onClick={() => window.history.back()}
             >
-              <svg
-                className="w-4 h-4 mr-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
+              <Icon icon="lineicons:arrow-left" className="w-4 h-4 mr-1" />
               Back
             </button>
           </div>
@@ -174,7 +163,10 @@ function RoomPage() {
           <div className="card bg-base-100 border border-base-300">
             <div className="card-body">
               <div className="flex items-center gap-3">
-                <div className="text-3xl">👥</div>
+                <Icon
+                  icon="lineicons:user-multiple-4"
+                  className="text-3xl text-base-content/70"
+                />
                 <div>
                   <div className="text-2xl font-bold">
                     {participants.length}
@@ -190,7 +182,10 @@ function RoomPage() {
           <div className="card bg-base-100 border border-base-300">
             <div className="card-body">
               <div className="flex items-center gap-3">
-                <div className="text-3xl">📊</div>
+                <Icon
+                  icon="lineicons:bar-chart"
+                  className="text-3xl text-base-content/70"
+                />
                 <div>
                   <div className="text-2xl font-bold">
                     {room.maxParticipants}
@@ -206,7 +201,10 @@ function RoomPage() {
           <div className="card bg-base-100 border border-base-300">
             <div className="card-body">
               <div className="flex items-center gap-3">
-                <div className="text-3xl">⏰</div>
+                <Icon
+                  icon="lineicons:calendar"
+                  className="text-3xl text-base-content/70"
+                />
                 <div>
                   <div className="text-2xl font-bold">
                     {formatDate(room.createdAt, "PPP")}
@@ -225,7 +223,7 @@ function RoomPage() {
 
             {participants.length === 0 ? (
               <div className="text-center py-8">
-                <div className="text-4xl mb-4">👤</div>
+                <Icon icon="lineicons:user" className="text-4xl mb-4 text-base-content/50" />
                 <p className="text-base-content/70">No participants yet</p>
               </div>
             ) : (
@@ -268,19 +266,7 @@ function RoomPage() {
         {/* Room Actions */}
         <div className="mt-8 flex gap-4">
           <button className="btn btn-primary">
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-              />
-            </svg>
+            <Icon icon="lineicons:comments" className="w-4 h-4 mr-2" />
             Start Session
           </button>
 
@@ -288,42 +274,12 @@ function RoomPage() {
             className="btn btn-secondary"
             onClick={() => setShowShareModal(true)}
           >
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
-              />
-            </svg>
+            <Icon icon="lineicons:share" className="w-4 h-4 mr-2" />
             Share Room
           </button>
 
           <button className="btn btn-outline">
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
+            <Icon icon="lineicons:cog" className="w-4 h-4 mr-2" />
             Settings
           </button>
         </div>
