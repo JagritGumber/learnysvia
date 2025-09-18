@@ -7,7 +7,6 @@ import {
 } from "../../utils/rooms-api";
 import { ShareRoomModal } from "../../components/ShareRoomModal";
 import { toast } from "react-hot-toast";
-import { formatDate } from "date-fns";
 import { Icon } from "@iconify/react";
 
 export const Route = createFileRoute("/_protected/room/$id")({
@@ -21,6 +20,7 @@ function RoomPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showParticipants, setShowParticipants] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -120,123 +120,82 @@ function RoomPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-base-100">
-      <div className="container mx-auto px-4 py-8 pt-0">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            <button
-              className="btn btn-ghost btn-sm"
-              onClick={() => window.history.back()}
-            >
-              <Icon icon="lineicons:arrow-left" className="w-4 h-4 mr-1" />
-              Back
-            </button>
-          </div>
+    <div className="min-h-[calc(100vh-64px)] bg-base-100 relative">
+      {/* Main Content - Minimal */}
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)]">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-base-content mb-2">
+            {room.name}
+          </h1>
+          <p className="text-lg text-base-content/70">
+            Session in progress
+          </p>
+        </div>
 
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-4xl font-bold text-base-content mb-2">
-                {room.name}
-              </h1>
-              <p className="text-lg text-base-content/70 mb-2">
-                Room Code:{" "}
-                <span className="font-mono font-semibold">{room.code}</span>
-              </p>
-              {room.description && (
-                <p className="text-base-content/80">{room.description}</p>
-              )}
-            </div>
+        {/* Action Buttons */}
+        <div className="flex gap-4">
+          <button
+            className="btn btn-primary btn-lg"
+            onClick={() => setShowParticipants(true)}
+          >
+            <Icon icon="lineicons:user-multiple-4" className="w-5 h-5 mr-2" />
+            Participants ({participants.length})
+          </button>
 
-            <div className="flex gap-2">
-              <div
-                className={`badge ${room.isPublic ? "badge-success" : "badge-warning"}`}
+          <button
+            className="btn btn-outline btn-lg"
+            onClick={() => setShowShareModal(true)}
+          >
+            <Icon icon="lineicons:share" className="w-5 h-5 mr-2" />
+            Share Room
+          </button>
+
+          <button className="btn btn-outline btn-lg">
+            <Icon icon="lineicons:cog" className="w-5 h-5 mr-2" />
+            Settings
+          </button>
+        </div>
+      </div>
+
+      {/* Participants Sidebar */}
+      {showParticipants && (
+        <div className="fixed inset-0 z-50">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowParticipants(false)}
+          />
+
+          {/* Sidebar */}
+          <div className="absolute right-0 top-0 h-full w-80 bg-base-100 shadow-xl transform transition-transform duration-300 ease-in-out">
+            <div className="flex items-center justify-between p-4 border-b border-base-300">
+              <h2 className="text-xl font-semibold text-base-content">
+                Participants ({participants.length})
+              </h2>
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => setShowParticipants(false)}
               >
-                {room.isPublic ? "Public" : "Private"}
-              </div>
+                <Icon icon="lineicons:close" className="w-5 h-5" />
+              </button>
             </div>
-          </div>
-        </div>
 
-        {/* Room Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="card bg-base-100 border border-base-300">
-            <div className="card-body">
-              <div className="flex items-center gap-3">
-                <Icon
-                  icon="lineicons:user-multiple-4"
-                  className="text-3xl text-base-content/70"
-                />
-                <div>
-                  <div className="text-2xl font-bold">
-                    {participants.length}
-                  </div>
-                  <div className="text-sm text-base-content/70">
-                    Participants
-                  </div>
+            <div className="p-4">
+              {participants.length === 0 ? (
+                <div className="text-center py-8">
+                  <Icon
+                    icon="lineicons:user"
+                    className="text-4xl mb-4 text-base-content/50 mx-auto"
+                  />
+                  <p className="text-base-content/70">No participants yet</p>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card bg-base-100 border border-base-300">
-            <div className="card-body">
-              <div className="flex items-center gap-3">
-                <Icon
-                  icon="lineicons:bar-chart"
-                  className="text-3xl text-base-content/70"
-                />
-                <div>
-                  <div className="text-2xl font-bold">
-                    {room.maxParticipants}
-                  </div>
-                  <div className="text-sm text-base-content/70">
-                    Max Capacity
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card bg-base-100 border border-base-300">
-            <div className="card-body">
-              <div className="flex items-center gap-3">
-                <Icon
-                  icon="lineicons:calendar"
-                  className="text-3xl text-base-content/70"
-                />
-                <div>
-                  <div className="text-2xl font-bold">
-                    {formatDate(room.createdAt, "PPP")}
-                  </div>
-                  <div className="text-sm text-base-content/70">Created</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Participants */}
-        <div className="card bg-base-100 border border-base-300">
-          <div className="card-body">
-            <h2 className="card-title mb-4">Participants</h2>
-
-            {participants.length === 0 ? (
-              <div className="text-center py-8">
-                <Icon
-                  icon="lineicons:user"
-                  className="text-4xl mb-4 text-base-content/50"
-                />
-                <p className="text-base-content/70">No participants yet</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {participants.map((participant) => (
-                  <div
-                    key={participant.id}
-                    className="flex items-center justify-between p-3 bg-base-200 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
+              ) : (
+                <div className="space-y-2">
+                  {participants.map((participant) => (
+                    <div
+                      key={participant.id}
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-base-200 transition-colors"
+                    >
                       <div className="avatar placeholder">
                         <div className="bg-neutral text-neutral-content rounded-full w-10">
                           <span className="text-sm">
@@ -246,55 +205,25 @@ function RoomPage() {
                           </span>
                         </div>
                       </div>
-                      <div>
-                        <div className="font-semibold">
-                          {participant.userName || "Unknown"}
-                        </div>
-                        <div className="text-sm text-base-content/70">
-                          Participant
-                        </div>
+                      <div className="font-medium text-base-content">
+                        {participant.userName || "Unknown"}
                       </div>
                     </div>
-
-                    <div className="text-sm text-base-content/70">
-                      {formatDate(participant.joinedAt, "PPP p")}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
+      )}
 
-        {/* Room Actions */}
-        <div className="mt-8 flex gap-4">
-          <button className="btn btn-primary">
-            <Icon icon="lineicons:comments" className="w-4 h-4 mr-2" />
-            Start Session
-          </button>
-
-          <button
-            className="btn btn-secondary"
-            onClick={() => setShowShareModal(true)}
-          >
-            <Icon icon="lineicons:share" className="w-4 h-4 mr-2" />
-            Share Room
-          </button>
-
-          <button className="btn btn-outline">
-            <Icon icon="lineicons:cog" className="w-4 h-4 mr-2" />
-            Settings
-          </button>
-        </div>
-
-        {/* Share Room Modal */}
-        {showShareModal && room && (
-          <ShareRoomModal
-            room={room}
-            onClose={() => setShowShareModal(false)}
-          />
-        )}
-      </div>
+      {/* Share Room Modal */}
+      {showShareModal && room && (
+        <ShareRoomModal
+          room={room}
+          onClose={() => setShowShareModal(false)}
+        />
+      )}
     </div>
   );
 }
