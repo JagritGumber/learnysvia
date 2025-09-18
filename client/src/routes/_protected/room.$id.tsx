@@ -5,6 +5,7 @@ import {
   type Room,
   type RoomParticipant,
 } from "../../utils/rooms-api";
+import { ShareRoomModal } from "../../components/ShareRoomModal";
 import { toast } from "react-hot-toast";
 import { formatDate } from "date-fns";
 
@@ -18,8 +19,7 @@ function RoomPage() {
   const [participants, setParticipants] = useState<RoomParticipant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [messages, setMessages] = useState<any[]>([]);
-  const [displayName, setDisplayName] = useState("");
+  const [showShareModal, setShowShareModal] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ function RoomPage() {
       ws.send(
         JSON.stringify({
           type: "join",
-          displayName: displayName || "Anonymous",
+          displayName: "Anonymous",
         })
       );
     };
@@ -69,26 +69,12 @@ function RoomPage() {
       case "user_left":
         toast(`${data.displayName} left the room`);
         break;
-      case "chat_message":
-        setMessages((prev) => [...prev, data]);
-        break;
       case "typing_start":
         // Handle typing indicator
         break;
       case "typing_stop":
         // Handle typing indicator
         break;
-    }
-  };
-
-  const sendMessage = (message: string) => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(
-        JSON.stringify({
-          type: "chat_message",
-          message,
-        })
-      );
     }
   };
 
@@ -298,6 +284,26 @@ function RoomPage() {
             Start Session
           </button>
 
+          <button
+            className="btn btn-secondary"
+            onClick={() => setShowShareModal(true)}
+          >
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+              />
+            </svg>
+            Share Room
+          </button>
+
           <button className="btn btn-outline">
             <svg
               className="w-4 h-4 mr-2"
@@ -321,6 +327,14 @@ function RoomPage() {
             Settings
           </button>
         </div>
+
+        {/* Share Room Modal */}
+        {showShareModal && room && (
+          <ShareRoomModal
+            room={room}
+            onClose={() => setShowShareModal(false)}
+          />
+        )}
       </div>
     </div>
   );
