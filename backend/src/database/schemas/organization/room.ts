@@ -11,9 +11,6 @@ export const room = sqliteTable("room", {
     .notNull(),
   isPublic: integer("is_public", { mode: "boolean" }).default(true).notNull(),
   maxParticipants: integer("max_participants").default(50),
-  allowAnonymous: integer("allow_anonymous", { mode: "boolean" })
-    .default(true)
-    .notNull(),
   expiresAt: integer("expires_at", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" })
     .$default(() => new Date())
@@ -29,9 +26,9 @@ export const roomParticipant = sqliteTable("room_participant", {
   roomId: text("room_id")
     .references(() => room.id)
     .notNull(),
-  userId: text("user_id").references(() => user.id),
-  displayName: text("display_name"),
-  role: text("role").default("participant").notNull(),
+  userId: text("user_id")
+    .references(() => user.id)
+    .notNull(),
   joinedAt: integer("joined_at", { mode: "timestamp" })
     .$default(() => new Date())
     .notNull(),

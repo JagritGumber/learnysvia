@@ -2,6 +2,7 @@ import { Elysia, t } from "elysia";
 import { eq, and, desc } from "drizzle-orm";
 import { db } from "../database/db";
 import { room, roomParticipant, roomSettings } from "../database/schemas";
+import { user as userTable } from "../database/schemas/auth/user";
 import { betterAuth } from "../macros/better-auth";
 
 // Generate unique room code
@@ -15,7 +16,6 @@ const createRoomSchema = t.Object({
   description: t.Optional(t.String({ maxLength: 500 })),
   isPublic: t.Optional(t.Boolean()),
   maxParticipants: t.Optional(t.Number({ minimum: 1, maximum: 1000 })),
-  allowAnonymous: t.Optional(t.Boolean()),
   expiresAt: t.Optional(t.Date()),
 });
 
@@ -25,7 +25,6 @@ const updateRoomSchema = t.Object({
   description: t.Optional(t.String({ maxLength: 500 })),
   isPublic: t.Optional(t.Boolean()),
   maxParticipants: t.Optional(t.Number({ minimum: 1, maximum: 1000 })),
-  allowAnonymous: t.Optional(t.Boolean()),
   expiresAt: t.Optional(t.Date()),
 });
 
@@ -85,7 +84,6 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
             createdBy: user.id,
             isPublic: body.isPublic ?? true,
             maxParticipants: body.maxParticipants ?? 50,
-            allowAnonymous: body.allowAnonymous ?? true,
             expiresAt: body.expiresAt,
           })
           .returning();
@@ -97,14 +95,6 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
           allowChat: true,
           allowFileSharing: true,
           requireApproval: false,
-        });
-
-        // Add creator as participant
-        await db.insert(roomParticipant).values({
-          id: Bun.randomUUIDv7(),
-          roomId: roomId,
-          userId: user.id,
-          role: "owner",
         });
 
         set.status = 201;
@@ -191,8 +181,16 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
           .limit(1);
 
         const participants = await db
-          .select()
+          .select({
+            id: roomParticipant.id,
+            roomId: roomParticipant.roomId,
+            userId: roomParticipant.userId,
+            joinedAt: roomParticipant.joinedAt,
+            userName: userTable.name,
+            userEmail: userTable.email,
+          })
           .from(roomParticipant)
+          .leftJoin(userTable, eq(roomParticipant.userId, userTable.id))
           .where(eq(roomParticipant.roomId, id));
 
         return {
@@ -314,7 +312,12 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
   // Join room by code
   .post(
     "/:code/join",
-    async ({ params: { code }, body, set, user }) => {
+    async ({ params: { code }, set, user }) => {
+      if (!user?.id) {
+        set.status = 401;
+        return { error: "Unauthorized" };
+      }
+
       try {
         // Find room by code
         const roomData = await db
@@ -329,12 +332,6 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
         }
 
         const foundRoom = roomData[0];
-
-        // Check if room allows anonymous users
-        if (!foundRoom.allowAnonymous && !user?.id) {
-          set.status = 403;
-          return { error: "Room requires authentication" };
-        }
 
         // Check if room is expired
         if (foundRoom.expiresAt && new Date(foundRoom.expiresAt) < new Date()) {
@@ -354,34 +351,30 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
         }
 
         // Check if user is already a participant
-        if (user?.id) {
-          const existingParticipant = await db
-            .select()
-            .from(roomParticipant)
-            .where(
-              and(
-                eq(roomParticipant.roomId, foundRoom.id),
-                eq(roomParticipant.userId, user.id)
-              )
+        const existingParticipant = await db
+          .select()
+          .from(roomParticipant)
+          .where(
+            and(
+              eq(roomParticipant.roomId, foundRoom.id),
+              eq(roomParticipant.userId, user.id)
             )
-            .limit(1);
+          )
+          .limit(1);
 
-          if (existingParticipant.length > 0) {
-            return {
-              success: true,
-              message: "Already joined room",
-              room: foundRoom,
-            };
-          }
+        if (existingParticipant.length > 0) {
+          return {
+            success: true,
+            message: "Already joined room",
+            room: foundRoom,
+          };
         }
 
         // Add participant
         await db.insert(roomParticipant).values({
           id: Bun.randomUUIDv7(),
           roomId: foundRoom.id,
-          userId: user?.id || null,
-          displayName: body?.displayName || null,
-          role: user?.id ? "authenticated" : "anonymous",
+          userId: user.id,
         });
 
         return {
@@ -396,11 +389,6 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
       }
     },
     {
-      body: t.Optional(
-        t.Object({
-          displayName: t.Optional(t.String({ maxLength: 50 })),
-        })
-      ),
       detail: {
         summary: "Join room by code",
         tags: ["rooms"],

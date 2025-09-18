@@ -1,65 +1,31 @@
 import api from "./api";
 
-export interface Room {
-  id: string;
-  code: string;
-  name: string;
-  description?: string;
-  isPublic: boolean;
-  maxParticipants: number;
-  allowAnonymous: boolean;
-  expiresAt?: string;
-  createdBy: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// Import Drizzle types from backend
+import type {
+  SelectRoom,
+  SelectRoomParticipant,
+  SelectRoomSettings,
+  InsertRoom,
+  InsertRoomSettings,
+} from "../../../backend/src/database/schemas";
 
-export interface RoomParticipant {
-  id: string;
-  roomId: string;
-  userId?: string;
-  displayName?: string;
-  role: "owner" | "authenticated" | "anonymous";
-  joinedAt: string;
-}
+export type Room = SelectRoom;
+export type RoomParticipant = SelectRoomParticipant & {
+  userName: string | null;
+  userEmail: string | null;
+};
+export type RoomSettings = SelectRoomSettings;
 
-export interface RoomSettings {
-  id: string;
-  roomId: string;
-  allowChat: boolean;
-  allowFileSharing: boolean;
-  requireApproval: boolean;
-  customSettings?: any;
-}
-
-export interface CreateRoomData {
-  name: string;
-  description?: string;
-  isPublic?: boolean;
-  maxParticipants?: number;
-  allowAnonymous?: boolean;
-  expiresAt?: Date;
-}
-
-export interface UpdateRoomData {
-  name?: string;
-  description?: string;
-  isPublic?: boolean;
-  maxParticipants?: number;
-  allowAnonymous?: boolean;
-  expiresAt?: Date;
-}
-
-export interface RoomSettingsData {
-  allowChat?: boolean;
-  allowFileSharing?: boolean;
-  requireApproval?: boolean;
-  customSettings?: any;
-}
-
-export interface JoinRoomData {
-  displayName?: string;
-}
+export type CreateRoomData = Omit<
+  InsertRoom,
+  "id" | "code" | "createdBy" | "createdAt" | "updatedAt"
+>;
+export type UpdateRoomData = Partial<
+  Omit<InsertRoom, "id" | "code" | "createdBy" | "createdAt" | "updatedAt">
+>;
+export type RoomSettingsData = Partial<
+  Omit<InsertRoomSettings, "id" | "roomId">
+>;
 
 export const roomsApi = {
   // Get user's rooms
@@ -102,16 +68,15 @@ export const roomsApi = {
   },
 
   // Join room by code
-  async joinRoom(
-    code: string,
-    data?: JoinRoomData
-  ): Promise<{ success: boolean; message: string; room: Room }> {
-    const response = await api.post(`/api/rooms/${code}/join`, data);
+  async joinRoom(code: string): Promise<{ success: boolean; message: string; room: Room }> {
+    const response = await api.post(`/api/rooms/${code}/join`);
     return response.data;
   },
 
   // Get room participants
-  async getRoomParticipants(id: string): Promise<{ participants: RoomParticipant[] }> {
+  async getRoomParticipants(
+    id: string
+  ): Promise<{ participants: RoomParticipant[] }> {
     const response = await api.get(`/api/rooms/${id}/participants`);
     return response.data;
   },

@@ -3,6 +3,7 @@ import { apiRouter } from "./routes/api";
 import cors from "@elysiajs/cors";
 import { env } from "@/env";
 import { auth } from "./utils/auth";
+import { websocketRouter } from "./routes/websocket";
 
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
@@ -15,6 +16,7 @@ const app = new Elysia()
     })
   )
   .use(apiRouter)
+  .use(websocketRouter)
   .mount(auth.handler)
   .listen(3000);
 

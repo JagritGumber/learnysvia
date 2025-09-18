@@ -1,7 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { roomsApi, type Room, type RoomParticipant } from "../../utils/rooms-api";
+import { useState, useEffect, useRef } from "react";
+import {
+  roomsApi,
+  type Room,
+  type RoomParticipant,
+} from "../../utils/rooms-api";
 import { toast } from "react-hot-toast";
+import { formatDate } from "date-fns";
 
 export const Route = createFileRoute("/_protected/room/$id")({
   component: RoomPage,
@@ -13,10 +18,79 @@ function RoomPage() {
   const [participants, setParticipants] = useState<RoomParticipant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [displayName, setDisplayName] = useState("");
+  const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     loadRoomData();
+    connectWebSocket();
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    };
   }, [id]);
+
+  const connectWebSocket = () => {
+    const ws = new WebSocket(`ws://localhost:3000/ws/room/${id}`);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      console.log("Connected to room websocket");
+      // Join with display name
+      ws.send(
+        JSON.stringify({
+          type: "join",
+          displayName: displayName || "Anonymous",
+        })
+      );
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      handleWebSocketMessage(data);
+    };
+
+    ws.onclose = () => {
+      console.log("Disconnected from room websocket");
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+  };
+
+  const handleWebSocketMessage = (data: any) => {
+    switch (data.type) {
+      case "user_joined":
+        toast.success(`${data.displayName} joined the room`);
+        break;
+      case "user_left":
+        toast(`${data.displayName} left the room`);
+        break;
+      case "chat_message":
+        setMessages((prev) => [...prev, data]);
+        break;
+      case "typing_start":
+        // Handle typing indicator
+        break;
+      case "typing_stop":
+        // Handle typing indicator
+        break;
+    }
+  };
+
+  const sendMessage = (message: string) => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(
+        JSON.stringify({
+          type: "chat_message",
+          message,
+        })
+      );
+    }
+  };
 
   const loadRoomData = async () => {
     try {
@@ -50,7 +124,8 @@ function RoomPage() {
             {error || "Room not found"}
           </h2>
           <p className="text-base-content/70 mb-6">
-            The room you're looking for doesn't exist or you don't have access to it.
+            The room you're looking for doesn't exist or you don't have access
+            to it.
           </p>
         </div>
       </div>
@@ -90,7 +165,8 @@ function RoomPage() {
                 {room.name}
               </h1>
               <p className="text-lg text-base-content/70 mb-2">
-                Room Code: <span className="font-mono font-semibold">{room.code}</span>
+                Room Code:{" "}
+                <span className="font-mono font-semibold">{room.code}</span>
               </p>
               {room.description && (
                 <p className="text-base-content/80">{room.description}</p>
@@ -114,8 +190,12 @@ function RoomPage() {
               <div className="flex items-center gap-3">
                 <div className="text-3xl">👥</div>
                 <div>
-                  <div className="text-2xl font-bold">{participants.length}</div>
-                  <div className="text-sm text-base-content/70">Participants</div>
+                  <div className="text-2xl font-bold">
+                    {participants.length}
+                  </div>
+                  <div className="text-sm text-base-content/70">
+                    Participants
+                  </div>
                 </div>
               </div>
             </div>
@@ -126,8 +206,12 @@ function RoomPage() {
               <div className="flex items-center gap-3">
                 <div className="text-3xl">📊</div>
                 <div>
-                  <div className="text-2xl font-bold">{room.maxParticipants}</div>
-                  <div className="text-sm text-base-content/70">Max Capacity</div>
+                  <div className="text-2xl font-bold">
+                    {room.maxParticipants}
+                  </div>
+                  <div className="text-sm text-base-content/70">
+                    Max Capacity
+                  </div>
                 </div>
               </div>
             </div>
@@ -139,30 +223,7 @@ function RoomPage() {
                 <div className="text-3xl">⏰</div>
                 <div>
                   <div className="text-2xl font-bold">
-                    {(() => {
-                      const timestamp = room.createdAt;
-                      let date;
-
-                      // Handle different timestamp formats
-                      if (typeof timestamp === 'string') {
-                        // If it's an ISO string, parse it directly
-                        if (timestamp.includes('T')) {
-                          date = new Date(timestamp);
-                        } else {
-                          // If it's a numeric string, convert to number and check if it's in microseconds
-                          const num = parseInt(timestamp);
-                          // If timestamp is > 10^12, it's likely in microseconds
-                          date = new Date(num > 1e12 ? num / 1000 : num);
-                        }
-                      } else if (typeof timestamp === 'number') {
-                        // If it's a number, check if it's in microseconds
-                        date = new Date(timestamp > 1e12 ? timestamp / 1000 : timestamp);
-                      } else {
-                        date = new Date(timestamp);
-                      }
-
-                      return date.toLocaleDateString();
-                    })()}
+                    {formatDate(room.createdAt, "PPP")}
                   </div>
                   <div className="text-sm text-base-content/70">Created</div>
                 </div>
@@ -192,47 +253,24 @@ function RoomPage() {
                       <div className="avatar placeholder">
                         <div className="bg-neutral text-neutral-content rounded-full w-10">
                           <span className="text-sm">
-                            {participant.displayName?.[0]?.toUpperCase() ||
-                             participant.userId?.[0]?.toUpperCase() ||
-                             "?"}
+                            {participant.userName?.[0]?.toUpperCase() ||
+                              participant.userId?.[0]?.toUpperCase() ||
+                              "?"}
                           </span>
                         </div>
                       </div>
                       <div>
                         <div className="font-semibold">
-                          {participant.displayName || "Anonymous"}
+                          {participant.userName || "Unknown"}
                         </div>
                         <div className="text-sm text-base-content/70">
-                          {participant.role}
+                          Participant
                         </div>
                       </div>
                     </div>
 
                     <div className="text-sm text-base-content/70">
-                      {(() => {
-                        const timestamp = participant.joinedAt;
-                        let date;
-
-                        // Handle different timestamp formats
-                        if (typeof timestamp === 'string') {
-                          // If it's an ISO string, parse it directly
-                          if (timestamp.includes('T')) {
-                            date = new Date(timestamp);
-                          } else {
-                            // If it's a numeric string, convert to number and check if it's in microseconds
-                            const num = parseInt(timestamp);
-                            // If timestamp is > 10^12, it's likely in microseconds
-                            date = new Date(num > 1e12 ? num / 1000 : num);
-                          }
-                        } else if (typeof timestamp === 'number') {
-                          // If it's a number, check if it's in microseconds
-                          date = new Date(timestamp > 1e12 ? timestamp / 1000 : timestamp);
-                        } else {
-                          date = new Date(timestamp);
-                        }
-
-                        return date.toLocaleDateString();
-                      })()}
+                      {formatDate(participant.joinedAt, "PPP p")}
                     </div>
                   </div>
                 ))}
@@ -273,7 +311,12 @@ function RoomPage() {
                 strokeWidth={2}
                 d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
               />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
             </svg>
             Settings
           </button>

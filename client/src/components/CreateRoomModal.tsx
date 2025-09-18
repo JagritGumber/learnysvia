@@ -12,7 +12,6 @@ export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
     description: "",
     isPublic: true,
     maxParticipants: 50,
-    allowAnonymous: true,
   });
   const [loading, setLoading] = useState(false);
 
@@ -44,7 +43,9 @@ export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
         <div className="p-6">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-base-content">Create New Room</h2>
+            <h2 className="text-2xl font-bold text-base-content">
+              Create New Room
+            </h2>
             <button
               onClick={onClose}
               className="btn btn-ghost btn-sm btn-circle"
@@ -81,7 +82,9 @@ export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
                 className="textarea textarea-bordered w-full resize-none"
                 rows={3}
                 value={formData.description || ""}
-                onChange={(e) => handleInputChange("description", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
+                }
                 maxLength={500}
               />
             </div>
@@ -91,17 +94,23 @@ export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
               {/* Max Participants */}
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text font-medium">Max Participants</span>
+                  <span className="label-text font-medium">
+                    Max Participants
+                  </span>
                 </label>
                 <input
                   type="number"
                   min={1}
                   max={1000}
                   className="input input-bordered w-full"
-                  value={formData.maxParticipants}
-                  onChange={(e) =>
-                    handleInputChange("maxParticipants", parseInt(e.target.value) || 50)
-                  }
+                  value={formData.maxParticipants || ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    handleInputChange(
+                      "maxParticipants",
+                      value === "" ? 50 : parseInt(value) || 50
+                    );
+                  }}
                 />
               </div>
 
@@ -123,21 +132,7 @@ export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
               </div>
             </div>
 
-            {/* Anonymous Access */}
-            <div className="form-control">
-              <label className="label cursor-pointer">
-                <span className="label-text font-medium">Allow Anonymous Users</span>
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-primary"
-                  checked={formData.allowAnonymous}
-                  onChange={(e) => handleInputChange("allowAnonymous", e.target.checked)}
-                />
-              </label>
-              <p className="text-sm text-base-content/70 mt-1">
-                Allow users to join without authentication
-              </p>
-            </div>
+
 
             {/* Actions */}
             <div className="flex gap-3 pt-4">
