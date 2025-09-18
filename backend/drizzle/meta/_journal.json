@@ -64,6 +64,13 @@
       "when": 1758146219391,
       "tag": "0008_productive_puppet_master",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1758227657776,
+      "tag": "0009_motionless_black_cat",
+      "breakpoints": true
     }
   ]
 }
