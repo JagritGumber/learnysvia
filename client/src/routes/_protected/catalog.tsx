@@ -7,11 +7,11 @@ import {
   type Option,
 } from "../../utils/polls-api";
 
-export const Route = createFileRoute("/_protected/dashboard")({
-  component: Dashboard,
+export const Route = createFileRoute("/_protected/catalog")({
+  component: Catalog,
 });
 
-function Dashboard() {
+function Catalog() {
   const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [options, setOptions] = useState<Option[]>([]);
@@ -96,7 +96,7 @@ function Dashboard() {
       <div className="min-h-[calc(100vh-64px)] bg-base-100 flex items-center justify-center">
         <div className="text-center">
           <div className="loading loading-spinner loading-lg"></div>
-          <p className="mt-4 text-base-content/70">Loading dashboard...</p>
+          <p className="mt-4 text-base-content/70">Loading catalog...</p>
         </div>
       </div>
     );

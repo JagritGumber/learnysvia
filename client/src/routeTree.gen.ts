@@ -12,7 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
+import { Route as ProtectedRoomsRouteImport } from './routes/_protected/rooms'
+import { Route as ProtectedCatalogRouteImport } from './routes/_protected/catalog'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -28,35 +29,49 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const ProtectedRoomsRoute = ProtectedRoomsRouteImport.update({
+  id: '/rooms',
+  path: '/rooms',
+  getParentRoute: () => ProtectedRouteRoute,
+} as any)
+const ProtectedCatalogRoute = ProtectedCatalogRouteImport.update({
+  id: '/catalog',
+  path: '/catalog',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/dashboard': typeof ProtectedDashboardRoute
+  '/catalog': typeof ProtectedCatalogRoute
+  '/rooms': typeof ProtectedRoomsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/dashboard': typeof ProtectedDashboardRoute
+  '/catalog': typeof ProtectedCatalogRoute
+  '/rooms': typeof ProtectedRoomsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/_protected/dashboard': typeof ProtectedDashboardRoute
+  '/_protected/catalog': typeof ProtectedCatalogRoute
+  '/_protected/rooms': typeof ProtectedRoomsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard'
+  fullPaths: '/' | '/auth' | '/catalog' | '/rooms'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard'
-  id: '__root__' | '/' | '/_protected' | '/auth' | '/_protected/dashboard'
+  to: '/' | '/auth' | '/catalog' | '/rooms'
+  id:
+    | '__root__'
+    | '/'
+    | '/_protected'
+    | '/auth'
+    | '/_protected/catalog'
+    | '/_protected/rooms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -88,22 +103,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_protected/dashboard': {
-      id: '/_protected/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof ProtectedDashboardRouteImport
+    '/_protected/rooms': {
+      id: '/_protected/rooms'
+      path: '/rooms'
+      fullPath: '/rooms'
+      preLoaderRoute: typeof ProtectedRoomsRouteImport
+      parentRoute: typeof ProtectedRouteRoute
+    }
+    '/_protected/catalog': {
+      id: '/_protected/catalog'
+      path: '/catalog'
+      fullPath: '/catalog'
+      preLoaderRoute: typeof ProtectedCatalogRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
   }
 }
 
 interface ProtectedRouteRouteChildren {
-  ProtectedDashboardRoute: typeof ProtectedDashboardRoute
+  ProtectedCatalogRoute: typeof ProtectedCatalogRoute
+  ProtectedRoomsRoute: typeof ProtectedRoomsRoute
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
-  ProtectedDashboardRoute: ProtectedDashboardRoute,
+  ProtectedCatalogRoute: ProtectedCatalogRoute,
+  ProtectedRoomsRoute: ProtectedRoomsRoute,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(

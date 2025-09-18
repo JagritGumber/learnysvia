@@ -48,7 +48,18 @@ export default function Header() {
         </Link>
       </div>
       <div className="navbar-center hidden lg:flex">
-        <ul className="menu menu-horizontal px-1"></ul>
+        <ul className="menu menu-horizontal px-1">
+          {isAuthenticated && (
+            <>
+              <li>
+                <Link to="/rooms">Rooms</Link>
+              </li>
+              <li>
+                <Link to="/catalog">Catalog</Link>
+              </li>
+            </>
+          )}
+        </ul>
       </div>
       <div className="navbar-end">
         {isAuthenticated && user ? (
@@ -76,7 +87,9 @@ export default function Header() {
                 <span>{user.name}</span>
               </li>
               <li>
-                <span className="text-sm text-base-content/70">{user.email}</span>
+                <span className="text-sm text-base-content/70">
+                  {user.email}
+                </span>
               </li>
               <li>
                 <hr className="my-1" />
