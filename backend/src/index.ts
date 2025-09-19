@@ -3,6 +3,7 @@ import { apiRouter } from "./routes/api";
 import cors from "@elysiajs/cors";
 import { env } from "@/env";
 import { auth } from "./utils/auth";
+import { wsRouter } from "./routes/ws";
 
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
@@ -14,6 +15,7 @@ const app = new Elysia()
       allowedHeaders: ["Content-Type", "Authorization"],
     })
   )
+  .use(wsRouter)
   .use(apiRouter)
   .mount(auth.handler)
   .listen(3000);
