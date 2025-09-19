@@ -1,14 +1,14 @@
 import { Elysia } from "elysia";
 import { eq, and, desc } from "drizzle-orm";
-import { db } from "../database/db";
+import { db } from "../../database/db";
 import {
   createRoomSchema,
   room,
   roomParticipant,
   updateRoomSchema,
-} from "../database/schemas";
-import { user as userTable } from "../database/schemas/auth/user";
-import { betterAuth } from "../macros/better-auth";
+} from "../../database/schemas";
+import { user as userTable } from "../../database/schemas/auth/user";
+import { betterAuth } from "../../macros/better-auth";
 import z from "zod";
 import { env } from "@/env";
 
