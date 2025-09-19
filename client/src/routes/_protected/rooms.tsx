@@ -64,7 +64,7 @@ function Rooms() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-base-100">
-      <div className="container mx-auto px-4 py-8 pt-0">
+      <div className="container mx-auto p-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>

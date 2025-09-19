@@ -120,40 +120,62 @@ function RoomPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-base-100 relative">
-      {/* Main Content - Minimal */}
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)]">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-base-content mb-2">
-            {room.name}
-          </h1>
-          <p className="text-lg text-base-content/70">
-            Session in progress
-          </p>
+    <div className="min-h-[calc(100vh-64px)] bg-base-100 flex">
+      {/* Sidebar */}
+      <div className="w-64 bg-base-200 border-r border-base-300 flex flex-col lg:block">
+        <div className="p-4 border-b border-base-300">
+          <h2 className="text-lg font-semibold text-base-content">
+            Room Tools
+          </h2>
         </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-4">
-          <button
-            className="btn btn-primary btn-lg"
-            onClick={() => setShowParticipants(true)}
-          >
-            <Icon icon="lineicons:user-multiple-4" className="w-5 h-5 mr-2" />
-            Participants ({participants.length})
+        <div className="p-4 flex-1">
+          <button className="btn btn-primary w-full">
+            <Icon icon="lineicons:plus" className="w-5 h-5 mr-2" />
+            New Poll
           </button>
+        </div>
+      </div>
 
-          <button
-            className="btn btn-outline btn-lg"
-            onClick={() => setShowShareModal(true)}
-          >
-            <Icon icon="lineicons:share" className="w-5 h-5 mr-2" />
-            Share Room
-          </button>
+      {/* Mobile Sidebar Toggle */}
+      <div className="lg:hidden fixed top-16 left-4 z-40">
+        <button className="btn btn-circle btn-primary">
+          <Icon icon="lineicons:menu" className="w-5 h-5" />
+        </button>
+      </div>
 
-          <button className="btn btn-outline btn-lg">
-            <Icon icon="lineicons:cog" className="w-5 h-5 mr-2" />
-            Settings
-          </button>
+      {/* Main Content */}
+      <div className="flex-1 relative lg:ml-0 ml-16">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)]">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-base-content mb-2">
+              {room.name}
+            </h1>
+            <p className="text-lg text-base-content/70">Session in progress</p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-4">
+            <button
+              className="btn btn-primary btn-lg"
+              onClick={() => setShowParticipants(true)}
+            >
+              <Icon icon="lineicons:user-multiple-4" className="w-5 h-5 mr-2" />
+              Participants ({participants.length})
+            </button>
+
+            <button
+              className="btn btn-outline btn-lg"
+              onClick={() => setShowShareModal(true)}
+            >
+              <Icon icon="lineicons:share" className="w-5 h-5 mr-2" />
+              Share Room
+            </button>
+
+            <button className="btn btn-outline btn-lg">
+              <Icon icon="lineicons:cog" className="w-5 h-5 mr-2" />
+              Settings
+            </button>
+          </div>
         </div>
       </div>
 
@@ -219,10 +241,7 @@ function RoomPage() {
 
       {/* Share Room Modal */}
       {showShareModal && room && (
-        <ShareRoomModal
-          room={room}
-          onClose={() => setShowShareModal(false)}
-        />
+        <ShareRoomModal room={room} onClose={() => setShowShareModal(false)} />
       )}
     </div>
   );

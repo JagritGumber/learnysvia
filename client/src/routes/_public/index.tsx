@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Icon } from "@iconify/react";
 import { authClient } from "@/utils/auth-client";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_public/")({
   component: App,
 });
 
@@ -29,7 +29,7 @@ function App() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Link
-                to={session?.user ? "/dashboard" : "/auth"}
+                to={session?.user ? "/rooms" : "/auth"}
                 className="btn btn-primary btn-lg"
               >
                 Start Teaching

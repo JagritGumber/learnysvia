@@ -1,8 +1,6 @@
-import { createRootRouteWithContext, Outlet, useLocation } from "@tanstack/react-router";
+import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanstackDevtools } from "@tanstack/react-devtools";
-
-import Header from "../components/Header";
 
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
@@ -17,14 +15,9 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 });
 
 function RootComponent() {
-  const location = useLocation();
-  const isBoardRoute = location.pathname.startsWith('/board/');
-  const isAuthRoute = location.pathname === '/auth';
-
   return (
     <div className="min-h-screen bg-base-100">
-      {!isBoardRoute && !isAuthRoute && <Header />}
-      <main className={isAuthRoute ? "" : "container mx-auto"}>
+      <main className="container mx-auto">
         <Outlet />
       </main>
       <TanstackDevtools
