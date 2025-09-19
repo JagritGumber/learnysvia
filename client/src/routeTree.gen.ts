@@ -15,7 +15,8 @@ import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as ProtectedRoomsRouteImport } from './routes/_protected/rooms'
 import { Route as ProtectedCatalogRouteImport } from './routes/_protected/catalog'
-import { Route as ProtectedRoomIdRouteImport } from './routes/_protected/room.$id'
+import { Route as PublicRoomIdRouteImport } from './routes/_public/room.$id'
+import { Route as PublicJoinCodeRouteImport } from './routes/_public/join.$code'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -45,10 +46,15 @@ const ProtectedCatalogRoute = ProtectedCatalogRouteImport.update({
   path: '/catalog',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
-const ProtectedRoomIdRoute = ProtectedRoomIdRouteImport.update({
+const PublicRoomIdRoute = PublicRoomIdRouteImport.update({
   id: '/room/$id',
   path: '/room/$id',
-  getParentRoute: () => ProtectedRouteRoute,
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicJoinCodeRoute = PublicJoinCodeRouteImport.update({
+  id: '/join/$code',
+  path: '/join/$code',
+  getParentRoute: () => PublicRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -56,14 +62,16 @@ export interface FileRoutesByFullPath {
   '/catalog': typeof ProtectedCatalogRoute
   '/rooms': typeof ProtectedRoomsRoute
   '/': typeof PublicIndexRoute
-  '/room/$id': typeof ProtectedRoomIdRoute
+  '/join/$code': typeof PublicJoinCodeRoute
+  '/room/$id': typeof PublicRoomIdRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/catalog': typeof ProtectedCatalogRoute
   '/rooms': typeof ProtectedRoomsRoute
   '/': typeof PublicIndexRoute
-  '/room/$id': typeof ProtectedRoomIdRoute
+  '/join/$code': typeof PublicJoinCodeRoute
+  '/room/$id': typeof PublicRoomIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -73,13 +81,14 @@ export interface FileRoutesById {
   '/_protected/catalog': typeof ProtectedCatalogRoute
   '/_protected/rooms': typeof ProtectedRoomsRoute
   '/_public/': typeof PublicIndexRoute
-  '/_protected/room/$id': typeof ProtectedRoomIdRoute
+  '/_public/join/$code': typeof PublicJoinCodeRoute
+  '/_public/room/$id': typeof PublicRoomIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/auth' | '/catalog' | '/rooms' | '/' | '/room/$id'
+  fullPaths: '/auth' | '/catalog' | '/rooms' | '/' | '/join/$code' | '/room/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/catalog' | '/rooms' | '/' | '/room/$id'
+  to: '/auth' | '/catalog' | '/rooms' | '/' | '/join/$code' | '/room/$id'
   id:
     | '__root__'
     | '/_protected'
@@ -88,7 +97,8 @@ export interface FileRouteTypes {
     | '/_protected/catalog'
     | '/_protected/rooms'
     | '/_public/'
-    | '/_protected/room/$id'
+    | '/_public/join/$code'
+    | '/_public/room/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -141,12 +151,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedCatalogRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
-    '/_protected/room/$id': {
-      id: '/_protected/room/$id'
+    '/_public/room/$id': {
+      id: '/_public/room/$id'
       path: '/room/$id'
       fullPath: '/room/$id'
-      preLoaderRoute: typeof ProtectedRoomIdRouteImport
-      parentRoute: typeof ProtectedRouteRoute
+      preLoaderRoute: typeof PublicRoomIdRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/join/$code': {
+      id: '/_public/join/$code'
+      path: '/join/$code'
+      fullPath: '/join/$code'
+      preLoaderRoute: typeof PublicJoinCodeRouteImport
+      parentRoute: typeof PublicRouteRoute
     }
   }
 }
@@ -154,13 +171,11 @@ declare module '@tanstack/react-router' {
 interface ProtectedRouteRouteChildren {
   ProtectedCatalogRoute: typeof ProtectedCatalogRoute
   ProtectedRoomsRoute: typeof ProtectedRoomsRoute
-  ProtectedRoomIdRoute: typeof ProtectedRoomIdRoute
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
   ProtectedCatalogRoute: ProtectedCatalogRoute,
   ProtectedRoomsRoute: ProtectedRoomsRoute,
-  ProtectedRoomIdRoute: ProtectedRoomIdRoute,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
@@ -169,10 +184,14 @@ const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
 
 interface PublicRouteRouteChildren {
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicJoinCodeRoute: typeof PublicJoinCodeRoute
+  PublicRoomIdRoute: typeof PublicRoomIdRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicIndexRoute: PublicIndexRoute,
+  PublicJoinCodeRoute: PublicJoinCodeRoute,
+  PublicRoomIdRoute: PublicRoomIdRoute,
 }
 
 const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(

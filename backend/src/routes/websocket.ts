@@ -18,9 +18,8 @@ const roomConnections = new Map<
   >
 >();
 
-export const websocketRouter = new Elysia({ prefix: "/ws" }).ws(
-  "/room/:roomId",
-  {
+export const websocketRouter = new Elysia({ prefix: "/ws" })
+  .ws("/room/:roomId", {
     open(ws) {
       const { roomId } = ws.data.params;
 
@@ -34,7 +33,9 @@ export const websocketRouter = new Elysia({ prefix: "/ws" }).ws(
       const { roomId } = ws.data.params;
 
       try {
-        const data = JSON.parse(message as string);
+        console.log("Received message:", message);
+        // Handle both parsed objects and JSON strings
+        const data = typeof message === 'string' ? JSON.parse(message) : message;
 
         switch (data.type) {
           case "join":
@@ -135,8 +136,50 @@ export const websocketRouter = new Elysia({ prefix: "/ws" }).ws(
         }
       }
     },
-  }
-);
+  })
+  .ws("/room/validate/:roomCode", {
+    open(ws) {
+      const { roomCode } = ws.data.params;
+      console.log(`Validation connection opened for room code: ${roomCode}`);
+    },
+
+    message(ws, message) {
+      try {
+        // Handle both parsed objects and JSON strings
+        const data = typeof message === 'string' ? JSON.parse(message) : message;
+
+        if (data.type === "validate") {
+          // For now, we'll assume the room exists if we can connect
+          // In a real implementation, you'd validate against the database
+          const mockRoom = {
+            id: "room_" + Date.now(),
+            name: "Sample Room",
+            description: "A room for testing",
+            createdBy: "Host User",
+          };
+
+          ws.send(
+            JSON.stringify({
+              type: "validated",
+              room: mockRoom,
+            })
+          );
+        }
+      } catch (error) {
+        console.error("Error in validation websocket:", error);
+        ws.send(
+          JSON.stringify({
+            type: "error",
+            message: "Validation failed",
+          })
+        );
+      }
+    },
+
+    close(ws) {
+      console.log("Validation connection closed");
+    },
+  });
 
 function broadcastToRoom(roomId: string, message: any, excludeWs?: any) {
   const connections = roomConnections.get(roomId);

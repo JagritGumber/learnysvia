@@ -309,6 +309,123 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
     }
   )
 
+  // Join room by code (anonymous) - More specific route first
+  .post(
+    "/:code/join-anonymous",
+    async ({ params: { code }, set, body }) => {
+      const { displayName, anonymousId } = body as {
+        displayName: string;
+        anonymousId?: string;
+      };
+
+      if (!displayName || displayName.trim().length === 0) {
+        set.status = 400;
+        return { error: "Display name is required" };
+      }
+
+      if (displayName.length > 50) {
+        set.status = 400;
+        return { error: "Display name too long (max 50 characters)" };
+      }
+
+      try {
+        // Find room by code
+        const roomData = await db
+          .select()
+          .from(room)
+          .where(eq(room.code, code))
+          .limit(1);
+
+        if (roomData.length === 0) {
+          set.status = 404;
+          return { error: "Room not found" };
+        }
+
+        const foundRoom = roomData[0];
+
+        // Check if room is expired
+        if (foundRoom.expiresAt && new Date(foundRoom.expiresAt) < new Date()) {
+          set.status = 410;
+          return { error: "Room has expired" };
+        }
+
+        // Check participant limit
+        const participantCount = await db
+          .select()
+          .from(roomParticipant)
+          .where(eq(roomParticipant.roomId, foundRoom.id));
+
+        if (participantCount.length >= (foundRoom.maxParticipants || 50)) {
+          set.status = 409;
+          return { error: "Room is full" };
+        }
+
+        const finalAnonymousId = anonymousId || Bun.randomUUIDv7();
+
+        // Check if this anonymous user is already in the room
+        const existingParticipant = await db
+          .select()
+          .from(roomParticipant)
+          .where(
+            and(
+              eq(roomParticipant.roomId, foundRoom.id),
+              eq(roomParticipant.anonymousId, finalAnonymousId)
+            )
+          )
+          .limit(1);
+
+        if (existingParticipant.length > 0) {
+          // Update display name if changed
+          if (existingParticipant[0].displayName !== displayName.trim()) {
+            await db
+              .update(roomParticipant)
+              .set({ displayName: displayName.trim() })
+              .where(eq(roomParticipant.id, existingParticipant[0].id));
+          }
+          return {
+            success: true,
+            message: "Already joined room",
+            room: foundRoom,
+            participantId: existingParticipant[0].id,
+            anonymousId: finalAnonymousId,
+          };
+        }
+
+        // Add anonymous participant
+        const participantId = Bun.randomUUIDv7();
+        await db.insert(roomParticipant).values({
+          id: participantId,
+          roomId: foundRoom.id,
+          anonymousId: finalAnonymousId,
+          displayName: displayName.trim(),
+          participantType: "anonymous",
+        });
+
+        return {
+          success: true,
+          message: "Joined room successfully",
+          room: foundRoom,
+          participantId,
+          anonymousId: finalAnonymousId,
+        };
+      } catch (error) {
+        console.error("Failed to join room anonymously:", error);
+        set.status = 500;
+        return { error: "Failed to join room" };
+      }
+    },
+    {
+      body: t.Object({
+        displayName: t.String({ minLength: 1, maxLength: 50 }),
+        anonymousId: t.Optional(t.String()),
+      }),
+      detail: {
+        summary: "Join room by code (anonymous)",
+        tags: ["rooms"],
+      },
+    }
+  )
+
   // Join room by code
   .post(
     "/:code/join",
@@ -375,6 +492,7 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
           id: Bun.randomUUIDv7(),
           roomId: foundRoom.id,
           userId: user.id,
+          participantType: "authenticated",
         });
 
         return {
@@ -437,6 +555,60 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
         tags: ["rooms"],
       },
       auth: true,
+    }
+  )
+
+  // Get room by code (public access for anonymous users)
+  .get(
+    "/info/:code",
+    async ({ params: { code }, set }) => {
+      try {
+        // Find room by code
+        const roomData = await db
+          .select()
+          .from(room)
+          .where(eq(room.code, code))
+          .limit(1);
+
+        if (roomData.length === 0) {
+          set.status = 404;
+          return { error: "Room not found" };
+        }
+
+        const foundRoom = roomData[0];
+
+        // Check if room is expired
+        if (foundRoom.expiresAt && new Date(foundRoom.expiresAt) < new Date()) {
+          set.status = 410;
+          return { error: "Room has expired" };
+        }
+
+        // Get participant count
+        const participantCount = await db
+          .select()
+          .from(roomParticipant)
+          .where(eq(roomParticipant.roomId, foundRoom.id));
+
+        return {
+          room: {
+            id: foundRoom.id,
+            name: foundRoom.name,
+            description: foundRoom.description,
+            maxParticipants: foundRoom.maxParticipants,
+            participantCount: participantCount.length,
+          },
+        };
+      } catch (error) {
+        console.error("Failed to get room info:", error);
+        set.status = 500;
+        return { error: "Failed to get room info" };
+      }
+    },
+    {
+      detail: {
+        summary: "Get room info by code (public)",
+        tags: ["rooms"],
+      },
     }
   )
 

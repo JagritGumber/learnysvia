@@ -3,7 +3,7 @@ import { user } from "../auth/user";
 
 export const room = sqliteTable("room", {
   id: text("id").primaryKey(),
-  code: text("code").notNull().unique(),
+  code: text("code").notNull().unique(), 
   name: text("name").notNull(),
   description: text("description"),
   createdBy: text("created_by")
@@ -27,8 +27,12 @@ export const roomParticipant = sqliteTable("room_participant", {
     .references(() => room.id)
     .notNull(),
   userId: text("user_id")
-    .references(() => user.id)
-    .notNull(),
+    .references(() => user.id),
+  anonymousId: text("anonymous_id"),
+  displayName: text("display_name"),
+  participantType: text("participant_type", { enum: ["authenticated", "anonymous"] })
+    .notNull()
+    .default("authenticated"),
   joinedAt: integer("joined_at", { mode: "timestamp" })
     .$default(() => new Date())
     .notNull(),
