@@ -17,6 +17,9 @@ export const room = sqliteTable("room", {
     .references(() => user.id)
     .notNull(),
   isPublic: integer("is_public", { mode: "boolean" }).default(true).notNull(),
+  status: text("status", { enum: ["not_started", "running", "ended"] })
+    .notNull()
+    .default("not_started"),
   maxParticipants: integer("max_participants").default(50),
   duration: text("duration").default("60m").notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })
@@ -47,6 +50,7 @@ export const roomParticipant = sqliteTable("room_participant", {
   })
     .notNull()
     .default("authenticated"),
+  role: text("role", { enum: ["host", "co_host", "participant"] }),
   createdAt: integer("created_at", { mode: "timestamp" })
     .$default(() => new Date())
     .notNull(),
