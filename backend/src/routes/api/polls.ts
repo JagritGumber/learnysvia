@@ -1,5 +1,5 @@
 import { db } from "@/database/db";
-import { catalogs, questions, options } from "@/database/schemas/organization";
+import { catalogs, questions, options } from "@/database/schemas/core";
 import Elysia from "elysia";
 import { betterAuth } from "@/macros/better-auth";
 import { eq, and } from "drizzle-orm";
@@ -378,12 +378,7 @@ export const pollsRouter = new Elysia({ prefix: "/polls" })
         .from(catalogs)
         .innerJoin(questions, eq(questions.catalogId, catalogs.id))
         .innerJoin(options, eq(options.questionId, questions.id))
-        .where(
-          and(
-            eq(options.id, parseInt(id)),
-            eq(catalogs.userId, user.id)
-          )
-        )
+        .where(and(eq(options.id, parseInt(id)), eq(catalogs.userId, user.id)))
         .get();
 
       if (!catalog) {
@@ -424,12 +419,7 @@ export const pollsRouter = new Elysia({ prefix: "/polls" })
         .from(catalogs)
         .innerJoin(questions, eq(questions.catalogId, catalogs.id))
         .innerJoin(options, eq(options.questionId, questions.id))
-        .where(
-          and(
-            eq(options.id, parseInt(id)),
-            eq(catalogs.userId, user.id)
-          )
-        )
+        .where(and(eq(options.id, parseInt(id)), eq(catalogs.userId, user.id)))
         .get();
 
       if (!catalog) {
