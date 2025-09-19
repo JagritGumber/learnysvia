@@ -12,6 +12,7 @@ export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
     description: "",
     isPublic: false,
     maxParticipants: 50,
+    duration: "60m",
   });
   const [loading, setLoading] = useState(false);
 
@@ -61,7 +62,7 @@ export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Room Name */}
-            <div className="form-control">
+            <div className="form-control flex flex-col gap-1">
               <label className="label">
                 <span className="label-text font-medium">Room Name *</span>
               </label>
@@ -77,7 +78,7 @@ export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
             </div>
 
             {/* Description */}
-            <div className="form-control">
+            <div className="form-control flex flex-col gap-1">
               <label className="label">
                 <span className="label-text font-medium">Description</span>
               </label>
@@ -96,7 +97,7 @@ export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
             {/* Settings Grid */}
             <div className="grid grid-cols-2 gap-4">
               {/* Max Participants */}
-              <div className="form-control">
+              <div className="form-control flex flex-col gap-1">
                 <label className="label">
                   <span className="label-text font-medium">
                     Max Participants
@@ -119,7 +120,7 @@ export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
               </div>
 
               {/* Public/Private */}
-              <div className="form-control">
+              <div className="form-control flex flex-col gap-1">
                 <label className="label">
                   <span className="label-text font-medium">Visibility</span>
                 </label>
@@ -134,6 +135,23 @@ export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
                   <option value="private">Private</option>
                 </select>
               </div>
+            </div>
+
+            {/* Duration */}
+            <div className="form-control flex flex-col gap-1">
+              <label className="label">
+                <span className="label-text font-medium">Duration</span>
+              </label>
+              <select
+                className="select select-bordered w-full"
+                value={formData.duration || "60m"}
+                onChange={(e) => handleInputChange("duration", e.target.value)}
+              >
+                <option value="30m">30 minutes</option>
+                <option value="60m">1 hour</option>
+                <option value="120m">2 hours</option>
+                <option value="180m">3 hours</option>
+              </select>
             </div>
 
             {/* Actions */}

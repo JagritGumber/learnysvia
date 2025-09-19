@@ -18,7 +18,7 @@ export const room = sqliteTable("room", {
     .notNull(),
   isPublic: integer("is_public", { mode: "boolean" }).default(true).notNull(),
   maxParticipants: integer("max_participants").default(50),
-  expiresAt: integer("expires_at", { mode: "timestamp" }),
+  duration: text("duration").default("60m").notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })
     .$default(() => new Date())
     .notNull(),

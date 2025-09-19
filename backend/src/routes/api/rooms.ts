@@ -25,7 +25,7 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
       description: true,
       isPublic: true,
       name: true,
-      expiresAt: true,
+      duration: true,
     }),
     updateRoom: updateRoomSchema,
   })
@@ -61,7 +61,7 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
             createdBy: user.id,
             isPublic: body.isPublic ?? true,
             maxParticipants: body.maxParticipants ?? 50,
-            expiresAt: body.expiresAt,
+            duration: body.duration ?? "60m",
           })
           .returning();
 

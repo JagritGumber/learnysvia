@@ -3,5 +3,5 @@ import { z } from "zod";
 
 export type CreateRoom = Pick<
   z.infer<typeof createRoomSchema>,
-  "name" | "description" | "isPublic" | "maxParticipants"
+  "name" | "description" | "isPublic" | "maxParticipants" | "duration"
 >;
