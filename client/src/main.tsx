@@ -5,6 +5,7 @@ import { createRouter } from "./router";
 import "./styles.css";
 import { Provider } from "./integrations/tanstack-query/root-provider";
 import { QueryClient } from "@tanstack/react-query";
+import { Toaster } from "react-hot-toast";
 
 const queryClient = new QueryClient();
 
@@ -14,6 +15,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider queryClient={queryClient}>
       <RouterProvider router={router} />
+      <Toaster />
     </Provider>
   </StrictMode>
 );
