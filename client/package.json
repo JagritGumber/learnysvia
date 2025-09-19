@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@elysiajs/eden": "^1.4.1",
     "@iconify/react": "^6.0.1",
     "@t3-oss/env-core": "^0.12.0",
     "@tailwindcss/vite": "^4.0.6",
@@ -37,6 +38,7 @@
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
     "daisyui": "^5.1.10",
+    "elysia": "^1.4.6",
     "jsdom": "^26.0.0",
     "typescript": "^5.7.2",
     "vite": "^6.3.5",
