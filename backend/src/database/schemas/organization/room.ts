@@ -1,11 +1,18 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { user } from "../auth/user";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
 
 export const room = sqliteTable("room", {
-  id: text("id").primaryKey(),
-  code: text("code").notNull().unique(), 
-  name: text("name").notNull(),
-  description: text("description"),
+  id: text("id")
+    .primaryKey()
+    .$default(() => Bun.randomUUIDv7()),
+  code: text("code").notNull().unique(),
+  name: text("name").$type<string>().notNull(),
+  description: text("description").$type<string>(),
   createdBy: text("created_by")
     .references(() => user.id)
     .notNull(),
@@ -21,41 +28,31 @@ export const room = sqliteTable("room", {
     .notNull(),
 });
 
+export const updateRoomSchema = createUpdateSchema(room);
+export const createRoomSchema = createInsertSchema(room);
+export const getRoomSchema = createSelectSchema(room);
+
 export const roomParticipant = sqliteTable("room_participant", {
-  id: text("id").primaryKey(),
+  id: text("id")
+    .primaryKey()
+    .$default(() => Bun.randomUUIDv7()),
   roomId: text("room_id")
     .references(() => room.id)
     .notNull(),
-  userId: text("user_id")
-    .references(() => user.id),
+  userId: text("user_id").references(() => user.id),
   anonymousId: text("anonymous_id"),
   displayName: text("display_name"),
-  participantType: text("participant_type", { enum: ["authenticated", "anonymous"] })
+  participantType: text("participant_type", {
+    enum: ["authenticated", "anonymous"],
+  })
     .notNull()
     .default("authenticated"),
-  joinedAt: integer("joined_at", { mode: "timestamp" })
+  createdAt: integer("created_at", { mode: "timestamp" })
     .$default(() => new Date())
     .notNull(),
-});
-
-export const roomSettings = sqliteTable("room_settings", {
-  id: text("id").primaryKey(),
-  roomId: text("room_id")
-    .references(() => room.id)
-    .notNull(),
-  allowChat: integer("allow_chat", { mode: "boolean" }).default(true).notNull(),
-  allowFileSharing: integer("allow_file_sharing", { mode: "boolean" })
-    .default(true)
-    .notNull(),
-  requireApproval: integer("require_approval", { mode: "boolean" })
-    .default(false)
-    .notNull(),
-  customSettings: text("custom_settings"),
 });
 
 export type InsertRoom = typeof room.$inferInsert;
 export type SelectRoom = typeof room.$inferSelect;
 export type InsertRoomParticipant = typeof roomParticipant.$inferInsert;
 export type SelectRoomParticipant = typeof roomParticipant.$inferSelect;
-export type InsertRoomSettings = typeof roomSettings.$inferInsert;
-export type SelectRoomSettings = typeof roomSettings.$inferSelect;

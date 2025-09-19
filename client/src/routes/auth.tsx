@@ -41,7 +41,7 @@ function Auth() {
         throw new Error("Authentication failed");
       }
 
-      navigate({ to: "/dashboard", replace: true });
+      navigate({ to: "/rooms", replace: true });
     } catch (err: any) {
       // Normalize common error shapes
       const message =

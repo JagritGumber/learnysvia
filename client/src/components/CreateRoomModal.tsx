@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { type CreateRoomData } from "../utils/rooms-api";
+import type { CreateRoom } from "@/shared/types/room";
 
 interface CreateRoomModalProps {
   onClose: () => void;
-  onCreate: (data: CreateRoomData) => Promise<void>;
+  onCreate: (data: CreateRoom) => Promise<void>;
 }
 
 export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
-  const [formData, setFormData] = useState<CreateRoomData>({
+  const [formData, setFormData] = useState<CreateRoom>({
     name: "",
     description: "",
-    isPublic: true,
+    isPublic: false,
     maxParticipants: 50,
   });
   const [loading, setLoading] = useState(false);
@@ -22,13 +22,14 @@ export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
     setLoading(true);
     try {
       await onCreate(formData);
+      onClose(); // Close modal on successful room creation
     } finally {
       setLoading(false);
     }
   };
 
   const handleInputChange = (
-    field: keyof CreateRoomData,
+    field: keyof CreateRoom,
     value: string | number | boolean
   ) => {
     setFormData((prev) => ({
@@ -38,7 +39,10 @@ export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div
+      id="create-room-modal"
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+    >
       <div className="bg-base-100 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           {/* Header */}
@@ -131,8 +135,6 @@ export function CreateRoomModal({ onClose, onCreate }: CreateRoomModalProps) {
                 </select>
               </div>
             </div>
-
-
 
             {/* Actions */}
             <div className="flex gap-3 pt-4">

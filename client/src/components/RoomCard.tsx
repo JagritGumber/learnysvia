@@ -4,10 +4,11 @@ import { ShareRoomModal } from "./ShareRoomModal";
 import { roomsApi } from "../utils/rooms-api";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "@tanstack/react-router";
+import { Icon } from "@iconify/react";
 
 interface RoomCardProps {
   room: Room;
-  onDelete: (roomId: string) => Promise<void>;
+  onDelete: ({ id }: { id: string }) => Promise<void>;
 }
 
 export function RoomCard({ room, onDelete }: RoomCardProps) {
@@ -21,7 +22,7 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
 
     setDeleting(true);
     try {
-      await onDelete(room.id);
+      await onDelete({ id: room.id });
     } finally {
       setDeleting(false);
     }
@@ -33,10 +34,10 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
       const result = await roomsApi.joinRoom(room.code);
       toast.success(`Successfully joined room "${room.name}"!`);
       // Navigate to room management interface
-      navigate({ to: '/room/$id', params: { id: result.room.id } });
+      navigate({ to: "/room/$id", params: { id: result.room.id } });
     } catch (error) {
-      console.error('Failed to join room:', error);
-      toast.error('Failed to join room. Please try again.');
+      console.error("Failed to join room:", error);
+      toast.error("Failed to join room. Please try again.");
     } finally {
       setJoining(false);
     }
@@ -53,7 +54,7 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
   const getParticipantText = () => {
     // This would come from the room data in a real implementation
     // For now, we'll show a placeholder
-    return `${Math.floor(Math.random() * room.maxParticipants)}/${room.maxParticipants}`;
+    return `${Math.floor(Math.random() * 10)}/${room.maxParticipants}`;
   };
 
   return (
@@ -162,19 +163,7 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
                       {deleting ? (
                         <div className="loading loading-spinner loading-sm"></div>
                       ) : (
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
+                        <Icon icon="lineicons:trash-3" />
                       )}
                       Delete Room
                     </button>
@@ -224,7 +213,7 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <span>{formatDate(room.createdAt)}</span>
+                <span>{formatDate(room.createdAt.toString())}</span>
               </div>
             </div>
             <div
@@ -258,25 +247,13 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
                   />
                 </svg>
               )}
-              {joining ? 'Joining...' : 'Join'}
+              {joining ? "Joining..." : "Join"}
             </button>
             <button
               className="btn btn-primary btn-sm"
               onClick={() => setShowShareModal(true)}
             >
-              <svg
-                className="w-4 h-4 mr-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
-                />
-              </svg>
+              <Icon icon="lineicons:share" />
               Share
             </button>
           </div>
