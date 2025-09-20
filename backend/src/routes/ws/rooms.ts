@@ -43,7 +43,7 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
       ws.data.params.id
     );
 
-    ws.subscribe(`room_${ws.data.params.id}_participants`);
+    ws.subscribe(`room_${ws.data.params.id}`);
     if (!room) {
       ws.send({
         event: "error",
@@ -56,7 +56,7 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
       event: "participant:updated",
       participant,
     });
-    app.server?.publish(`room_${ws.data.params.id}_participants`, "notfresh");
+    app.server?.publish(`room_${ws.data.params.id}`, "participants:notfresh");
   },
   close: async (ws) => {
     const room = await getRoomByIdentifierWithParticipantCount(
@@ -73,7 +73,7 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
     ws.send({
       event: "participant:removed",
     });
-    app.server?.publish(`room_${ws.data.params.id}_participants`, "notfresh");
+    app.server?.publish(`room_${ws.data.params.id}`, "participants:notfresh");
   },
   message: async (ws, data) => {
     if (data.event === "participants:get") {
@@ -83,7 +83,7 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
         participants,
         message: "Successfully fetched participants",
       });
-      app.server?.publish(`room_${ws.data.params.id}_participants`, "fresh");
+      app.server?.publish(`room_${ws.data.params.id}`, "participants:fresh");
     }
   },
 });

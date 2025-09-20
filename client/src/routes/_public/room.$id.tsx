@@ -45,13 +45,16 @@ function RoomPage() {
           console.error("Data validation failed", event.data);
           return;
         }
-
         const data = event.data as unknown as (typeof event.data)[200];
+        const channelSignal = event.data as unknown as string;
 
         if (data?.event === "participants:result") {
           useWebsocketStore.getState().setParticipants(data?.participants);
           useWebsocketStore.getState().setLoadingParticipants(false);
-        } else if (data?.event === "participant:updated") {
+        } else if (
+          data?.event === "participant:updated" ||
+          channelSignal === "participants:notfresh"
+        ) {
           useWebsocketStore.getState().fetchParticipants(search.rid);
         } else if (data?.event === "error") {
           useWebsocketStore.getState().setParticipantsError(data?.message);
