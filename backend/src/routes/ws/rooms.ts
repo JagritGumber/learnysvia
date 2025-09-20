@@ -1,7 +1,7 @@
 import { betterAuth } from "@/macros/better-auth";
 import {
   addRoomHost,
-  addRoomParticpant,
+  addRoomParticipant,
   getRoomByIdentifier,
   startRoomById,
 } from "@/services/rooms.service";
@@ -58,7 +58,11 @@ export const roomsWs = new Elysia({ name: "rooms", prefix: "/rooms" })
           return;
         }
 
-        await addRoomParticpant(room.id, data.name, data.anonymousId);
+        await addRoomParticipant(room.id, {
+          type: "anon",
+          anonId: data.anonymousId,
+          name: data.name,
+        });
         ws.send({
           event: "joined",
           message: "Joined room successfully",
