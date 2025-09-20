@@ -28,3 +28,12 @@ export const addWsIdForParticipant = async (
       .returning()
   )?.[0];
 };
+
+export const removeParticipant = async (participantId: string) => {
+  return (
+    await db
+      .delete(t.roomParticipant)
+      .where(q.eq(t.roomParticipant.id, participantId))
+      .returning()
+  )?.[0];
+};

@@ -2,6 +2,7 @@ import { selectRoomParticipantSchema } from "@/database/schemas";
 import {
   addWsIdForParticipant,
   getActiveRoomParticipants,
+  removeParticipant,
 } from "@/services/participants.service";
 import { getRoomByIdentifierWithParticipantCount } from "@/services/rooms.service";
 import { Elysia } from "elysia";
@@ -28,6 +29,9 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
       event: z.literal("participant:updated"),
       participant: selectRoomParticipantSchema,
     }),
+    z.object({
+      event: z.literal("participant:removed"),
+    }),
   ]),
   params: z.object({
     id: z.string(),
@@ -48,6 +52,22 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
     ws.send({
       event: "participant:updated",
       participant,
+    });
+  },
+  close: async (ws) => {
+    const room = await getRoomByIdentifierWithParticipantCount(
+      ws.data.params.id
+    );
+    if (!room) {
+      ws.send({
+        event: "error",
+        message: "There is no room with this code",
+      });
+      ws.close();
+    }
+    const participant = await removeParticipant(ws.data.params.id);
+    ws.send({
+      event: "participant:removed",
     });
   },
   message: async (ws, data) => {
