@@ -43,9 +43,19 @@ export const useRoomMutations = () => {
   });
 
   const joinRoom = useMutation({
-    mutationFn: async ({ code }: { code: string }) => {
+    mutationFn: async ({
+      code,
+      name,
+      type,
+    }: {
+      code: string;
+      name: string;
+      type: "auth" | "anon";
+    }) => {
       const response = await api.api.rooms.join.post({
-        code: code,
+        code,
+        name,
+        type,
       });
       if (response.error) {
         throw new Error(

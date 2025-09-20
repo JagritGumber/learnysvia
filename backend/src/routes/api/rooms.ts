@@ -35,10 +35,6 @@ const updateRoomStatusSchema = z.object({
   id: z.string(),
 });
 
-const joinRoomAnonymousSchema = z.object({
-  displayName: z.string().min(1).max(50),
-});
-
 export const roomsRouter = new Elysia({ prefix: "/rooms" })
   .use(betterAuth)
   .model({
@@ -199,7 +195,7 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
   })
   .patch(
     "/status",
-    async ({ status, user, body }) => {
+    async ({ status, body }) => {
       try {
         const room = await getRoomByIdentifier(body.id);
 
@@ -229,35 +225,20 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
   .group(
     "/:id",
     {
-      params: z.object({ id: z.uuid() }),
+      params: z.object({ id: z.string() }),
     },
     (app) =>
       app
-        .get("/", async ({ params: { id }, status, user }) => {
+        .get("/", async ({ params: { id }, status }) => {
           try {
-            const roomData = await getRoomByIdentifier(id);
+            const roomData = await getRoomByIdentifierWithParticipantCount(id);
 
             if (!roomData) {
               return status(404, "Room not found");
             }
 
-            const participants = await db
-              .select({
-                id: roomParticipant.id,
-                roomId: roomParticipant.roomId,
-                userId: roomParticipant.userId,
-                joinedAt: roomParticipant.createdAt,
-                userName: userTable.name,
-                userEmail: userTable.email,
-              })
-              .from(roomParticipant)
-              .leftJoin(userTable, eq(roomParticipant.userId, userTable.id))
-              .where(eq(roomParticipant.roomId, id));
-
             return status(200, {
               room: roomData,
-              participants,
-              count: participants.length,
             });
           } catch (error) {
             console.error("Failed to fetch room:", error);

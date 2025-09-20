@@ -2,20 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ShareRoomModal } from "../../components/ShareRoomModal";
 import { Icon } from "@iconify/react";
-import z from "zod";
 import { useRoomById } from "@/queries/roomById";
-
-const searchSchema = z.object({
-  displayName: z.string().min(1).optional(),
-});
 
 export const Route = createFileRoute("/_public/room/$id")({
   component: RoomPage,
-  validateSearch: (search) => searchSchema.parse(search),
 });
 
 function RoomPage() {
-  const search = Route.useSearch();
   const { id } = Route.useParams();
   const { data, isPending, error } = useRoomById(id);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -59,7 +52,7 @@ function RoomPage() {
             {data.room.name}
           </h1>
           <p className="text-lg text-base-content/70 mb-4">
-            Welcome, {search.displayName || "Guest"}!
+            Welcome, {"Guest"}!
           </p>
           <p className="text-base-content/70">Room ID: {data.room.id}</p>
         </div>
