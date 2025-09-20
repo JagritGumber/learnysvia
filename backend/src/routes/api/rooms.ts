@@ -7,7 +7,6 @@ import {
   roomParticipant,
   updateRoomSchema,
 } from "../../database/schemas";
-import { user as userTable } from "../../database/schemas/auth/user";
 import { betterAuth } from "../../macros/better-auth";
 import z from "zod";
 import { env } from "@/env";
@@ -17,7 +16,6 @@ import {
   getRoomByIdentifier,
   getRoomByIdentifierWithParticipantCount,
   startRoomById,
-  updateRoomStatusByIdentifier,
 } from "@/services/rooms.service";
 import { auth } from "@/utils/auth";
 
