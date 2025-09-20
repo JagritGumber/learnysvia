@@ -15,8 +15,8 @@ const app = new Elysia()
       allowedHeaders: ["Content-Type", "Authorization"],
     })
   )
-  .use(wsRouter)
   .use(apiRouter)
+  .use(wsRouter)
   .mount(auth.handler)
   .listen(3000);
 

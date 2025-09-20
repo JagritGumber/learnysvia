@@ -11,11 +11,25 @@ import { user as userTable } from "../../database/schemas/auth/user";
 import { betterAuth } from "../../macros/better-auth";
 import z from "zod";
 import { env } from "@/env";
+import {
+  getRoomByIdentifier,
+  startRoomById,
+  updateRoomStatusByIdentifier,
+} from "@/services/rooms.service";
 
 // Generate unique room code
 function generateRoomCode(): string {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
+
+const updateRoomStatusSchema = z.object({
+  status: updateRoomSchema
+    .pick({
+      status: true,
+    })
+    .shape.status.nonoptional(),
+  id: z.string(),
+});
 
 export const roomsRouter = new Elysia({ prefix: "/rooms" })
   .use(betterAuth)
@@ -28,6 +42,7 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
       duration: true,
     }),
     updateRoom: updateRoomSchema,
+    updateRoomStatus: updateRoomStatusSchema,
   })
   .guard({
     auth: true,
@@ -95,6 +110,35 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
       return status(500, "Failed to fetch rooms");
     }
   })
+  .patch(
+    "/status",
+    async ({ status, user, body }) => {
+      try {
+        const room = await getRoomByIdentifier(body.id);
+
+        if (room.status === "not_started") {
+          if (body.status !== "running") {
+            return status(
+              400,
+              `Test status: not_started is not updatable to ${body.status}, allowed type is "running"`
+            );
+          }
+          // Start the test
+          const [startedRoom] = await startRoomById(room.id);
+          if (!startedRoom) {
+            throw new Error("Unable to start the server");
+          }
+          return status(204);
+        }
+      } catch (e) {
+        console.error("Failed to join the room", e);
+        return status(500);
+      }
+    },
+    {
+      body: "updateRoomStatus",
+    }
+  )
   .group(
     "/:id",
     {

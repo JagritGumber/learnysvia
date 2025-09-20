@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { type Room } from "../utils/rooms-api";
 import { ShareRoomModal } from "./ShareRoomModal";
-import { roomsApi } from "../utils/rooms-api";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "@tanstack/react-router";
 import { Icon } from "@iconify/react";
+import { api } from "@/utils/treaty";
 
 interface RoomCardProps {
   room: Room;
@@ -31,30 +31,16 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
   const handleJoin = async () => {
     setJoining(true);
     try {
-      const result = await roomsApi.joinRoom(room.code);
+      const room = await api.websocket.rooms.subscribe();
       toast.success(`Successfully joined room "${room.name}"!`);
       // Navigate to room management interface
-      navigate({ to: "/room/$id", params: { id: result.room.id } });
+      // navigate({ to: "/room/$id", params: { id: result.room.id } });
     } catch (error) {
       console.error("Failed to join room:", error);
-      toast.error("Failed to join room. Please try again.");
+      // toast.error("Failed to join room. Please try again.");
     } finally {
       setJoining(false);
     }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const getParticipantText = () => {
-    // This would come from the room data in a real implementation
-    // For now, we'll show a placeholder
-    return `${Math.floor(Math.random() * 10)}/${room.maxParticipants}`;
   };
 
   return (
@@ -181,41 +167,7 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
           )}
 
           {/* Stats */}
-          <div className="flex justify-between items-center text-sm text-base-content/70 mb-4">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-                  />
-                </svg>
-                <span>{getParticipantText()}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <span>{formatDate(room.createdAt.toString())}</span>
-              </div>
-            </div>
+          <div className="flex justify-end items-center text-sm text-base-content/70 mb-4">
             <div
               className={`badge ${room.isPublic ? "badge-success" : "badge-warning"}`}
             >
@@ -233,19 +185,7 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
               {joining ? (
                 <div className="loading loading-spinner loading-sm"></div>
               ) : (
-                <svg
-                  className="w-4 h-4 mr-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
-                  />
-                </svg>
+                <Icon icon="lineicons:location-arrow-right" />
               )}
               {joining ? "Joining..." : "Join"}
             </button>
