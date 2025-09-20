@@ -1,14 +1,13 @@
 import { db } from "@/database/db";
 import * as t from "@/database/schemas";
 import * as q from "drizzle-orm";
-import { RoomStatus } from "../../../shared/types/room";
+import { RoomStatus } from "@/shared/types/room";
 
 /**
  * Select the room from the database based on it's id or unique identifier code
  * @param codeOrId This could either be the unique code for the room or the id of the room
  * @returns The room that it found, could also be undefined
  */
-
 export const getRoomByIdentifier = async (codeOrId: string) => {
   return (
     await db
