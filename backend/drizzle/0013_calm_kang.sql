@@ -1,0 +1,1 @@
+ALTER TABLE `room_participant` ADD `ws_id` text;

@@ -62,7 +62,7 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
           return status(404, "Room not found");
         }
 
-        if (roomInfo.particpantCount >= (roomInfo.maxParticipants || 50)) {
+        if (roomInfo.participantCount >= (roomInfo.maxParticipants || 50)) {
           return status(409, "Room is full");
         }
 

@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ShareRoomModal } from "@/components/ShareRoomModal";
 import { Icon } from "@iconify/react";
 import { useRoomById } from "@/queries/roomById";
 import { ParticipantsDrawer } from "@/components/ParticipantsDrawer";
+import { useWebsocketStore } from "@/store/websocket";
+import { api } from "@/utils/treaty";
+import toast from "react-hot-toast";
 
 export const Route = createFileRoute("/_public/room/$id")({
   component: RoomPage,
@@ -14,6 +17,29 @@ function RoomPage() {
   const { data, isPending, error } = useRoomById(id);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showParticipantsPanel, setShowParticipantsPanel] = useState(false);
+
+  const startWebsocketConnection = async () => {
+    if (useWebsocketStore.getState().websocket) {
+      console.log("websocket already subscribed");
+      return;
+    }
+    console.log("Connecting websocket");
+
+    try {
+      const ws = api.ws.rooms({ id }).subscribe();
+      useWebsocketStore.getState().setWebsocket(ws);
+      ws.on("open", (event) => {
+        console.log(event);
+      });
+    } catch (error) {
+      console.error("Failed to connect to the room", error);
+      toast.error("Failed to connect to the room, Please try again later");
+    }
+  };
+
+  useEffect(() => {
+    startWebsocketConnection();
+  }, []);
 
   if (isPending) {
     return (

@@ -44,6 +44,7 @@ export const roomParticipant = sqliteTable("room_participant", {
     .notNull(),
   userId: text("user_id").references(() => user.id),
   anonymousId: text("anonymous_id"),
+  wsId: text("ws_id"),
   displayName: text("display_name"),
   participantType: text("participant_type", {
     enum: ["authenticated", "anonymous"],

@@ -36,7 +36,7 @@ export const getRoomByIdentifierWithParticipantCount = async (
         maxParticipants: t.room.maxParticipants,
         duration: t.room.duration,
         updatedAt: t.room.updatedAt,
-        particpantCount: q.count(t.roomParticipant.id),
+        participantCount: q.count(t.roomParticipant.wsId),
       })
       .from(t.room)
       .leftJoin(t.roomParticipant, q.eq(t.room.id, t.roomParticipant.roomId))
