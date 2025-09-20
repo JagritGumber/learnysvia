@@ -71,6 +71,7 @@ export const useRoomMutations = () => {
     onSuccess: async (data, variables) => {
       toast.success("Successfully joined room");
       navigate({
+        from: "/rooms",
         to: "/room/$id",
         params: { id: variables.code },
         search: { pid: data?.id, rid: data.roomId },
