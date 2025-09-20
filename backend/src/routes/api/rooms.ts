@@ -12,10 +12,14 @@ import { betterAuth } from "../../macros/better-auth";
 import z from "zod";
 import { env } from "@/env";
 import {
+  addRoomHost,
+  addRoomParticipant,
   getRoomByIdentifier,
+  getRoomByIdentifierWithParticipantCount,
   startRoomById,
   updateRoomStatusByIdentifier,
 } from "@/services/rooms.service";
+import { auth } from "@/utils/auth";
 
 // Generate unique room code
 function generateRoomCode(): string {
@@ -31,6 +35,10 @@ const updateRoomStatusSchema = z.object({
   id: z.string(),
 });
 
+const joinRoomAnonymousSchema = z.object({
+  displayName: z.string().min(1).max(50),
+});
+
 export const roomsRouter = new Elysia({ prefix: "/rooms" })
   .use(betterAuth)
   .model({
@@ -44,9 +52,86 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
     updateRoom: updateRoomSchema,
     updateRoomStatus: updateRoomStatusSchema,
   })
-  .post("/join", async () => {}, {
-    body: z.object({}),
-  })
+  .post(
+    "/join",
+    async ({ body, status, request: { headers } }) => {
+      const session = await auth.api.getSession({
+        headers,
+      });
+
+      try {
+        // Find room by code
+        const roomInfo = await getRoomByIdentifierWithParticipantCount(
+          body.code
+        );
+        if (!roomInfo) {
+          return status(404, "Room not found");
+        }
+
+        if (roomInfo.particpantCount >= (roomInfo.maxParticipants || 50)) {
+          return status(409, "Room is full");
+        }
+
+        const isAuthenticated = !!session;
+
+        if (
+          (isAuthenticated && body.type === "anon") ||
+          (!isAuthenticated && body.type === "auth")
+        )
+          return status(400);
+
+        if (!isAuthenticated && body.type === "anon") {
+          if (roomInfo.status === "ended" || roomInfo.status === "not_started")
+            return status(400, "Room is not running");
+          const participant = await addRoomParticipant(roomInfo.id, {
+            type: "anon",
+            name: body.name,
+            anonId: Bun.randomUUIDv7(),
+          });
+          return status(201, participant);
+        }
+
+        // Either user is authenticated and is the host (start the room)
+        if (isAuthenticated && body.type === "auth") {
+          if (roomInfo.status === "ended") return status(400, "Room has ended");
+
+          if (roomInfo.status === "not_started") {
+            await startRoomById(roomInfo.id);
+          }
+
+          // if is not room host
+          if (roomInfo.createdBy !== session.user.id) {
+            const participant = await addRoomParticipant(roomInfo.id, {
+              type: "auth",
+              name: session.user.name,
+              userId: session.user.id,
+            });
+            return status(201, participant);
+          }
+          const participant = await addRoomHost(roomInfo.id, session.user.id);
+          return status(201, participant);
+        }
+
+        return status(400, "Bad Request");
+      } catch (error) {
+        console.error("Failed to join room:", error);
+        return status(500, "Failed to join room");
+      }
+    },
+    {
+      body: z.union([
+        z.object({
+          type: z.literal("anon"),
+          code: z.string(),
+          name: z.string(),
+        }),
+        z.object({
+          type: z.literal("auth"),
+          code: z.string(),
+        }),
+      ]),
+    }
+  )
   .guard({
     auth: true,
   })
@@ -150,13 +235,9 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
       app
         .get("/", async ({ params: { id }, status, user }) => {
           try {
-            const roomData = await db
-              .select()
-              .from(room)
-              .where(and(eq(room.id, id), eq(room.createdBy, user.id)))
-              .limit(1);
+            const roomData = await getRoomByIdentifier(id);
 
-            if (roomData.length === 0) {
+            if (!roomData) {
               return status(404, "Room not found");
             }
 
@@ -174,7 +255,7 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
               .where(eq(roomParticipant.roomId, id));
 
             return status(200, {
-              room: roomData[0],
+              room: roomData,
               participants,
               count: participants.length,
             });

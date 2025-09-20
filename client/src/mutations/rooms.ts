@@ -42,5 +42,49 @@ export const useRoomMutations = () => {
     },
   });
 
-  return { deleteRoom, createRoom };
+  const joinRoom = useMutation({
+    mutationFn: async ({ code }: { code: string }) => {
+      const response = await api.api.rooms.join.post({
+        code: code,
+      });
+      if (response.error) {
+        throw new Error(
+          typeof response.error.value === "string"
+            ? response.error.value
+            : JSON.stringify(response.error.value)
+        );
+      }
+      return response.data;
+    },
+    onSuccess: async () => {
+      toast.success("Successfully joined room");
+    },
+    onError: async (error) => {
+      toast.error(error.message || "Failed to join room");
+    },
+  });
+
+  const startRoom = useMutation({
+    mutationFn: async ({ id }: { id: string }) => {
+      const response = await api.api.rooms.status.patch({
+        id: id,
+        status: "running",
+      });
+      if (response.error) {
+        throw new Error(
+          typeof response.error.value === "string"
+            ? response.error.value
+            : JSON.stringify(response.error.value)
+        );
+      }
+    },
+    onSuccess: async () => {
+      toast.success("Test started successfully");
+    },
+    onError: async (error) => {
+      toast.error(error.message || "Failed to start test");
+    },
+  });
+
+  return { deleteRoom, createRoom, joinRoom, startRoom };
 };

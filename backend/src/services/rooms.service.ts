@@ -16,16 +16,48 @@ export const getRoomByIdentifier = async (codeOrId: string) => {
       .from(t.room)
       .where(q.or(q.eq(t.room.code, codeOrId), q.eq(t.room.id, codeOrId)))
       .limit(1)
-  )[0];
+  )?.[0];
+};
+
+export const getRoomByIdentifierWithParticipantCount = async (
+  codeOrId: string
+) => {
+  return (
+    await db
+      .select({
+        id: t.room.id,
+        code: t.room.code,
+        name: t.room.name,
+        description: t.room.description,
+        createdBy: t.room.createdBy,
+        createdAt: t.room.createdAt,
+        isPublic: t.room.isPublic,
+        status: t.room.status,
+        maxParticipants: t.room.maxParticipants,
+        duration: t.room.duration,
+        updatedAt: t.room.updatedAt,
+        particpantCount: q.count(t.roomParticipant.id),
+      })
+      .from(t.room)
+      .leftJoin(t.roomParticipant, q.eq(t.room.id, t.roomParticipant.roomId))
+      .where(q.or(q.eq(t.room.code, codeOrId), q.eq(t.room.id, codeOrId)))
+      .groupBy(t.room.id)
+      .limit(1)
+  )?.[0];
 };
 
 export const addRoomHost = async (roomId: string, hostId: string) => {
-  return await db.insert(t.roomParticipant).values({
-    roomId,
-    userId: hostId,
-    participantType: "authenticated",
-    role: "host",
-  });
+  return (
+    await db
+      .insert(t.roomParticipant)
+      .values({
+        roomId,
+        userId: hostId,
+        participantType: "authenticated",
+        role: "host",
+      })
+      .returning()
+  )?.[0];
 };
 
 export const startRoomById = async (id: string) => {
@@ -36,18 +68,43 @@ export const startRoomById = async (id: string) => {
     .returning();
 };
 
-export const addRoomParticpant = async (
+export const addRoomParticipant = async (
   roomId: string,
-  name: string,
-  anonymousId: string
+  data:
+    | { type: "anon"; name: string; anonId: string }
+    | { type: "auth"; name: string; userId: string }
 ) => {
-  return await db.insert(t.roomParticipant).values({
-    roomId,
-    displayName: name,
-    participantType: "anonymous",
-    role: "participant",
-    anonymousId: anonymousId,
-  });
+  const existingUser = await db
+    .select()
+    .from(t.roomParticipant)
+    .where(
+      data.type === "auth"
+        ? q.eq(t.roomParticipant.userId, data.userId)
+        : q.eq(t.roomParticipant.anonymousId, data.anonId)
+    );
+
+  if (existingUser.length > 0 && existingUser?.[0]) {
+    throw new Error("Participant already in the room");
+  }
+
+  return (
+    await db
+      .insert(t.roomParticipant)
+      .values({
+        roomId,
+        displayName: data.name,
+        participantType: data.type === "anon" ? "anonymous" : "authenticated",
+        role: "participant",
+        ...(data.type === "anon"
+          ? {
+              anonymousId: data.anonId,
+            }
+          : {
+              userId: data.userId,
+            }),
+      })
+      .returning()
+  )?.[0];
 };
 
 export const updateRoomStatusByIdentifier = async (
