@@ -2,9 +2,11 @@ import { api } from "@/utils/treaty";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CreateRoom, SelectParticipant } from "@/shared/types/room";
 import toast from "react-hot-toast";
+import { useNavigate } from "@tanstack/react-router";
 
 export const useRoomMutations = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const deleteRoom = useMutation({
     mutationFn: async ({ id }: { id: string }) => {
@@ -66,8 +68,13 @@ export const useRoomMutations = () => {
       }
       return response.data as SelectParticipant;
     },
-    onSuccess: async () => {
+    onSuccess: async (data, variables) => {
       toast.success("Successfully joined room");
+      navigate({
+        to: "/room/$id",
+        params: { id: variables.code },
+        search: { pid: data?.id, rid: data.roomId },
+      });
     },
     onError: async (error) => {
       toast.error(error.message || "Failed to join room");

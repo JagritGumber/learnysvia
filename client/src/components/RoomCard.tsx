@@ -29,7 +29,6 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
     navigate({
       to: "/join/$code",
       params: { code: room.code },
-      search: { rid: room.id },
     });
   };
 

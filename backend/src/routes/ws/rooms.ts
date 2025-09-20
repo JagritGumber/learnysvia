@@ -65,7 +65,7 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
       });
       ws.close();
     }
-    const participant = await removeParticipant(ws.data.params.id);
+    const participant = await removeParticipant(ws.data.params.pid);
     ws.send({
       event: "participant:removed",
     });
