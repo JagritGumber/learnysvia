@@ -1,6 +1,6 @@
 import { api } from "@/utils/treaty";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { CreateRoom } from "@/shared/types/room";
+import type { CreateRoom, SelectParticipant } from "@/shared/types/room";
 import toast from "react-hot-toast";
 
 export const useRoomMutations = () => {
@@ -64,7 +64,7 @@ export const useRoomMutations = () => {
             : JSON.stringify(response.error.value)
         );
       }
-      return response.data;
+      return response.data as SelectParticipant;
     },
     onSuccess: async () => {
       toast.success("Successfully joined room");

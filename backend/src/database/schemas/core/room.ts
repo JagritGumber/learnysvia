@@ -57,6 +57,8 @@ export const roomParticipant = sqliteTable("room_participant", {
     .notNull(),
 });
 
+export const selectRoomParticipantSchema = createSelectSchema(roomParticipant);
+
 export type InsertRoom = typeof room.$inferInsert;
 export type SelectRoom = typeof room.$inferSelect;
 export type InsertRoomParticipant = typeof roomParticipant.$inferInsert;

@@ -7,9 +7,16 @@ import { ParticipantsDrawer } from "@/components/ParticipantsDrawer";
 import { useWebsocketStore } from "@/store/websocket";
 import { api } from "@/utils/treaty";
 import toast from "react-hot-toast";
+import z from "zod";
+
+const searchSchema = z.object({
+  pid: z.string(),
+  rid: z.string(),
+});
 
 export const Route = createFileRoute("/_public/room/$id")({
   component: RoomPage,
+  validateSearch: (search) => searchSchema.parse(search),
 });
 
 function RoomPage() {
@@ -17,6 +24,7 @@ function RoomPage() {
   const { data, isPending, error } = useRoomById(id);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showParticipantsPanel, setShowParticipantsPanel] = useState(false);
+  const search = Route.useSearch();
 
   const startWebsocketConnection = async () => {
     if (useWebsocketStore.getState().websocket) {
@@ -26,10 +34,45 @@ function RoomPage() {
     console.log("Connecting websocket");
 
     try {
-      const ws = api.ws.rooms({ id }).subscribe();
+      const ws = api.ws.rooms({ id })({ pid: search.pid }).subscribe();
       useWebsocketStore.getState().setWebsocket(ws);
       ws.on("open", (event) => {
-        console.log(event);
+        console.log("WebSocket connected", event);
+      });
+
+      ws.on("message", (event) => {
+        if (event.data[422]) {
+          console.error("Data validation failed", event.data);
+          return;
+        }
+
+        const data = event.data as unknown as (typeof event.data)[200];
+
+        if (data?.event === "participants:result") {
+          useWebsocketStore.getState().setParticipants(data?.participants);
+          useWebsocketStore.getState().setLoadingParticipants(false);
+        } else if (data?.event === "participant:updated") {
+          useWebsocketStore.getState().fetchParticipants(search.rid);
+        } else if (data?.event === "error") {
+          useWebsocketStore.getState().setParticipantsError(data?.message);
+          useWebsocketStore.getState().setLoadingParticipants(false);
+          toast.error(`Participants error: ${data.message}`);
+        }
+      });
+
+      ws.on("error", (error) => {
+        console.error("WebSocket error:", error);
+        useWebsocketStore
+          .getState()
+          .setParticipantsError("WebSocket connection error");
+        toast.error("Connection error occurred");
+      });
+
+      ws.on("close", (event) => {
+        console.log("WebSocket closed", event);
+        useWebsocketStore.getState().setWebsocket(null);
+        useWebsocketStore.getState().setParticipants([]);
+        useWebsocketStore.getState().setParticipantsError(null);
       });
     } catch (error) {
       console.error("Failed to connect to the room", error);
@@ -51,9 +94,9 @@ function RoomPage() {
 
   if (error || !data?.room) {
     return (
-      <div className="min-h-screen bg-base-100 flex items-center justify-center">
+      <div className="min-h-screen bg-base-100 flex flex-col items-center justify-center">
+        <Icon icon="lineicons:ban" className="text-8xl mb-6 text-error" />
         <div className="text-center">
-          <Icon icon="lineicons:ban" className="text-8xl mb-6 text-error" />
           <h2 className="text-2xl font-semibold text-base-content mb-4">
             {typeof error === "string"
               ? error
@@ -126,7 +169,10 @@ function RoomPage() {
           </div>
         </div>
       </div>
-      <ParticipantsDrawer setShowParticipantsPanel={setShowParticipantsPanel} />
+      <ParticipantsDrawer
+        setShowParticipantsPanel={setShowParticipantsPanel}
+        roomId={search.rid}
+      />
 
       {showShareModal && data.room && (
         <ShareRoomModal

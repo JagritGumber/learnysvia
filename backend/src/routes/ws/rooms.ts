@@ -1,9 +1,13 @@
-import { getActiveRoomParticipants } from "@/services/participants.service";
+import { selectRoomParticipantSchema } from "@/database/schemas";
+import {
+  addWsIdForParticipant,
+  getActiveRoomParticipants,
+} from "@/services/participants.service";
 import { getRoomByIdentifierWithParticipantCount } from "@/services/rooms.service";
 import { Elysia } from "elysia";
 import z from "zod";
 
-export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id", {
+export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
   body: z.union([
     z.object({
       event: z.literal("participants:get"),
@@ -12,33 +16,26 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id", {
   ]),
   response: z.union([
     z.object({
-      event: z.literal("participant:result"),
-      participants: z.array(
-        z.object({
-          id: z.string(),
-          roomId: z.string(),
-          userId: z.string().nullable(),
-          anonymousId: z.string().nullable(),
-          wsId: z.string().nullable(),
-          displayName: z.string().nullable(),
-          participantType: z.enum(["authenticated", "anonymous"]),
-          role: z.enum(["host", "co_host", "participant"]).nullable(),
-          createdAt: z.date(),
-        })
-      ),
+      event: z.literal("participants:result"),
+      participants: z.array(selectRoomParticipantSchema),
       message: z.string(),
     }),
     z.object({
       event: z.literal("error"),
       message: z.string(),
     }),
+    z.object({
+      event: z.literal("participant:updated"),
+      participant: selectRoomParticipantSchema,
+    }),
   ]),
   params: z.object({
     id: z.string(),
+    pid: z.string(),
   }),
   open: async (ws) => {
     const room = await getRoomByIdentifierWithParticipantCount(
-      ws.data.query.id
+      ws.data.params.id
     );
     if (!room) {
       ws.send({
@@ -47,12 +44,17 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id", {
       });
       ws.close();
     }
+    const participant = await addWsIdForParticipant(ws.data.params.pid, ws.id);
+    ws.send({
+      event: "participant:updated",
+      participant,
+    });
   },
   message: async (ws, data) => {
     if (data.event === "participants:get") {
       const participants = await getActiveRoomParticipants(data.roomId);
       ws.send({
-        event: "participant:result",
+        event: "participants:result",
         participants,
         message: "Successfully fetched participants",
       });

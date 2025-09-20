@@ -1,15 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRoomMutations } from "../../mutations/rooms";
 import { useEffect } from "react";
+import z from "zod";
+
+const searchSchema = z.object({
+  rid: z.string(),
+});
 
 export const Route = createFileRoute("/_public/join/$code")({
   component: JoinRoomPage,
+  validateSearch: (search) => searchSchema.parse(search),
 });
 
 function JoinRoomPage() {
   const { code } = Route.useParams();
   const { joinRoom } = useRoomMutations();
   const navigate = Route.useNavigate();
+  const search = Route.useSearch();
 
   useEffect(() => {
     if (!joinRoom.isPending && !joinRoom.isSuccess) {
@@ -22,6 +29,10 @@ function JoinRoomPage() {
       to: "/room/$id",
       params: {
         id: code,
+      },
+      search: {
+        pid: joinRoom.data?.id,
+        rid: search.rid,
       },
     });
   }
