@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { type Room } from "../utils/rooms-api";
 import { ShareRoomModal } from "./ShareRoomModal";
-import { toast } from "react-hot-toast";
 import { useNavigate } from "@tanstack/react-router";
 import { Icon } from "@iconify/react";
-import { api } from "@/utils/treaty";
 
 interface RoomCardProps {
   room: Room;
@@ -14,7 +12,6 @@ interface RoomCardProps {
 export function RoomCard({ room, onDelete }: RoomCardProps) {
   const [showShareModal, setShowShareModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [joining, setJoining] = useState(false);
   const navigate = useNavigate();
 
   const handleDelete = async () => {
@@ -28,19 +25,8 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
     }
   };
 
-  const handleJoin = async () => {
-    setJoining(true);
-    try {
-      const room = await api.websocket.rooms.subscribe();
-      toast.success(`Successfully joined room "${room.name}"!`);
-      // Navigate to room management interface
-      // navigate({ to: "/room/$id", params: { id: result.room.id } });
-    } catch (error) {
-      console.error("Failed to join room:", error);
-      // toast.error("Failed to join room. Please try again.");
-    } finally {
-      setJoining(false);
-    }
+  const handleNavigateToJoin = () => {
+    navigate({ to: "/join/$code", params: { code: room.code } });
   };
 
   return (
@@ -179,15 +165,10 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
           <div className="card-actions justify-end gap-2">
             <button
               className="btn btn-success btn-sm"
-              onClick={handleJoin}
-              disabled={joining}
+              onClick={handleNavigateToJoin}
             >
-              {joining ? (
-                <div className="loading loading-spinner loading-sm"></div>
-              ) : (
-                <Icon icon="lineicons:location-arrow-right" />
-              )}
-              {joining ? "Joining..." : "Join"}
+              <Icon icon="lineicons:location-arrow-right" />
+              Join
             </button>
             <button
               className="btn btn-primary btn-sm"

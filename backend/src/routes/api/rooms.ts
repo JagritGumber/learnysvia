@@ -44,10 +44,12 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
     updateRoom: updateRoomSchema,
     updateRoomStatus: updateRoomStatusSchema,
   })
+  .post("/join", async () => {}, {
+    body: z.object({}),
+  })
   .guard({
     auth: true,
   })
-  // Create room
   .post(
     "/",
     async ({ body, status, user }) => {
