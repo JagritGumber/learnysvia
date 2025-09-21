@@ -1,5 +1,6 @@
 import {
   createRoomSchema,
+  selectCatalogSchema,
   selectRoomParticipantSchema,
   updateRoomSchema,
 } from "../../backend/src/database/schemas";
@@ -15,3 +16,5 @@ export type SelectRoom = z.infer<typeof updateRoomSchema>;
 export type RoomStatus = Required<SelectRoom>["status"];
 
 export type SelectParticipant = z.infer<typeof selectRoomParticipantSchema>;
+
+export type SelectCatalog = z.infer<typeof selectCatalogSchema>;

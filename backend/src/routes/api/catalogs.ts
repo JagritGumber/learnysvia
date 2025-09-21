@@ -25,26 +25,30 @@ export const catalogsRouter = new Elysia({ prefix: "/catalogs" })
   .guard({
     auth: true,
   })
-  .get("/", async ({ user }) => {
-    const userCatalogs = await getUserCatalogs(user.id);
-    return {
-      catalogs: userCatalogs,
-    };
+  .get("/", async ({ user, status }) => {
+    try {
+      const userCatalogs = await getUserCatalogs(user.id);
+      return status(200, userCatalogs);
+    } catch (e) {
+      return status(500);
+    }
   })
   .post(
     "/",
-    async ({ body, user }) => {
-      const { name, description } = body;
+    async ({ body, user, status }) => {
+      try {
+        const { name, description } = body;
 
-      const newCatalog = await createEmptyCatalog({
-        name,
-        description,
-        userId: user.id,
-      });
+        const newCatalog = await createEmptyCatalog({
+          name,
+          description,
+          userId: user.id,
+        });
 
-      return {
-        catalog: newCatalog,
-      };
+        return status(201, newCatalog);
+      } catch (e) {
+        return status(500);
+      }
     },
     {
       body: "createCatalog",
@@ -61,35 +65,43 @@ export const catalogsRouter = new Elysia({ prefix: "/catalogs" })
       app
         .patch(
           "/",
-          async ({ params, body, user }) => {
-            const { cid } = params;
-            const { name, description } = body;
+          async ({ params, body, user, status }) => {
+            try {
+              const { cid } = params;
+              const { name, description } = body;
 
-            const updatedCatalog = await updateCatalog(cid, {
-              name,
-              description,
-              userId: user.id,
-            });
+              const updatedCatalog = await updateCatalog(cid, {
+                name,
+                description,
+                userId: user.id,
+              });
 
-            return {
-              catalog: updatedCatalog,
-            };
+              return status(200, {
+                catalog: updatedCatalog,
+              });
+            } catch (e) {
+              return status(500);
+            }
           },
           {
             body: "updateCatalog",
           }
         )
-        .delete("/", async ({ params, user }) => {
-          const { cid } = params;
+        .delete("/", async ({ params, user, status }) => {
+          try {
+            const { cid } = params;
 
-          const deletedCatalog = deleteCatalog({
-            userId: user.id,
-            catalogId: cid,
-          });
+            const deletedCatalog = deleteCatalog({
+              userId: user.id,
+              catalogId: cid,
+            });
 
-          return {
-            catalog: deletedCatalog,
-          };
+            return status(200, {
+              catalog: deletedCatalog,
+            });
+          } catch (e) {
+            return status(500);
+          }
         })
         .use(questionsRouter)
   );

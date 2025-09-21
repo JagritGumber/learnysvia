@@ -4,6 +4,6 @@ import { roomsRouter } from "./api/rooms";
 import { catalogsRouter } from "./api/catalogs";
 
 export const apiRouter = new Elysia({ prefix: "/api" })
-  .use(catalogsRouter)
   .use(usersRouter)
-  .use(roomsRouter);
+  .use(roomsRouter)
+  .use(catalogsRouter);

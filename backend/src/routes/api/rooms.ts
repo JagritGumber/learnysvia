@@ -17,7 +17,6 @@ import {
   getRoomByIdentifierWithParticipantCount,
   startRoomById,
 } from "@/services/rooms.service";
-import { auth } from "@/utils/auth";
 
 // Generate unique room code
 function generateRoomCode(): string {
@@ -71,7 +70,7 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
           const participant = await addRoomParticipant(roomInfo.id, {
             type: "anon",
             name: body.name,
-            userId: user.id
+            userId: user.id,
           });
           return status(201, participant);
         }
