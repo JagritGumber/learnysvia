@@ -2,12 +2,14 @@ import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { questions } from "./question";
 
 export const options = sqliteTable("options", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: text("id")
+    .primaryKey()
+    .$default(() => Bun.randomUUIDv7()),
   text: text("text").notNull(),
   isCorrect: integer("is_correct", { mode: "boolean" })
     .default(false)
     .notNull(),
-  questionId: integer("question_id")
+  questionId: text("question_id")
     .references(() => questions.id)
     .notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })

@@ -31,18 +31,39 @@ export const createCatalogQuestion = async (
   catalogId: string,
   {
     text,
+    options,
   }: {
     text: string;
+    options?: { text: string; isCorrect: boolean }[];
   }
 ) => {
-  return await db
-    .insert(t.questions)
-    .values({
-      text,
-      catalogId: catalogId,
-    })
-    .returning()
-    .get();
+  return await db.transaction(async (tx) => {
+    // Create the question
+    const question = await tx
+      .insert(t.questions)
+      .values({
+        text,
+        catalogId: catalogId,
+      })
+      .returning()
+      .get();
+
+    // Create options if provided
+    if (options && options.length > 0) {
+      await tx.insert(t.options).values(
+        options.map(
+          (option) =>
+            ({
+              text: option.text,
+              isCorrect: option.isCorrect,
+              questionId: question.id,
+            } satisfies t.InsertOption)
+        )
+      );
+    }
+
+    return question;
+  });
 };
 
 export const updateCatalogQuestion = async (
