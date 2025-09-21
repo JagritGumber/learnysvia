@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react";
 import { useCatalogStore } from "@/store/catalog";
 import { QuestionForm } from "./QuestionForm";
 import { useQuestionById } from "@/queries/questionById.query";
+import { useQuestionFormStore } from "@/store/questionForm.store";
 
 interface CatalogContentProps {}
 
@@ -10,6 +11,9 @@ export function CatalogContent({}: CatalogContentProps) {
   const selectedQuestion = useCatalogStore((state) => state.selectedQuestion);
   const showCreateQuestionForm = useCatalogStore(
     (state) => state.showCreateQuestionForm
+  );
+  const showEditQuestionForm = useCatalogStore(
+    (state) => state.showEditQuestionForm
   );
 
   // Use the query to fetch question data
@@ -38,7 +42,7 @@ export function CatalogContent({}: CatalogContentProps) {
     );
   }
 
-  if (showCreateQuestionForm) {
+  if (showCreateQuestionForm || showEditQuestionForm) {
     return <QuestionForm />;
   }
 
@@ -108,6 +112,19 @@ export function CatalogContent({}: CatalogContentProps) {
 
   const { question } = questionData;
 
+  const handleEditQuestion = () => {
+    // Set edit mode and populate form with existing question data
+    const { setEditMode, populateForm } = useQuestionFormStore.getState();
+    const { setShowEditQuestionForm } = useCatalogStore.getState();
+
+    setEditMode(true, selectedQuestion!);
+    populateForm({
+      text: question.text,
+      options: question.options || [],
+    });
+    setShowEditQuestionForm(true);
+  };
+
   return (
     <div className="flex-1 bg-base-200 p-6">
       <h3 className="text-2xl font-bold text-base-content mb-4">
@@ -174,17 +191,17 @@ export function CatalogContent({}: CatalogContentProps) {
         </div>
       </div>
 
-      {/* <div className="flex gap-3">
-            <button className="btn btn-primary" onClick={onEditQuestion}>
-              Edit Question
-            </button>
-            <button className="btn btn-outline" onClick={onCreatePoll}>
+      <div className="flex gap-3">
+        <button className="btn btn-primary" onClick={handleEditQuestion}>
+          Edit Question
+        </button>
+        {/* <button className="btn btn-outline" onClick={onCreatePoll}>
               Create Poll
             </button>
             <button className="btn btn-ghost" onClick={onDeleteQuestion}>
               Delete
-            </button>
-          </div> */}
+            </button> */}
+      </div>
     </div>
   );
 }

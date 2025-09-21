@@ -31,5 +31,38 @@ export const useQuestionMutations = () => {
     },
   });
 
-  return { createQuestion };
+  const updateQuestion = useMutation({
+    mutationFn: async ({
+      cid,
+      qid,
+      text,
+      options,
+    }: {
+      cid: string;
+      qid: string;
+      text: string;
+      options: { text: string; isCorrect: boolean }[];
+    }) => {
+      const response = await api.api
+        .catalogs({ cid })
+        .questions({ qid })
+        .patch({
+          text,
+          options,
+        });
+      if (response.error) {
+        throw new Error(
+          typeof response.error.value === "string"
+            ? response.error.value
+            : JSON.stringify(response.error.value)
+        );
+      }
+    },
+    onSuccess: (_data, { cid, qid }) => {
+      queryClient.invalidateQueries({ queryKey: ["catalogs", cid] });
+      queryClient.invalidateQueries({ queryKey: ["questions", qid] });
+    },
+  });
+
+  return { createQuestion, updateQuestion };
 };

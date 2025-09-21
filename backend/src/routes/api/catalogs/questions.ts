@@ -19,12 +19,25 @@ export const questionsRouter = new Elysia({ prefix: "/questions" })
   .use(catalogMacro)
   .model({
     createQuestion: createQuestionSchema.pick({ text: true }).extend({
-      options: z.array(z.object({
-        text: z.string(),
-        isCorrect: z.boolean(),
-      })).optional(),
+      options: z
+        .array(
+          z.object({
+            text: z.string(),
+            isCorrect: z.boolean(),
+          })
+        )
+        .optional(),
     }),
-    updateQuestion: updateQuestionSchema.pick({ text: true }),
+    updateQuestion: updateQuestionSchema.pick({ text: true }).extend({
+      options: z
+        .array(
+          z.object({
+            text: z.string(),
+            isCorrect: z.boolean(),
+          })
+        )
+        .optional(),
+    }),
   })
   .guard({
     auth: true,
@@ -80,10 +93,11 @@ export const questionsRouter = new Elysia({ prefix: "/questions" })
           "/",
           async ({ params, body }) => {
             const { qid } = params;
-            const { text } = body;
+            const { text, options } = body;
 
             const updatedQuestion = await updateCatalogQuestion(qid, {
               text,
+              options,
             });
             return {
               success: true,

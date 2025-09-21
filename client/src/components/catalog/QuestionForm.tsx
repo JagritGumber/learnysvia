@@ -7,14 +7,16 @@ interface QuestionFormProps {}
 
 export function QuestionForm({}: QuestionFormProps) {
   const selectedCatalog = useCatalogStore((state) => state.selectedCatalog);
-  const { createQuestion } = useQuestionMutations();
-  const { setShowCreateQuestionForm } = useCatalogStore.getState();
+  const { createQuestion, updateQuestion } = useQuestionMutations();
+  const { setShowCreateQuestionForm, setShowEditQuestionForm } = useCatalogStore.getState();
 
   // Use the store for all form state
   const {
     text,
     options,
     isSubmitting,
+    isEditMode,
+    editingQuestionId,
     setText,
     addOption,
     removeOption,
@@ -45,20 +47,38 @@ export function QuestionForm({}: QuestionFormProps) {
     setIsSubmitting(true);
 
     try {
-      await createQuestion.mutateAsync?.({
-        text: text.trim(),
-        cid: selectedCatalog!,
-        options: validOptions.map((opt) => ({
-          text: opt.text.trim(),
-          isCorrect: opt.isCorrect,
-        })),
-      });
+      if (isEditMode && editingQuestionId) {
+        // Update existing question
+        await updateQuestion.mutateAsync?.({
+          cid: selectedCatalog!,
+          qid: editingQuestionId,
+          text: text.trim(),
+          options: validOptions.map((opt) => ({
+            text: opt.text.trim(),
+            isCorrect: opt.isCorrect,
+          })),
+        });
 
-      // Reset form and close
-      resetForm();
-      setShowCreateQuestionForm(false);
+        // Reset form and close
+        resetForm();
+        setShowEditQuestionForm(false);
+      } else {
+        // Create new question
+        await createQuestion.mutateAsync?.({
+          text: text.trim(),
+          cid: selectedCatalog!,
+          options: validOptions.map((opt) => ({
+            text: opt.text.trim(),
+            isCorrect: opt.isCorrect,
+          })),
+        });
+
+        // Reset form and close
+        resetForm();
+        setShowCreateQuestionForm(false);
+      }
     } catch (error) {
-      console.error("Error creating question:", error);
+      console.error(`Error ${isEditMode ? 'updating' : 'creating'} question:`, error);
     } finally {
       setIsSubmitting(false);
     }
@@ -66,14 +86,18 @@ export function QuestionForm({}: QuestionFormProps) {
 
   const handleCancel = () => {
     resetForm();
-    setShowCreateQuestionForm(false);
+    if (isEditMode) {
+      setShowEditQuestionForm(false);
+    } else {
+      setShowCreateQuestionForm(false);
+    }
   };
 
   return (
     <div className=" flex-1 bg-base-200 p-6">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-2xl font-bold text-base-content">
-          Create New Question
+          {isEditMode ? "Edit Question" : "Create New Question"}
         </h3>
         <button
           className="btn btn-ghost btn-sm btn-circle"
@@ -187,10 +211,10 @@ export function QuestionForm({}: QuestionFormProps) {
             {isSubmitting ? (
               <>
                 <span className="loading loading-spinner loading-sm"></span>
-                Creating...
+                {isEditMode ? "Updating..." : "Creating..."}
               </>
             ) : (
-              "Create Question"
+              isEditMode ? "Update Question" : "Create Question"
             )}
           </button>
         </div>

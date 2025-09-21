@@ -70,18 +70,53 @@ export const updateCatalogQuestion = async (
   qid: string,
   {
     text,
+    options,
   }: {
     text: string | undefined;
+    options?: { text: string; isCorrect: boolean }[];
   }
 ) => {
-  await db
-    .update(t.questions)
-    .set({
-      text,
-    })
-    .where(q.eq(t.questions.id, qid))
-    .returning()
-    .get();
+  return await db.transaction(async (tx) => {
+    // Update the question text if provided
+    if (text !== undefined) {
+      await tx
+        .update(t.questions)
+        .set({
+          text,
+        })
+        .where(q.eq(t.questions.id, qid));
+    }
+
+    // Update options if provided
+    if (options !== undefined) {
+      // Delete existing options
+      await tx
+        .delete(t.options)
+        .where(q.eq(t.options.questionId, qid));
+
+      // Insert new options
+      if (options.length > 0) {
+        await tx.insert(t.options).values(
+          options.map(
+            (option) =>
+              ({
+                text: option.text,
+                isCorrect: option.isCorrect,
+                questionId: qid,
+              } satisfies t.InsertOption)
+          )
+        );
+      }
+    }
+
+    // Return the updated question with options
+    return await tx.query.questions.findFirst({
+      where: q.eq(t.questions.id, qid),
+      with: {
+        options: true,
+      },
+    });
+  });
 };
 
 export const deleteCatalogQuestion = async (qid: string) => {
