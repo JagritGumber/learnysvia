@@ -75,6 +75,7 @@ export const useRoomMutations = () => {
         to: "/room/$id",
         params: { id: variables.code },
         search: { pid: data?.id, rid: data.roomId },
+        replace: true,
       });
     },
     onError: async (error) => {

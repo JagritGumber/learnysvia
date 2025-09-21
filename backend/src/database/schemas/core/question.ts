@@ -1,6 +1,11 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { catalogs } from "./catalog";
-import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
+import z from "zod";
 
 export const questions = sqliteTable("questions", {
   id: text("id")
@@ -25,3 +30,9 @@ export type NewQuestion = typeof questions.$inferInsert;
 
 export const createQuestionSchema = createInsertSchema(questions);
 export const updateQuestionSchema = createUpdateSchema(questions);
+export const selectQuestionSchema = createSelectSchema(questions, {
+  id: z.string(),
+  title: z.string(),
+  content: z.string(),
+  catalogId: z.string(),
+});

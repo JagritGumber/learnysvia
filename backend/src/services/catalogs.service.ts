@@ -33,6 +33,46 @@ export const getUserCatalog = async (
     .get();
 };
 
+export const getUserCatalogWithQuestions = async (
+  cid: string,
+  { userId }: { userId: string }
+) => {
+  const catalog = await db
+    .select({
+      id: t.catalogs.id,
+      name: t.catalogs.name,
+      description: t.catalogs.description,
+      userId: t.catalogs.userId,
+      createdAt: t.catalogs.createdAt,
+      updatedAt: t.catalogs.updatedAt,
+    })
+    .from(t.catalogs)
+    .where(q.and(q.eq(t.catalogs.id, cid), q.eq(t.catalogs.userId, userId)))
+    .get();
+
+  if (!catalog) {
+    return null;
+  }
+
+  const questions = await db
+    .select({
+      id: t.questions.id,
+      title: t.questions.title,
+      content: t.questions.content,
+      catalogId: t.questions.catalogId,
+      createdAt: t.questions.createdAt,
+      updatedAt: t.questions.updatedAt,
+    })
+    .from(t.questions)
+    .where(q.eq(t.questions.catalogId, cid))
+    .orderBy(t.questions.createdAt);
+
+  return {
+    ...catalog,
+    questions,
+  };
+};
+
 export const createEmptyCatalog = async ({
   name,
   description,

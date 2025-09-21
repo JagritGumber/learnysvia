@@ -1,33 +1,46 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { pollsApi, type Question, type Option } from "@/utils/polls-api";
+import { useEffect, useState } from "react";
+import { pollsApi } from "@/utils/polls-api";
 import { Icon } from "@iconify/react";
 import { useCatalogs } from "@/queries/catalogs";
 import { CreateCatalogModal } from "@/components/CreateCatalogModal";
 import { useCatalogMutations } from "@/mutations/catalog";
+import { useCatalogStore } from "@/store/catalog";
+import { CatalogSidebar } from "@/components/CatalogSidebar";
+import { QuestionsPanel } from "@/components/QuestionsPanel";
+import { MainContent } from "@/components/MainContent";
 
 export const Route = createFileRoute("/_protected/_dashboard/catalog")({
   component: CatalogPage,
 });
 
 function CatalogPage() {
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [options, setOptions] = useState<Option[]>([]);
-  const [selectedCatalog, setSelectedCatalog] = useState<number | null>(null);
-  const [selectedQuestion, setSelectedQuestion] = useState<number | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const {
+    questions,
+    options,
+    selectedCatalog,
+    selectedQuestion,
+    showCreateModal,
+    setQuestions,
+    setOptions,
+    setShowCreateModal,
+  } = useCatalogStore();
+
   const { data: catalogs, isPending, error, refetch } = useCatalogs();
-  const { createCatalog } = useCatalogMutations();
+  const { createCatalog, deleteCatalog } = useCatalogMutations();
+
+  // State for delete confirmation modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [catalogToDelete, setCatalogToDelete] = useState<string | null>(null);
 
   // Load questions when catalog changes
   useEffect(() => {
     if (selectedCatalog) {
-      loadQuestions(selectedCatalog);
+      loadQuestions(parseInt(selectedCatalog));
     } else {
       setQuestions([]);
-      setSelectedQuestion(null);
     }
-  }, [selectedCatalog]);
+  }, [selectedCatalog, setQuestions]);
 
   // Load options when question changes
   useEffect(() => {
@@ -36,7 +49,7 @@ function CatalogPage() {
     } else {
       setOptions([]);
     }
-  }, [selectedQuestion]);
+  }, [selectedQuestion, setOptions]);
 
   const loadQuestions = async (catalogId: number) => {
     try {
@@ -56,21 +69,74 @@ function CatalogPage() {
     }
   };
 
-  const handleCatalogClick = (catalogId: number) => {
-    setSelectedCatalog(catalogId);
-    setSelectedQuestion(null);
-  };
-
-  const handleQuestionClick = (questionId: number) => {
-    setSelectedQuestion(questionId);
-  };
-
   const selectedCatalogData = selectedCatalog
     ? catalogs?.find((c) => c.id === selectedCatalog)
     : null;
   const selectedQuestionData = selectedQuestion
     ? questions.find((q) => q.id === selectedQuestion)
     : null;
+
+  // Event handlers
+  const handleCreateCatalog = () => {
+    setShowCreateModal(true);
+  };
+
+  const handleCreateQuestion = () => {
+    // TODO: Implement create question functionality
+    console.log("Create question clicked");
+  };
+
+  const handleDeleteCatalog = (catalogId: string) => {
+    setCatalogToDelete(catalogId);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (catalogToDelete) {
+      try {
+        await deleteCatalog.mutateAsync({ id: catalogToDelete });
+        setShowDeleteModal(false);
+        setCatalogToDelete(null);
+      } catch (error) {
+        console.error("Failed to delete catalog:", error);
+      }
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setCatalogToDelete(null);
+  };
+
+  const handleEditQuestion = () => {
+    // TODO: Implement edit question functionality
+    console.log("Edit question clicked");
+  };
+
+  const handleCreatePoll = () => {
+    // TODO: Implement create poll functionality
+    console.log("Create poll clicked");
+  };
+
+  const handleDeleteQuestion = () => {
+    // TODO: Implement delete question functionality
+    console.log("Delete question clicked");
+  };
+
+  const handleAddOption = () => {
+    // TODO: Implement add option functionality
+    console.log("Add option clicked");
+  };
+
+  const handleEditOption = (optionId: number) => {
+    // TODO: Implement edit option functionality
+    console.log("Edit option clicked:", optionId);
+  };
+
+  const handleDeleteOption = (optionId: number) => {
+    // TODO: Implement delete option functionality
+    console.log("Delete option clicked:", optionId);
+  };
 
   if (isPending) {
     return (
@@ -103,158 +169,34 @@ function CatalogPage() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-base-100 flex">
-      {/* Main Catalog Sidebar */}
-      <div className="w-64 bg-base-100 border-r border-base-300">
-        <div className="p-4 border-b border-base-300">
-          <h2 className="text-lg font-semibold text-base-content">
-            Question Catalogs
-          </h2>
-          <button
-            className="btn btn-primary btn-sm mt-2 w-full"
-            onClick={() => setShowCreateModal(true)}
-          >
-            + New Catalog
-          </button>
-        </div>
-        <div className="p-2">
-          {catalogs.map((catalog) => (
-            <button
-              key={catalog.id}
-              onClick={() => handleCatalogClick(catalog.id)}
-              className={`w-full text-left p-3 rounded-lg mb-1 transition-colors ${
-                selectedCatalog === catalog.id
-                  ? "bg-primary text-primary-content"
-                  : "hover:bg-base-300 text-base-content"
-              }`}
-            >
-              <div className="font-medium">{catalog.name}</div>
-              <div className="text-sm opacity-70">
-                {catalog.questionCount} questions
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Left Sidebar - Catalogs */}
+      <CatalogSidebar
+        catalogs={catalogs || []}
+        onCreateCatalog={handleCreateCatalog}
+      />
 
-      {/* Questions Sidebar */}
+      {/* Middle Panel - Questions */}
       {selectedCatalog && (
-        <div className="w-80 bg-base-100 border-r border-base-300">
-          <div className="p-4 border-b border-base-300">
-            <h3 className="text-lg font-semibold text-base-content">
-              {selectedCatalogData?.name} Questions
-            </h3>
-            <button className="btn btn-accent btn-sm mt-2 w-full">
-              + New Question
-            </button>
-          </div>
-          <div className="p-2 max-h-[calc(100vh-200px)] overflow-y-auto">
-            {questions.map((question) => (
-              <button
-                key={question.id}
-                onClick={() => handleQuestionClick(question.id)}
-                className={`w-full text-left p-3 rounded-lg mb-2 transition-colors ${
-                  selectedQuestion === question.id
-                    ? "bg-secondary text-secondary-content"
-                    : "hover:bg-base-200 text-base-content"
-                }`}
-              >
-                <div className="font-medium text-sm line-clamp-2">
-                  {question.title}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
+        <QuestionsPanel
+          questions={questions}
+          selectedCatalogData={selectedCatalogData ?? null}
+          onDeleteCatalog={() => handleDeleteCatalog(selectedCatalog)}
+          onCreateQuestion={handleCreateQuestion}
+        />
       )}
 
-      {/* Main Content Area */}
-      <div className="flex-1 p-6 bg-base-200">
-        {!selectedCatalog ? (
-          <div className="text-center py-12">
-            <Icon
-              icon="lineicons:bar-chart"
-              className="text-6xl mb-4 text-base-content/50"
-            />
-            <h1 className="text-3xl font-bold text-base-content mb-4">
-              Poll Management Dashboard
-            </h1>
-            <p className="text-base-content/70 text-lg max-w-md mx-auto">
-              Select a catalog from the sidebar to view and manage your
-              questions.
-            </p>
-          </div>
-        ) : !selectedQuestion ? (
-          <div className="text-center py-12">
-            <Icon
-              icon="lineicons:notebook-1"
-              className="text-5xl mb-4 text-base-content/50"
-            />
-            <h2 className="text-2xl font-bold text-base-content mb-4">
-              {selectedCatalogData?.name}
-            </h2>
-            <p className="text-base-content/70">
-              Select a question from the sidebar to view its details and manage
-              options.
-            </p>
-          </div>
-        ) : (
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-base-100 rounded-lg border border-base-300 p-6">
-              <h3 className="text-2xl font-bold text-base-content mb-4">
-                {selectedQuestionData?.title}
-              </h3>
-              <div className="prose prose-lg max-w-none mb-6">
-                <p className="text-base-content/80 leading-relaxed">
-                  {selectedQuestionData?.content}
-                </p>
-              </div>
-
-              {/* Options Section */}
-              <div className="mb-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-lg font-semibold text-base-content">
-                    Answer Options
-                  </h4>
-                  <button className="btn btn-accent btn-sm">
-                    + Add Option
-                  </button>
-                </div>
-                <div className="space-y-2">
-                  {options.map((option) => (
-                    <div
-                      key={option.id}
-                      className={`p-3 rounded-lg border ${
-                        option.isCorrect
-                          ? "border-success bg-success/10"
-                          : "border-base-300"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-base-content">{option.text}</span>
-                        <div className="flex gap-2">
-                          {option.isCorrect && (
-                            <span className="badge badge-success">Correct</span>
-                          )}
-                          <button className="btn btn-ghost btn-xs">Edit</button>
-                          <button className="btn btn-ghost btn-xs text-error">
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button className="btn btn-primary">Edit Question</button>
-                <button className="btn btn-outline">Create Poll</button>
-                <button className="btn btn-ghost">Delete</button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Right Panel - Main Content */}
+      <MainContent
+        selectedCatalogData={selectedCatalogData ?? null}
+        selectedQuestionData={selectedQuestionData ?? null}
+        options={options}
+        onEditQuestion={handleEditQuestion}
+        onCreatePoll={handleCreatePoll}
+        onDeleteQuestion={handleDeleteQuestion}
+        onAddOption={handleAddOption}
+        onEditOption={handleEditOption}
+        onDeleteOption={handleDeleteOption}
+      />
 
       {/* Create Catalog Modal */}
       {showCreateModal && (
@@ -262,6 +204,45 @@ function CatalogPage() {
           onClose={() => setShowCreateModal(false)}
           onCreate={(data) => createCatalog.mutateAsync(data)}
         />
+      )}
+
+      {showDeleteModal && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Delete Catalog</h3>
+            <p className="py-4">
+              Are you sure you want to delete this catalog? This action cannot
+              be undone and will also delete all questions and options
+              associated with this catalog.
+            </p>
+            <div className="modal-action">
+              <button
+                className="btn"
+                onClick={handleCancelDelete}
+                disabled={deleteCatalog.isPending}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-error"
+                onClick={handleConfirmDelete}
+                disabled={deleteCatalog.isPending}
+              >
+                {deleteCatalog.isPending ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="lineicons:trash-3" className="size-4" />
+                    Delete
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

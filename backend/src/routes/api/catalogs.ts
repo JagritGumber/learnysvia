@@ -96,9 +96,7 @@ export const catalogsRouter = new Elysia({ prefix: "/catalogs" })
               catalogId: cid,
             });
 
-            return status(200, {
-              catalog: deletedCatalog,
-            });
+            return status(200, deletedCatalog);
           } catch (e) {
             return status(500);
           }
