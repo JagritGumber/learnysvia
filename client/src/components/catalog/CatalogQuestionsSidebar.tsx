@@ -6,7 +6,7 @@ import { AutoSizeLoader } from "../core/AutoSizeLoader";
 interface CatalogQuestionsSidebarProps {}
 
 export function CatalogQuestionsSidebar({}: CatalogQuestionsSidebarProps) {
-  const { setSelectedQuestion, setShowDeleteModal } =
+  const { setSelectedQuestion, setShowDeleteModal, setShowCreateQuestionForm } =
     useCatalogStore.getState();
   const selectedCatalog = useCatalogStore((state) => state.selectedCatalog);
   const selectedQuestion = useCatalogStore((state) => state.selectedQuestion);
@@ -25,8 +25,8 @@ export function CatalogQuestionsSidebar({}: CatalogQuestionsSidebarProps) {
   };
 
   const handleCreateQuestion = () => {
-    // TODO: Implement create question functionality
-    console.log("Create question clicked");
+    setSelectedQuestion(null); // Clear any selected question
+    setShowCreateQuestionForm(true);
   };
 
   if (isPending) {

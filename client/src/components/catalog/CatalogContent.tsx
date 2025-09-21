@@ -1,11 +1,13 @@
 import { Icon } from "@iconify/react";
 import { useCatalogStore } from "@/store/catalog";
+import { QuestionForm } from "./QuestionForm";
 
 interface CatalogContentProps {}
 
 export function CatalogContent({}: CatalogContentProps) {
   const selectedCatalog = useCatalogStore((state) => state.selectedCatalog);
   const selectedQuestion = useCatalogStore((state) => state.selectedQuestion);
+  const showCreateQuestionForm = useCatalogStore((state) => state.showCreateQuestionForm);
 
   if (!selectedCatalog) {
     return (
@@ -24,6 +26,10 @@ export function CatalogContent({}: CatalogContentProps) {
         </div>
       </div>
     );
+  }
+
+  if (showCreateQuestionForm) {
+    return <QuestionForm />;
   }
 
   if (!selectedQuestion) {
