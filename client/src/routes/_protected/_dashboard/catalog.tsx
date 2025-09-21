@@ -4,7 +4,7 @@ import { pollsApi, type Question, type Option } from "@/utils/polls-api";
 import { Icon } from "@iconify/react";
 import { useCatalogs } from "@/queries/catalogs";
 import { CreateCatalogModal } from "@/components/CreateCatalogModal";
-import type { CreateCatalog } from "@/shared/types/catalog";
+import { useCatalogMutations } from "@/mutations/catalog";
 
 export const Route = createFileRoute("/_protected/_dashboard/catalog")({
   component: CatalogPage,
@@ -17,6 +17,7 @@ function CatalogPage() {
   const [selectedQuestion, setSelectedQuestion] = useState<number | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { data: catalogs, isPending, error, refetch } = useCatalogs();
+  const { createCatalog } = useCatalogMutations();
 
   // Load questions when catalog changes
   useEffect(() => {
@@ -64,18 +65,6 @@ function CatalogPage() {
     setSelectedQuestion(questionId);
   };
 
-  const handleCreateCatalog = async (data: CreateCatalog) => {
-    try {
-      // TODO: Implement catalog creation API call
-      console.log("Creating catalog:", data);
-      // After successful creation, refetch catalogs to update the list
-      await refetch();
-    } catch (err) {
-      console.error("Failed to create catalog:", err);
-      throw err; // Re-throw to let the modal handle the error
-    }
-  };
-
   const selectedCatalogData = selectedCatalog
     ? catalogs?.find((c) => c.id === selectedCatalog)
     : null;
@@ -115,7 +104,7 @@ function CatalogPage() {
   return (
     <div className="min-h-[calc(100vh-64px)] bg-base-100 flex">
       {/* Main Catalog Sidebar */}
-      <div className="w-64 bg-base-200 border-r border-base-300">
+      <div className="w-64 bg-base-100 border-r border-base-300">
         <div className="p-4 border-b border-base-300">
           <h2 className="text-lg font-semibold text-base-content">
             Question Catalogs
@@ -154,7 +143,7 @@ function CatalogPage() {
             <h3 className="text-lg font-semibold text-base-content">
               {selectedCatalogData?.name} Questions
             </h3>
-            <button className="btn btn-secondary btn-sm mt-2 w-full">
+            <button className="btn btn-accent btn-sm mt-2 w-full">
               + New Question
             </button>
           </div>
@@ -179,7 +168,7 @@ function CatalogPage() {
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 bg-base-200">
         {!selectedCatalog ? (
           <div className="text-center py-12">
             <Icon
@@ -271,7 +260,7 @@ function CatalogPage() {
       {showCreateModal && (
         <CreateCatalogModal
           onClose={() => setShowCreateModal(false)}
-          onCreate={handleCreateCatalog}
+          onCreate={(data) => createCatalog.mutateAsync(data)}
         />
       )}
     </div>

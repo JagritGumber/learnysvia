@@ -3,10 +3,13 @@ import type { CreateCatalog } from "@/shared/types/catalog";
 
 interface CreateCatalogModalProps {
   onClose: () => void;
-  onCreate: (data: CreateCatalog) => Promise<void>;
+  onCreate: (data: CreateCatalog) => void;
 }
 
-export function CreateCatalogModal({ onClose, onCreate }: CreateCatalogModalProps) {
+export function CreateCatalogModal({
+  onClose,
+  onCreate,
+}: CreateCatalogModalProps) {
   const [formData, setFormData] = useState<CreateCatalog>({
     name: "",
     description: "",
@@ -26,10 +29,7 @@ export function CreateCatalogModal({ onClose, onCreate }: CreateCatalogModalProp
     }
   };
 
-  const handleInputChange = (
-    field: keyof CreateCatalog,
-    value: string
-  ) => {
+  const handleInputChange = (field: keyof CreateCatalog, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,

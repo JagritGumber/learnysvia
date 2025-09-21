@@ -17,14 +17,14 @@ function Rooms() {
 
   if (isPending) {
     return (
-      <div className="min-h-[calc(100vh-64px)] bg-base-100 flex items-center justify-center">
+      <div className="min-h-[calc(100vh-64px)] bg-base-200 flex items-center justify-center">
         <div className="loading loading-spinner loading-lg"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-base-100">
+    <div className="min-h-[calc(100vh-64px)] bg-base-200">
       <div className="container mx-auto p-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
