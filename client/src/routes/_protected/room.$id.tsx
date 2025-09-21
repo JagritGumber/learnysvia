@@ -14,7 +14,7 @@ const searchSchema = z.object({
   rid: z.string(),
 });
 
-export const Route = createFileRoute("/_public/room/$id")({
+export const Route = createFileRoute("/_protected/room/$id")({
   component: RoomPage,
   validateSearch: (search) => searchSchema.parse(search),
 });

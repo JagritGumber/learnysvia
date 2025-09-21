@@ -35,8 +35,5 @@ export const updateRoomSchema = createUpdateSchema(room);
 export const createRoomSchema = createInsertSchema(room);
 export const getRoomSchema = createSelectSchema(room);
 
-
-
 export type InsertRoom = typeof room.$inferInsert;
 export type SelectRoom = typeof room.$inferSelect;
-

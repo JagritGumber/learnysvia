@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CreateRoomModal } from "../../components/CreateRoomModal";
-import { RoomCard } from "../../components/RoomCard";
+import { CreateRoomModal } from "../../../components/CreateRoomModal";
+import { RoomCard } from "../../../components/RoomCard";
 import { Icon } from "@iconify/react";
 import { useRooms } from "@/queries/rooms";
 import { useRoomMutations } from "@/mutations/rooms";
 import { useState } from "react";
 
-export const Route = createFileRoute("/_protected/rooms")({
+export const Route = createFileRoute("/_protected/_dashboard/rooms")({
   component: Rooms,
 });
 
@@ -37,7 +37,7 @@ function Rooms() {
             </p>
           </div>
           <button
-            className="btn btn-primary btn-lg"
+            className="btn btn-primary btn-md"
             onClick={() => setShowCreateModal(true)}
           >
             <Icon icon="lineicons:plus" className="w-5 h-5 mr-2" />

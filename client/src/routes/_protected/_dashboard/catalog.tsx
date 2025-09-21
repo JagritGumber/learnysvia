@@ -5,10 +5,10 @@ import {
   type Catalog,
   type Question,
   type Option,
-} from "../../utils/polls-api";
+} from "@/utils/polls-api";
 import { Icon } from "@iconify/react";
 
-export const Route = createFileRoute("/_protected/catalog")({
+export const Route = createFileRoute("/_protected/_dashboard/catalog")({
   component: Catalog,
 });
 
@@ -107,7 +107,10 @@ function Catalog() {
     return (
       <div className="min-h-[calc(100vh-64px)] bg-base-100 flex items-center justify-center">
         <div className="text-center">
-          <Icon icon="lineicons:warning" className="text-6xl mb-4 text-warning" />
+          <Icon
+            icon="lineicons:warning"
+            className="text-6xl mb-4 text-warning"
+          />
           <h1 className="text-2xl font-bold text-base-content mb-4">Error</h1>
           <p className="text-base-content/70 mb-4">{error}</p>
           <button className="btn btn-primary" onClick={loadCatalogs}>
@@ -185,7 +188,10 @@ function Catalog() {
       <div className="flex-1 p-6">
         {!selectedCatalog ? (
           <div className="text-center py-12">
-            <Icon icon="lineicons:bar-chart" className="text-6xl mb-4 text-base-content/50" />
+            <Icon
+              icon="lineicons:bar-chart"
+              className="text-6xl mb-4 text-base-content/50"
+            />
             <h1 className="text-3xl font-bold text-base-content mb-4">
               Poll Management Dashboard
             </h1>
@@ -196,7 +202,10 @@ function Catalog() {
           </div>
         ) : !selectedQuestion ? (
           <div className="text-center py-12">
-            <Icon icon="lineicons:notebook-1" className="text-5xl mb-4 text-base-content/50" />
+            <Icon
+              icon="lineicons:notebook-1"
+              className="text-5xl mb-4 text-base-content/50"
+            />
             <h2 className="text-2xl font-bold text-base-content mb-4">
               {selectedCatalogData?.name}
             </h2>

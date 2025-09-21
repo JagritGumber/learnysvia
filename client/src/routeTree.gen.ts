@@ -13,10 +13,11 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
-import { Route as ProtectedRoomsRouteImport } from './routes/_protected/rooms'
-import { Route as ProtectedCatalogRouteImport } from './routes/_protected/catalog'
-import { Route as PublicRoomIdRouteImport } from './routes/_public/room.$id'
+import { Route as ProtectedDashboardRouteRouteImport } from './routes/_protected/_dashboard/route'
 import { Route as PublicJoinCodeRouteImport } from './routes/_public/join.$code'
+import { Route as ProtectedRoomIdRouteImport } from './routes/_protected/room.$id'
+import { Route as ProtectedDashboardRoomsRouteImport } from './routes/_protected/_dashboard/rooms'
+import { Route as ProtectedDashboardCatalogRouteImport } from './routes/_protected/_dashboard/catalog'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -36,69 +37,76 @@ const PublicIndexRoute = PublicIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PublicRouteRoute,
 } as any)
-const ProtectedRoomsRoute = ProtectedRoomsRouteImport.update({
-  id: '/rooms',
-  path: '/rooms',
+const ProtectedDashboardRouteRoute = ProtectedDashboardRouteRouteImport.update({
+  id: '/_dashboard',
   getParentRoute: () => ProtectedRouteRoute,
-} as any)
-const ProtectedCatalogRoute = ProtectedCatalogRouteImport.update({
-  id: '/catalog',
-  path: '/catalog',
-  getParentRoute: () => ProtectedRouteRoute,
-} as any)
-const PublicRoomIdRoute = PublicRoomIdRouteImport.update({
-  id: '/room/$id',
-  path: '/room/$id',
-  getParentRoute: () => PublicRouteRoute,
 } as any)
 const PublicJoinCodeRoute = PublicJoinCodeRouteImport.update({
   id: '/join/$code',
   path: '/join/$code',
   getParentRoute: () => PublicRouteRoute,
 } as any)
+const ProtectedRoomIdRoute = ProtectedRoomIdRouteImport.update({
+  id: '/room/$id',
+  path: '/room/$id',
+  getParentRoute: () => ProtectedRouteRoute,
+} as any)
+const ProtectedDashboardRoomsRoute = ProtectedDashboardRoomsRouteImport.update({
+  id: '/rooms',
+  path: '/rooms',
+  getParentRoute: () => ProtectedDashboardRouteRoute,
+} as any)
+const ProtectedDashboardCatalogRoute =
+  ProtectedDashboardCatalogRouteImport.update({
+    id: '/catalog',
+    path: '/catalog',
+    getParentRoute: () => ProtectedDashboardRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
-  '/catalog': typeof ProtectedCatalogRoute
-  '/rooms': typeof ProtectedRoomsRoute
   '/': typeof PublicIndexRoute
+  '/catalog': typeof ProtectedDashboardCatalogRoute
+  '/rooms': typeof ProtectedDashboardRoomsRoute
+  '/room/$id': typeof ProtectedRoomIdRoute
   '/join/$code': typeof PublicJoinCodeRoute
-  '/room/$id': typeof PublicRoomIdRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
-  '/catalog': typeof ProtectedCatalogRoute
-  '/rooms': typeof ProtectedRoomsRoute
   '/': typeof PublicIndexRoute
+  '/catalog': typeof ProtectedDashboardCatalogRoute
+  '/rooms': typeof ProtectedDashboardRoomsRoute
+  '/room/$id': typeof ProtectedRoomIdRoute
   '/join/$code': typeof PublicJoinCodeRoute
-  '/room/$id': typeof PublicRoomIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_protected': typeof ProtectedRouteRouteWithChildren
   '/_public': typeof PublicRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/_protected/catalog': typeof ProtectedCatalogRoute
-  '/_protected/rooms': typeof ProtectedRoomsRoute
+  '/_protected/_dashboard': typeof ProtectedDashboardRouteRouteWithChildren
   '/_public/': typeof PublicIndexRoute
+  '/_protected/_dashboard/catalog': typeof ProtectedDashboardCatalogRoute
+  '/_protected/_dashboard/rooms': typeof ProtectedDashboardRoomsRoute
+  '/_protected/room/$id': typeof ProtectedRoomIdRoute
   '/_public/join/$code': typeof PublicJoinCodeRoute
-  '/_public/room/$id': typeof PublicRoomIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/auth' | '/catalog' | '/rooms' | '/' | '/join/$code' | '/room/$id'
+  fullPaths: '/auth' | '/' | '/catalog' | '/rooms' | '/room/$id' | '/join/$code'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/catalog' | '/rooms' | '/' | '/join/$code' | '/room/$id'
+  to: '/auth' | '/' | '/catalog' | '/rooms' | '/room/$id' | '/join/$code'
   id:
     | '__root__'
     | '/_protected'
     | '/_public'
     | '/auth'
-    | '/_protected/catalog'
-    | '/_protected/rooms'
+    | '/_protected/_dashboard'
     | '/_public/'
+    | '/_protected/_dashboard/catalog'
+    | '/_protected/_dashboard/rooms'
+    | '/_protected/room/$id'
     | '/_public/join/$code'
-    | '/_public/room/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -137,26 +145,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicIndexRouteImport
       parentRoute: typeof PublicRouteRoute
     }
-    '/_protected/rooms': {
-      id: '/_protected/rooms'
-      path: '/rooms'
-      fullPath: '/rooms'
-      preLoaderRoute: typeof ProtectedRoomsRouteImport
+    '/_protected/_dashboard': {
+      id: '/_protected/_dashboard'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof ProtectedDashboardRouteRouteImport
       parentRoute: typeof ProtectedRouteRoute
-    }
-    '/_protected/catalog': {
-      id: '/_protected/catalog'
-      path: '/catalog'
-      fullPath: '/catalog'
-      preLoaderRoute: typeof ProtectedCatalogRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
-    '/_public/room/$id': {
-      id: '/_public/room/$id'
-      path: '/room/$id'
-      fullPath: '/room/$id'
-      preLoaderRoute: typeof PublicRoomIdRouteImport
-      parentRoute: typeof PublicRouteRoute
     }
     '/_public/join/$code': {
       id: '/_public/join/$code'
@@ -165,17 +159,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicJoinCodeRouteImport
       parentRoute: typeof PublicRouteRoute
     }
+    '/_protected/room/$id': {
+      id: '/_protected/room/$id'
+      path: '/room/$id'
+      fullPath: '/room/$id'
+      preLoaderRoute: typeof ProtectedRoomIdRouteImport
+      parentRoute: typeof ProtectedRouteRoute
+    }
+    '/_protected/_dashboard/rooms': {
+      id: '/_protected/_dashboard/rooms'
+      path: '/rooms'
+      fullPath: '/rooms'
+      preLoaderRoute: typeof ProtectedDashboardRoomsRouteImport
+      parentRoute: typeof ProtectedDashboardRouteRoute
+    }
+    '/_protected/_dashboard/catalog': {
+      id: '/_protected/_dashboard/catalog'
+      path: '/catalog'
+      fullPath: '/catalog'
+      preLoaderRoute: typeof ProtectedDashboardCatalogRouteImport
+      parentRoute: typeof ProtectedDashboardRouteRoute
+    }
   }
 }
 
+interface ProtectedDashboardRouteRouteChildren {
+  ProtectedDashboardCatalogRoute: typeof ProtectedDashboardCatalogRoute
+  ProtectedDashboardRoomsRoute: typeof ProtectedDashboardRoomsRoute
+}
+
+const ProtectedDashboardRouteRouteChildren: ProtectedDashboardRouteRouteChildren =
+  {
+    ProtectedDashboardCatalogRoute: ProtectedDashboardCatalogRoute,
+    ProtectedDashboardRoomsRoute: ProtectedDashboardRoomsRoute,
+  }
+
+const ProtectedDashboardRouteRouteWithChildren =
+  ProtectedDashboardRouteRoute._addFileChildren(
+    ProtectedDashboardRouteRouteChildren,
+  )
+
 interface ProtectedRouteRouteChildren {
-  ProtectedCatalogRoute: typeof ProtectedCatalogRoute
-  ProtectedRoomsRoute: typeof ProtectedRoomsRoute
+  ProtectedDashboardRouteRoute: typeof ProtectedDashboardRouteRouteWithChildren
+  ProtectedRoomIdRoute: typeof ProtectedRoomIdRoute
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
-  ProtectedCatalogRoute: ProtectedCatalogRoute,
-  ProtectedRoomsRoute: ProtectedRoomsRoute,
+  ProtectedDashboardRouteRoute: ProtectedDashboardRouteRouteWithChildren,
+  ProtectedRoomIdRoute: ProtectedRoomIdRoute,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
@@ -185,13 +216,11 @@ const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
 interface PublicRouteRouteChildren {
   PublicIndexRoute: typeof PublicIndexRoute
   PublicJoinCodeRoute: typeof PublicJoinCodeRoute
-  PublicRoomIdRoute: typeof PublicRoomIdRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicIndexRoute: PublicIndexRoute,
   PublicJoinCodeRoute: PublicJoinCodeRoute,
-  PublicRoomIdRoute: PublicRoomIdRoute,
 }
 
 const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
