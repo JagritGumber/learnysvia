@@ -3,6 +3,7 @@ import { useCatalogStore } from "@/store/catalog";
 import { QuestionForm } from "./QuestionForm";
 import { useQuestionById } from "@/queries/questionById.query";
 import { useQuestionFormStore } from "@/store/questionForm.store";
+import { DeleteQuestionAlertModal } from "@/components/modals/DeleteQuestionAlertModal";
 
 interface CatalogContentProps {}
 
@@ -14,6 +15,9 @@ export function CatalogContent({}: CatalogContentProps) {
   );
   const showEditQuestionForm = useCatalogStore(
     (state) => state.showEditQuestionForm
+  );
+  const showDeleteQuestionModal = useCatalogStore(
+    (state) => state.showDeleteQuestionModal
   );
 
   // Use the query to fetch question data
@@ -125,6 +129,11 @@ export function CatalogContent({}: CatalogContentProps) {
     setShowEditQuestionForm(true);
   };
 
+  const handleDeleteQuestion = () => {
+    const { setShowDeleteQuestionModal } = useCatalogStore.getState();
+    setShowDeleteQuestionModal(true);
+  };
+
   return (
     <div className="flex-1 bg-base-200 p-6">
       <h3 className="text-2xl font-bold text-base-content mb-4">
@@ -197,11 +206,18 @@ export function CatalogContent({}: CatalogContentProps) {
         </button>
         {/* <button className="btn btn-outline" onClick={onCreatePoll}>
               Create Poll
-            </button>
-            <button className="btn btn-ghost" onClick={onDeleteQuestion}>
-              Delete
             </button> */}
+        <button className="btn btn-ghost" onClick={handleDeleteQuestion}>
+          Delete
+        </button>
       </div>
+
+      {/* Delete Question Modal */}
+      {showDeleteQuestionModal && (
+        <div className="modal modal-open">
+          <DeleteQuestionAlertModal />
+        </div>
+      )}
     </div>
   );
 }

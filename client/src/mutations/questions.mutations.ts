@@ -64,5 +64,25 @@ export const useQuestionMutations = () => {
     },
   });
 
-  return { createQuestion, updateQuestion };
+  const deleteQuestion = useMutation({
+    mutationFn: async ({ cid, qid }: { cid: string; qid: string }) => {
+      const response = await api.api
+        .catalogs({ cid })
+        .questions({ qid })
+        .delete();
+      if (response.error) {
+        throw new Error(
+          typeof response.error.value === "string"
+            ? response.error.value
+            : JSON.stringify(response.error.value)
+        );
+      }
+    },
+    onSuccess: (_data, { cid, qid }) => {
+      queryClient.invalidateQueries({ queryKey: ["catalogs", cid] });
+      queryClient.invalidateQueries({ queryKey: ["questions", qid] });
+    },
+  });
+
+  return { createQuestion, updateQuestion, deleteQuestion };
 };

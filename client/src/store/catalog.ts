@@ -5,6 +5,7 @@ interface CatalogState {
   selectedQuestion: string | null;
   showCreateModal: boolean;
   showDeleteModal: boolean;
+  showDeleteQuestionModal: boolean;
   showCreateQuestionForm: boolean;
   showEditQuestionForm: boolean;
 
@@ -13,6 +14,7 @@ interface CatalogState {
   setSelectedQuestion: (questionId: string | null) => void;
   setShowCreateModal: (show: boolean) => void;
   setShowDeleteModal: (show: boolean) => void;
+  setShowDeleteQuestionModal: (show: boolean) => void;
   setShowCreateQuestionForm: (show: boolean) => void;
   setShowEditQuestionForm: (show: boolean) => void;
   clearSelection: () => void;
@@ -24,6 +26,7 @@ export const useCatalogStore = create<CatalogState>((set) => ({
   selectedQuestion: null,
   showCreateModal: false,
   showDeleteModal: false,
+  showDeleteQuestionModal: false,
   showCreateQuestionForm: false,
   showEditQuestionForm: false,
 
@@ -32,6 +35,7 @@ export const useCatalogStore = create<CatalogState>((set) => ({
   setSelectedQuestion: (selectedQuestion) => set({ selectedQuestion }),
   setShowCreateModal: (showCreateModal) => set({ showCreateModal }),
   setShowDeleteModal: (showDeleteModal) => set({ showDeleteModal }),
+  setShowDeleteQuestionModal: (showDeleteQuestionModal) => set({ showDeleteQuestionModal }),
   setShowCreateQuestionForm: (showCreateQuestionForm) =>
     set({ showCreateQuestionForm }),
   setShowEditQuestionForm: (showEditQuestionForm) =>
