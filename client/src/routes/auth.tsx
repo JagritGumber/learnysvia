@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { authClient } from "../utils/auth-client";
+import { Icon } from "@iconify/react";
 
 export const Route = createFileRoute("/auth")({
   component: Auth,
@@ -11,6 +12,7 @@ function Auth() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -71,52 +73,61 @@ function Auth() {
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="form-control">
-                <label className="label">
+                <label className="label mb-1">
                   <span className="label-text">Email</span>
                 </label>
                 <input
                   type="email"
                   autoComplete="email"
                   required
-                  className="input input-bordered w-full focus:input-primary"
+                  className="input input-bordered w-full focus:input-primary validator"
                   placeholder="you@domain.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
                 />
+                <div className="validator-hint hidden">
+                  Please enter a valid email address
+                </div>
               </div>
 
               <div className="form-control">
-                <label className="label">
+                <label className="label block mb-1">
                   <span className="label-text">Password</span>
                 </label>
-                <input
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  className="input input-bordered w-full focus:input-primary"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                />
+                <div className="join w-full">
+                  <div className="w-full">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="current-password"
+                      required
+                      minLength={8}
+                      className="input input-bordered join-item focus:input-primary validator w-full"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={loading}
+                    />
+                    <div className="validator-hint hidden">
+                      Password must be at least 8 characters long
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-ghost join-item"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={loading}
+                  >
+                    <Icon
+                      icon={showPassword ? "ph:eye-bold" : "ph:eye-closed-bold"}
+                    />
+                  </button>
+                </div>
               </div>
 
               {error && (
                 <div className="alert alert-error shadow-sm text-sm">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="stroke-current shrink-0 h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
+                  <Icon icon="ph:x-circle-bold" />
                   <span>{error}</span>
                 </div>
               )}
