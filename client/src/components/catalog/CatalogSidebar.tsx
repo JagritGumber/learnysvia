@@ -46,15 +46,15 @@ export function CatalogSidebar({}: CatalogSidebarProps) {
           <button
             key={catalog.id}
             onClick={() => handleCatalogClick(catalog.id)}
-            className={`w-full text-left p-3 rounded-lg mb-1 transition-colors ${
+            className={`w-full text-left p-3 rounded-lg mb-1 transition-colors flex justify-between ${
               selectedCatalog === catalog.id
-                ? "bg-primary text-primary-content"
+                ? "bg-accent text-accent-content"
                 : "hover:bg-base-300 text-base-content"
             }`}
           >
             <div className="font-medium">{catalog.name}</div>
-            <div className="text-sm opacity-70">
-              {catalog.questionCount} questions
+            <div className="badge badge-outline badge-neutral">
+              {catalog.questionCount}
             </div>
           </button>
         ))}

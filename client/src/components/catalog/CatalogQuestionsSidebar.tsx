@@ -56,7 +56,7 @@ export function CatalogQuestionsSidebar({}: CatalogQuestionsSidebarProps) {
           </button>
         </div>
         <button
-          className="btn btn-accent btn-sm mt-2 w-full"
+          className="btn btn-primary btn-sm mt-2 w-full"
           onClick={handleCreateQuestion}
         >
           + New Question
