@@ -18,3 +18,10 @@ export type RoomStatus = Required<SelectRoom>["status"];
 export type SelectParticipant = z.infer<typeof selectRoomParticipantSchema>;
 
 export type SelectCatalog = z.infer<typeof selectCatalogSchema>;
+
+export type SelectCatalogWithParticipantCount = Omit<
+  SelectCatalog,
+  "userId"
+> & {
+  questionCount: number;
+};

@@ -1,30 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import {
-  pollsApi,
-  type Catalog,
-  type Question,
-  type Option,
-} from "@/utils/polls-api";
+import { pollsApi, type Question, type Option } from "@/utils/polls-api";
 import { Icon } from "@iconify/react";
+import { useCatalogs } from "@/queries/catalogs";
 
 export const Route = createFileRoute("/_protected/_dashboard/catalog")({
-  component: Catalog,
+  component: CatalogPage,
 });
 
-function Catalog() {
-  const [catalogs, setCatalogs] = useState<Catalog[]>([]);
+function CatalogPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [options, setOptions] = useState<Option[]>([]);
   const [selectedCatalog, setSelectedCatalog] = useState<number | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Load catalogs on component mount
-  useEffect(() => {
-    loadCatalogs();
-  }, []);
+  const { data: catalogs, isPending, error, refetch } = useCatalogs();
 
   // Load questions when catalog changes
   useEffect(() => {
@@ -44,19 +33,6 @@ function Catalog() {
       setOptions([]);
     }
   }, [selectedQuestion]);
-
-  const loadCatalogs = async () => {
-    try {
-      setLoading(true);
-      const data = await pollsApi.getCatalogs();
-      setCatalogs(data);
-    } catch (err) {
-      setError("Failed to load catalogs");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const loadQuestions = async (catalogId: number) => {
     try {
@@ -86,13 +62,13 @@ function Catalog() {
   };
 
   const selectedCatalogData = selectedCatalog
-    ? catalogs.find((c) => c.id === selectedCatalog)
+    ? catalogs?.find((c) => c.id === selectedCatalog)
     : null;
   const selectedQuestionData = selectedQuestion
     ? questions.find((q) => q.id === selectedQuestion)
     : null;
 
-  if (loading) {
+  if (isPending) {
     return (
       <div className="min-h-[calc(100vh-64px)] bg-base-100 flex items-center justify-center">
         <div className="text-center">
@@ -112,8 +88,8 @@ function Catalog() {
             className="text-6xl mb-4 text-warning"
           />
           <h1 className="text-2xl font-bold text-base-content mb-4">Error</h1>
-          <p className="text-base-content/70 mb-4">{error}</p>
-          <button className="btn btn-primary" onClick={loadCatalogs}>
+          <p className="text-base-content/70 mb-4">{error.message}</p>
+          <button className="btn btn-primary" onClick={() => refetch()}>
             Try Again
           </button>
         </div>

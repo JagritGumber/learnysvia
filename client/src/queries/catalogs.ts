@@ -1,4 +1,4 @@
-import { SelectCatalog } from "@/shared/types/room";
+import { SelectCatalogWithParticipantCount } from "@/shared/types/room";
 import { api } from "@/utils/treaty";
 import { useQuery } from "@tanstack/react-query";
 
@@ -14,6 +14,6 @@ export const useCatalogs = () =>
             : JSON.stringify(response.error.value)
         );
       }
-      return response.data as SelectCatalog[];
+      return response.data as SelectCatalogWithParticipantCount[];
     },
   });
