@@ -27,8 +27,8 @@ function JoinRoomPage() {
   // If no session, show username form
   if (!session.data?.user) {
     return (
-      <div className="min-h-screen bg-base-100 flex items-center justify-center p-4">
-        <div className="bg-base-100 rounded-lg shadow-xl max-w-md w-full">
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-base-100 rounded-lg shadow-xl max-w-md w-full border border-base-300">
           <div className="p-6">
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
@@ -38,7 +38,13 @@ function JoinRoomPage() {
             </div>
 
             {/* Form */}
-            <form onSubmit={(e) => { e.preventDefault(); handleJoinWithUsername(); }} className="space-y-4">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleJoinWithUsername();
+              }}
+              className="space-y-4"
+            >
               {/* Username Input */}
               <div className="form-control flex flex-col gap-1">
                 <label className="label">

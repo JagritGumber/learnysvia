@@ -15,6 +15,7 @@ export const user = sqliteTable("user", {
     .$default(() => new Date())
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+  isAnonymous: integer("is_anonymous", { mode: "boolean" }),
 });
 
 export type InsertUser = typeof user.$inferInsert;
