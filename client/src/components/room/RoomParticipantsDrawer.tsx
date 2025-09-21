@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react";
 import { useWebsocketStore } from "@/store/websocket";
 import { useEffect } from "react";
 
-export const ParticipantsDrawer = ({
+export const RoomParticipantsDrawer = ({
   setShowParticipantsPanel,
   roomId,
 }: {

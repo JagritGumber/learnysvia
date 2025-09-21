@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react";
 import { useCatalogStore } from "@/store/catalog";
 import { Question } from "@/utils/polls-api";
 
-interface QuestionsPanelProps {
+interface CatalogQuestionsSidebarProps {
   questions: Question[];
   selectedCatalogData: {
     id: string;
@@ -12,12 +12,12 @@ interface QuestionsPanelProps {
   onCreateQuestion: () => void;
 }
 
-export function QuestionsPanel({
+export function CatalogQuestionsSidebar({
   questions,
   selectedCatalogData,
   onDeleteCatalog,
   onCreateQuestion
-}: QuestionsPanelProps) {
+}: CatalogQuestionsSidebarProps) {
   const { selectedQuestion, setSelectedQuestion } = useCatalogStore();
 
   const handleQuestionClick = (questionId: number) => {

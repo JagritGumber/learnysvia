@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CreateRoomModal } from "../../../components/CreateRoomModal";
-import { RoomCard } from "../../../components/RoomCard";
+import { CreateRoomModal } from "../../../components/modals/CreateRoomModal";
+import { RoomCard } from "../../../components/room/RoomCard";
 import { Icon } from "@iconify/react";
 import { useRooms } from "@/queries/rooms";
 import { useRoomMutations } from "@/mutations/rooms";

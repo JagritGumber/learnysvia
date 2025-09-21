@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ShareRoomModal } from "@/components/ShareRoomModal";
+import { ShareRoomModal } from "@/components/modals/ShareRoomModal";
 import { Icon } from "@iconify/react";
 import { useRoomById } from "@/queries/roomById";
-import { ParticipantsDrawer } from "@/components/ParticipantsDrawer";
+import { RoomParticipantsDrawer } from "@/components/room/RoomParticipantsDrawer";
 import { useWebsocketStore } from "@/store/websocket";
 import { api } from "@/utils/treaty";
 import toast from "react-hot-toast";
@@ -172,7 +172,7 @@ function RoomPage() {
           </div>
         </div>
       </div>
-      <ParticipantsDrawer
+      <RoomParticipantsDrawer
         setShowParticipantsPanel={setShowParticipantsPanel}
         roomId={search.rid}
       />

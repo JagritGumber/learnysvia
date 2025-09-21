@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { type Room } from "../utils/rooms-api";
+import { type Room } from "../../utils/rooms-api";
 import { toast } from "react-hot-toast";
 import { Icon } from "@iconify/react";
 

@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react";
 import { useCatalogStore } from "@/store/catalog";
 import { Question, Option } from "@/utils/polls-api";
 
-interface MainContentProps {
+interface CatalogContentProps {
   selectedCatalogData: {
     id: string;
     name: string;
@@ -17,7 +17,7 @@ interface MainContentProps {
   onDeleteOption: (optionId: number) => void;
 }
 
-export function MainContent({
+export function CatalogContent({
   selectedCatalogData,
   selectedQuestionData,
   options,
@@ -27,7 +27,7 @@ export function MainContent({
   onAddOption,
   onEditOption,
   onDeleteOption,
-}: MainContentProps) {
+}: CatalogContentProps) {
   const { selectedCatalog, selectedQuestion } = useCatalogStore();
 
   if (!selectedCatalog) {
@@ -61,7 +61,8 @@ export function MainContent({
             {selectedCatalogData?.name}
           </h2>
           <p className="text-base-content/70">
-            Select a question from the sidebar to view its details and manage options.
+            Select a question from the sidebar to view its details and manage
+            options.
           </p>
         </div>
       </div>
@@ -87,10 +88,7 @@ export function MainContent({
               <h4 className="text-lg font-semibold text-base-content">
                 Answer Options
               </h4>
-              <button
-                className="btn btn-accent btn-sm"
-                onClick={onAddOption}
-              >
+              <button className="btn btn-accent btn-sm" onClick={onAddOption}>
                 + Add Option
               </button>
             </div>
@@ -130,22 +128,13 @@ export function MainContent({
           </div>
 
           <div className="flex gap-3">
-            <button
-              className="btn btn-primary"
-              onClick={onEditQuestion}
-            >
+            <button className="btn btn-primary" onClick={onEditQuestion}>
               Edit Question
             </button>
-            <button
-              className="btn btn-outline"
-              onClick={onCreatePoll}
-            >
+            <button className="btn btn-outline" onClick={onCreatePoll}>
               Create Poll
             </button>
-            <button
-              className="btn btn-ghost"
-              onClick={onDeleteQuestion}
-            >
+            <button className="btn btn-ghost" onClick={onDeleteQuestion}>
               Delete
             </button>
           </div>

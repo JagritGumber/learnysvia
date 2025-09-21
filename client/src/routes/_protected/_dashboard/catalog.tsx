@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { pollsApi } from "@/utils/polls-api";
 import { Icon } from "@iconify/react";
 import { useCatalogs } from "@/queries/catalogs";
-import { CreateCatalogModal } from "@/components/CreateCatalogModal";
+import { CreateCatalogModal } from "@/components/modals/CreateCatalogModal";
 import { useCatalogMutations } from "@/mutations/catalog";
 import { useCatalogStore } from "@/store/catalog";
-import { CatalogSidebar } from "@/components/CatalogSidebar";
-import { QuestionsPanel } from "@/components/QuestionsPanel";
-import { MainContent } from "@/components/MainContent";
+import { CatalogSidebar } from "@/components/catalog/CatalogSidebar";
+import { CatalogQuestionsSidebar } from "@/components/catalog/CatalogQuestionsSidebar";
+import { CatalogContent } from "@/components/catalog/CatalogContent";
 
 export const Route = createFileRoute("/_protected/_dashboard/catalog")({
   component: CatalogPage,
@@ -177,7 +177,7 @@ function CatalogPage() {
 
       {/* Middle Panel - Questions */}
       {selectedCatalog && (
-        <QuestionsPanel
+        <CatalogQuestionsSidebar
           questions={questions}
           selectedCatalogData={selectedCatalogData ?? null}
           onDeleteCatalog={() => handleDeleteCatalog(selectedCatalog)}
@@ -186,7 +186,7 @@ function CatalogPage() {
       )}
 
       {/* Right Panel - Main Content */}
-      <MainContent
+      <CatalogContent
         selectedCatalogData={selectedCatalogData ?? null}
         selectedQuestionData={selectedQuestionData ?? null}
         options={options}

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { type Room } from "../utils/rooms-api";
-import { ShareRoomModal } from "./ShareRoomModal";
+import { type Room } from "../../utils/rooms-api";
+import { ShareRoomModal } from "../modals/ShareRoomModal";
 import { useNavigate } from "@tanstack/react-router";
 import { Icon } from "@iconify/react";
 
