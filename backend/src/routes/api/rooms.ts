@@ -46,13 +46,12 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
     updateRoom: updateRoomSchema,
     updateRoomStatus: updateRoomStatusSchema,
   })
+  .guard({
+    auth: true,
+  })
   .post(
     "/join",
-    async ({ body, status, request: { headers } }) => {
-      const session = await auth.api.getSession({
-        headers,
-      });
-
+    async ({ body, status, user }) => {
       try {
         // Find room by code
         const roomInfo = await getRoomByIdentifierWithParticipantCount(
@@ -66,27 +65,19 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
           return status(409, "Room is full");
         }
 
-        const isAuthenticated = !!session;
-
-        if (
-          (isAuthenticated && body.type === "anon") ||
-          (!isAuthenticated && body.type === "auth")
-        )
-          return status(400);
-
-        if (!isAuthenticated && body.type === "anon") {
+        if (body.type === "anon") {
           if (roomInfo.status === "ended" || roomInfo.status === "not_started")
             return status(400, "Room is not running");
           const participant = await addRoomParticipant(roomInfo.id, {
             type: "anon",
             name: body.name,
-            anonId: Bun.randomUUIDv7(),
+            userId: user.id
           });
           return status(201, participant);
         }
 
         // Either user is authenticated and is the host (start the room)
-        if (isAuthenticated && body.type === "auth") {
+        if (body.type === "auth") {
           if (roomInfo.status === "ended") return status(400, "Room has ended");
 
           if (roomInfo.status === "not_started") {
@@ -94,15 +85,15 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
           }
 
           // if is not room host
-          if (roomInfo.createdBy !== session.user.id) {
+          if (roomInfo.createdBy !== user.id) {
             const participant = await addRoomParticipant(roomInfo.id, {
               type: "auth",
-              name: session.user.name,
-              userId: session.user.id,
+              name: user.name,
+              userId: user.id,
             });
             return status(201, participant);
           }
-          const participant = await addRoomHost(roomInfo.id, session.user.id);
+          const participant = await addRoomHost(roomInfo.id, user.id);
           return status(201, participant);
         }
 
@@ -126,9 +117,6 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
       ]),
     }
   )
-  .guard({
-    auth: true,
-  })
   .post(
     "/",
     async ({ body, status, user }) => {

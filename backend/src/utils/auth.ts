@@ -16,5 +16,9 @@ export const auth = betterAuth({
   trustedOrigins: [env.CLIENT_URL],
   secret: env.BETTER_AUTH_SECRET,
   baseURL: env.BETTER_AUTH_URL,
-  plugins: [anonymous()],
+  plugins: [
+    anonymous({
+      emailDomainName: env.CLIENT_URL.replace(/(https|http):\/\//g, ""),
+    }),
+  ],
 });

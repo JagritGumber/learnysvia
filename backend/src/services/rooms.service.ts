@@ -69,18 +69,12 @@ export const startRoomById = async (id: string) => {
 
 export const addRoomParticipant = async (
   roomId: string,
-  data:
-    | { type: "anon"; name: string; anonId: string }
-    | { type: "auth"; name: string; userId: string }
+  data: { type: "anon" | "auth"; name: string; userId: string }
 ) => {
   const existingUser = await db
     .select()
     .from(t.roomParticipant)
-    .where(
-      data.type === "auth"
-        ? q.eq(t.roomParticipant.userId, data.userId)
-        : q.eq(t.roomParticipant.anonymousId, data.anonId)
-    );
+    .where(q.eq(t.roomParticipant.userId, data.userId));
 
   if (existingUser.length > 0 && existingUser?.[0]) {
     throw new Error("Participant already in the room");
@@ -94,13 +88,7 @@ export const addRoomParticipant = async (
         displayName: data.name,
         participantType: data.type === "anon" ? "anonymous" : "authenticated",
         role: "participant",
-        ...(data.type === "anon"
-          ? {
-              anonymousId: data.anonId,
-            }
-          : {
-              userId: data.userId,
-            }),
+        userId: data.userId,
       })
       .returning()
   )?.[0];

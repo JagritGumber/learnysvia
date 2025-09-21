@@ -13,9 +13,10 @@ function JoinRoomPage() {
   const session = authClient.useSession();
   const [username, setUsername] = useState("");
 
-  const handleJoinWithUsername = () => {
+  const handleJoinWithUsername = async () => {
+    await authClient.signIn.anonymous();
     if (username.trim()) {
-      joinRoom.mutateAsync({ code, name: username.trim(), type: "anon" });
+      await joinRoom.mutateAsync({ code, name: username.trim(), type: "anon" });
     }
   };
 
