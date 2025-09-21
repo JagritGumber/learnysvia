@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ShareRoomModal } from "@/components/modals/ShareRoomModal";
+import { CreatePollModal } from "@/components/modals/CreatePollModal";
 import { Icon } from "@iconify/react";
 import { useRoomById } from "@/queries/roomById.query";
 import { RoomParticipantsDrawer } from "@/components/room/RoomParticipantsDrawer";
@@ -24,7 +25,19 @@ function RoomPage() {
   const { data, isPending, error } = useRoomById(id);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showParticipantsPanel, setShowParticipantsPanel] = useState(false);
+  const [showCreatePollModal, setShowCreatePollModal] = useState(false);
   const search = Route.useSearch();
+
+  const handleCreatePoll = async (questionId: string) => {
+    try {
+      // TODO: Implement poll creation API call
+      console.log("Creating poll with question:", questionId);
+      toast.success("Poll created successfully!");
+    } catch (error) {
+      console.error("Failed to create poll:", error);
+      toast.error("Failed to create poll");
+    }
+  };
 
   const startWebsocketConnection = async () => {
     if (useWebsocketStore.getState().websocket) {
@@ -126,35 +139,41 @@ function RoomPage() {
 
       {/* Main Content */}
       <div className="drawer-content flex flex-col">
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center p-4">
+          {/* Host View - Empty State */}
           <div className="text-center max-w-md mx-auto">
             <div className="mb-8">
               <Icon
-                icon="lineicons:room"
+                icon="lineicons:document"
                 className="text-6xl mb-6 text-primary mx-auto"
               />
               <h1 className="text-3xl font-bold text-base-content mb-2">
-                {data.room.name}
+                Start Your First Poll
               </h1>
               <p className="text-lg text-base-content/70 mb-4">
-                Welcome, {"Guest"}!
+                Create engaging polls for your session participants
               </p>
-              <p className="text-base-content/70">Room ID: {data.room.id}</p>
+              <p className="text-base-content/70 mb-6">
+                Select questions from your catalogs to get started
+              </p>
             </div>
 
-            {/* Action Buttons */}
+            {/* Action Buttons for Host */}
             <div className="flex flex-col gap-4">
               <button
                 className="btn btn-primary btn-lg"
+                onClick={() => setShowCreatePollModal(true)}
+              >
+                <Icon icon="lineicons:plus" className="w-5 h-5 mr-2" />
+                Create Poll
+              </button>
+
+              <button
+                className="btn btn-outline btn-lg"
                 onClick={() => setShowShareModal(true)}
               >
                 <Icon icon="lineicons:share" className="w-5 h-5 mr-2" />
                 Share Room
-              </button>
-
-              <button className="btn btn-outline btn-lg">
-                <Icon icon="lineicons:cog" className="w-5 h-5 mr-2" />
-                Settings
               </button>
             </div>
           </div>
@@ -183,6 +202,12 @@ function RoomPage() {
           onClose={() => setShowShareModal(false)}
         />
       )}
+
+      <CreatePollModal
+        isOpen={showCreatePollModal}
+        onClose={() => setShowCreatePollModal(false)}
+        onCreatePoll={handleCreatePoll}
+      />
     </div>
   );
 }
