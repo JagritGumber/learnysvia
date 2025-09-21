@@ -1,4 +1,4 @@
-import { useCatalogMutations } from "@/mutations/catalog";
+import { useCatalogMutations } from "@/mutations/catalogs.mutations";
 import { useCatalogStore } from "@/store/catalog";
 import { Icon } from "@iconify/react";
 

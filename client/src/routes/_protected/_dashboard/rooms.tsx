@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CreateRoomModal } from "../../../components/modals/CreateRoomModal";
 import { RoomCard } from "../../../components/room/RoomCard";
 import { Icon } from "@iconify/react";
-import { useRooms } from "@/queries/rooms";
-import { useRoomMutations } from "@/mutations/rooms";
+import { useRooms } from "@/queries/rooms.query";
+import { useRoomMutations } from "@/mutations/rooms.mutations";
 import { useState } from "react";
 
 export const Route = createFileRoute("/_protected/_dashboard/rooms")({

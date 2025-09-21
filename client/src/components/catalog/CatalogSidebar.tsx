@@ -1,4 +1,4 @@
-import { useCatalogs } from "@/queries/catalogs";
+import { useCatalogs } from "@/queries/catalogs.query";
 import { useCatalogStore } from "@/store/catalog";
 import { AutoSizeLoader } from "../core/AutoSizeLoader";
 

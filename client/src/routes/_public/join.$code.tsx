@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useRoomMutations } from "../../mutations/rooms";
+import { useRoomMutations } from "../../mutations/rooms.mutations";
 import { authClient } from "../../utils/auth-client";
 import { useState } from "react";
 

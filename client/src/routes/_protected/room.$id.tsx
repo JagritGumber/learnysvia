@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ShareRoomModal } from "@/components/modals/ShareRoomModal";
 import { Icon } from "@iconify/react";
-import { useRoomById } from "@/queries/roomById";
+import { useRoomById } from "@/queries/roomById.query";
 import { RoomParticipantsDrawer } from "@/components/room/RoomParticipantsDrawer";
 import { useWebsocketStore } from "@/store/websocket";
 import { api } from "@/utils/treaty";

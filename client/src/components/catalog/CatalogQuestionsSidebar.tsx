@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
 import { useCatalogStore } from "@/store/catalog";
-import { useCatalogQuestions } from "@/queries/questions";
+import { useCatalogQuestions } from "@/queries/questions.query";
 import { AutoSizeLoader } from "../core/AutoSizeLoader";
 
 interface CatalogQuestionsSidebarProps {}

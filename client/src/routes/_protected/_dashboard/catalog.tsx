@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Icon } from "@iconify/react";
-import { useCatalogs } from "@/queries/catalogs";
+import { useCatalogs } from "@/queries/catalogs.query";
 import { CreateCatalogModal } from "@/components/modals/CreateCatalogModal";
-import { useCatalogMutations } from "@/mutations/catalog";
+import { useCatalogMutations } from "@/mutations/catalogs.mutations";
 import { useCatalogStore } from "@/store/catalog";
 import { CatalogSidebar } from "@/components/catalog/CatalogSidebar";
 import { CatalogQuestionsSidebar } from "@/components/catalog/CatalogQuestionsSidebar";
