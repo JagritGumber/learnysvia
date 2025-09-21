@@ -1,5 +1,6 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { questions } from "./question";
+import { relations } from "drizzle-orm";
 
 export const options = sqliteTable("options", {
   id: text("id")
@@ -20,6 +21,13 @@ export const options = sqliteTable("options", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+export const optionRelations = relations(options, ({ one }) => ({
+  question: one(questions, {
+    fields: [options.questionId],
+    references: [questions.id],
+  }),
+}));
 
 export type SelectOption = typeof options.$inferSelect;
 export type InsertOption = typeof options.$inferInsert;

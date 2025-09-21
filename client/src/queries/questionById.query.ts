@@ -1,19 +1,22 @@
 import { SelectQuestion } from "@/shared/types/question";
-import { SelectCatalog } from "@/shared/types/room";
 import { api } from "@/utils/treaty";
 import { useQuery } from "@tanstack/react-query";
 
-export const useCatalogQuestions = (catalogId: string | null) =>
+export const useQuestionById = (
+  catalogId: string | null,
+  questionId: string | null
+) =>
   useQuery({
-    queryKey: ["catalogs", catalogId],
+    queryKey: ["questions", questionId],
     queryFn: async () => {
-      if (!catalogId) {
+      if (!catalogId || !questionId) {
         return null;
       }
 
       const response = await api.api
         .catalogs({ cid: catalogId })
-        .questions.get();
+        .questions({ qid: questionId })
+        .get();
       console.log(response);
       if (response.error) {
         throw new Error(
@@ -24,8 +27,15 @@ export const useCatalogQuestions = (catalogId: string | null) =>
       }
 
       return response.data as {
-        questions: SelectQuestion[];
-      } & Pick<SelectCatalog, "id" | "name" | "description">;
+        question: SelectQuestion & {
+          options: Array<{
+            id: string;
+            text: string;
+            isCorrect: boolean;
+            questionId: string;
+          }>;
+        };
+      };
     },
+    enabled: !!catalogId && !!questionId,
   });
-

@@ -93,9 +93,10 @@ export const deleteCatalogQuestion = async (qid: string) => {
 };
 
 export const getCatalogQuestion = async (qid: string) => {
-  return await db
-    .select()
-    .from(t.questions)
-    .where(q.eq(t.questions.id, qid))
-    .get();
+  return await db.query.questions.findFirst({
+    where: q.eq(t.questions.id, qid),
+    with: {
+      options: true,
+    },
+  });
 };
