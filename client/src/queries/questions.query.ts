@@ -28,4 +28,3 @@ export const useCatalogQuestions = (catalogId: string | null) =>
       } & Pick<SelectCatalog, "id" | "name" | "description">;
     },
   });
-
