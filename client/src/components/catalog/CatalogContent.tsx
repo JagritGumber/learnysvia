@@ -7,7 +7,9 @@ interface CatalogContentProps {}
 export function CatalogContent({}: CatalogContentProps) {
   const selectedCatalog = useCatalogStore((state) => state.selectedCatalog);
   const selectedQuestion = useCatalogStore((state) => state.selectedQuestion);
-  const showCreateQuestionForm = useCatalogStore((state) => state.showCreateQuestionForm);
+  const showCreateQuestionForm = useCatalogStore(
+    (state) => state.showCreateQuestionForm
+  );
 
   if (!selectedCatalog) {
     return (
@@ -53,30 +55,28 @@ export function CatalogContent({}: CatalogContentProps) {
   }
 
   return (
-    <div className="flex-1 p-6 bg-base-200">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-base-100 rounded-lg border border-base-300 p-6">
-          <h3 className="text-2xl font-bold text-base-content mb-4">
-            {selectedQuestion} Title
-          </h3>
-          <div className="prose prose-lg max-w-none mb-6">
-            <p className="text-base-content/80 leading-relaxed">
-              {selectedQuestion} Content
-            </p>
-          </div>
+    <div className="flex-1 bg-base-200 p-6">
+      <h3 className="text-2xl font-bold text-base-content mb-4">
+        {selectedQuestion} Title
+      </h3>
+      <div className="prose prose-lg max-w-none mb-6">
+        <p className="text-base-content/80 leading-relaxed">
+          {selectedQuestion} Content
+        </p>
+      </div>
 
-          {/* Options Section */}
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-4">
-              <h4 className="text-lg font-semibold text-base-content">
-                Answer Options
-              </h4>
-              {/* <button className="btn btn-accent btn-sm" onClick={onAddOption}>
+      {/* Options Section */}
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-4">
+          <h4 className="text-lg font-semibold text-base-content">
+            Answer Options
+          </h4>
+          {/* <button className="btn btn-accent btn-sm" onClick={onAddOption}>
                 + Add Option
               </button> */}
-            </div>
-            <div className="space-y-2">
-              {/* {options.map((option) => (
+        </div>
+        <div className="space-y-2">
+          {/* {options.map((option) => (
                 <div
                   key={option.id}
                   className={`p-3 rounded-lg border ${
@@ -107,10 +107,10 @@ export function CatalogContent({}: CatalogContentProps) {
                   </div>
                 </div>
               ))} */}
-            </div>
-          </div>
+        </div>
+      </div>
 
-          {/* <div className="flex gap-3">
+      {/* <div className="flex gap-3">
             <button className="btn btn-primary" onClick={onEditQuestion}>
               Edit Question
             </button>
@@ -121,8 +121,6 @@ export function CatalogContent({}: CatalogContentProps) {
               Delete
             </button>
           </div> */}
-        </div>
-      </div>
     </div>
   );
 }

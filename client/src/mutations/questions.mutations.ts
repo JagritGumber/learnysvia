@@ -1,7 +1,9 @@
 import { api } from "@/utils/treaty";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useQuestionMutations = () => {
+  const queryClient = useQueryClient();
+
   const createQuestion = useMutation({
     mutationFn: async ({
       cid,
@@ -23,6 +25,9 @@ export const useQuestionMutations = () => {
             : JSON.stringify(response.error.value)
         );
       }
+    },
+    onSuccess: (_data, { cid }) => {
+      queryClient.invalidateQueries({ queryKey: ["catalogs", cid] });
     },
   });
 

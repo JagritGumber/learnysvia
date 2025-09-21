@@ -49,7 +49,7 @@ export function CatalogQuestionsSidebar({}: CatalogQuestionsSidebarProps) {
             {catalogWithQuestions.name} Questions
           </h3>
           <button
-            className="btn btn-ghost btn-sm btn-circle text-error"
+            className="btn btn-ghost btn-sm btn-circle text-error-content disabled:text-error"
             onClick={handleDeleteCatalog}
           >
             <Icon icon="lineicons:trash-3" className="size-5" />
@@ -71,7 +71,7 @@ export function CatalogQuestionsSidebar({}: CatalogQuestionsSidebarProps) {
               onClick={() => handleQuestionClick(question.id)}
               className={`w-full text-left p-3 rounded-lg mb-2 transition-colors ${
                 selectedQuestion === question.id
-                  ? "bg-secondary text-secondary-content"
+                  ? "bg-accent text-accent-content"
                   : "hover:bg-base-200 text-base-content"
               }`}
             >

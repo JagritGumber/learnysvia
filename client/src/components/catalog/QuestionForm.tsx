@@ -1,60 +1,27 @@
-import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { useCatalogStore } from "@/store/catalog";
 import { useQuestionMutations } from "@/mutations/questions.mutations";
-
-interface Option {
-  id: string;
-  text: string;
-  isCorrect: boolean;
-}
+import { useQuestionFormStore } from "@/store/questionForm.store";
 
 interface QuestionFormProps {}
 
 export function QuestionForm({}: QuestionFormProps) {
-  const [text, setText] = useState("");
-  const [options, setOptions] = useState<Option[]>([
-    { id: "1", text: "", isCorrect: false },
-    { id: "2", text: "", isCorrect: false },
-  ]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const selectedCatalog = useCatalogStore((state) => state.selectedCatalog);
   const { createQuestion } = useQuestionMutations();
-
   const { setShowCreateQuestionForm } = useCatalogStore.getState();
 
-  const addOption = () => {
-    const newId = (
-      Math.max(...options.map((opt) => parseInt(opt.id))) + 1
-    ).toString();
-    setOptions([...options, { id: newId, text: "", isCorrect: false }]);
-  };
-
-  const removeOption = (id: string) => {
-    if (options.length > 2) {
-      setOptions(options.filter((opt) => opt.id !== id));
-    }
-  };
-
-  const updateOption = (
-    id: string,
-    field: keyof Option,
-    value: string | boolean
-  ) => {
-    if (field === "isCorrect" && value === true) {
-      // If marking an option as correct, uncheck all others
-      setOptions(
-        options.map((opt) => ({
-          ...opt,
-          isCorrect: opt.id === id,
-        }))
-      );
-    } else {
-      setOptions(
-        options.map((opt) => (opt.id === id ? { ...opt, [field]: value } : opt))
-      );
-    }
-  };
+  // Use the store for all form state
+  const {
+    text,
+    options,
+    isSubmitting,
+    setText,
+    addOption,
+    removeOption,
+    updateOption,
+    resetForm,
+    setIsSubmitting,
+  } = useQuestionFormStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,11 +55,7 @@ export function QuestionForm({}: QuestionFormProps) {
       });
 
       // Reset form and close
-      setText("");
-      setOptions([
-        { id: "1", text: "", isCorrect: false },
-        { id: "2", text: "", isCorrect: false },
-      ]);
+      resetForm();
       setShowCreateQuestionForm(false);
     } catch (error) {
       console.error("Error creating question:", error);
@@ -102,11 +65,7 @@ export function QuestionForm({}: QuestionFormProps) {
   };
 
   const handleCancel = () => {
-    setText("");
-    setOptions([
-      { id: "1", text: "", isCorrect: false },
-      { id: "2", text: "", isCorrect: false },
-    ]);
+    resetForm();
     setShowCreateQuestionForm(false);
   };
 
@@ -189,16 +148,14 @@ export function QuestionForm({}: QuestionFormProps) {
                   <span className="text-sm text-base-content">Correct</span>
                 </label>
 
-                {options.length > 2 && (
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm btn-circle text-error"
-                    onClick={() => removeOption(option.id)}
-                    disabled={isSubmitting}
-                  >
-                    <Icon icon="lineicons:trash" className="size-4" />
-                  </button>
-                )}
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm btn-circle text-error-content disabled:text-error"
+                  onClick={() => removeOption(option.id)}
+                  disabled={isSubmitting || options.length < 3}
+                >
+                  <Icon icon="lineicons:trash-3" className="size-4" />
+                </button>
               </div>
             ))}
           </div>
