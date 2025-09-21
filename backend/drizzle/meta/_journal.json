@@ -106,6 +106,13 @@
       "when": 1758440439783,
       "tag": "0014_slim_silhouette",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "6",
+      "when": 1758449208737,
+      "tag": "0015_nosy_mole_man",
+      "breakpoints": true
     }
   ]
 }
