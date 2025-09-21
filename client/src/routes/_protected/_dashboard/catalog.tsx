@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { pollsApi, type Question, type Option } from "@/utils/polls-api";
 import { Icon } from "@iconify/react";
 import { useCatalogs } from "@/queries/catalogs";
+import { CreateCatalogModal } from "@/components/CreateCatalogModal";
+import type { CreateCatalog } from "@/shared/types/catalog";
 
 export const Route = createFileRoute("/_protected/_dashboard/catalog")({
   component: CatalogPage,
@@ -13,6 +15,7 @@ function CatalogPage() {
   const [options, setOptions] = useState<Option[]>([]);
   const [selectedCatalog, setSelectedCatalog] = useState<number | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<number | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const { data: catalogs, isPending, error, refetch } = useCatalogs();
 
   // Load questions when catalog changes
@@ -61,6 +64,18 @@ function CatalogPage() {
     setSelectedQuestion(questionId);
   };
 
+  const handleCreateCatalog = async (data: CreateCatalog) => {
+    try {
+      // TODO: Implement catalog creation API call
+      console.log("Creating catalog:", data);
+      // After successful creation, refetch catalogs to update the list
+      await refetch();
+    } catch (err) {
+      console.error("Failed to create catalog:", err);
+      throw err; // Re-throw to let the modal handle the error
+    }
+  };
+
   const selectedCatalogData = selectedCatalog
     ? catalogs?.find((c) => c.id === selectedCatalog)
     : null;
@@ -105,7 +120,10 @@ function CatalogPage() {
           <h2 className="text-lg font-semibold text-base-content">
             Question Catalogs
           </h2>
-          <button className="btn btn-primary btn-sm mt-2 w-full">
+          <button
+            className="btn btn-primary btn-sm mt-2 w-full"
+            onClick={() => setShowCreateModal(true)}
+          >
             + New Catalog
           </button>
         </div>
@@ -248,6 +266,14 @@ function CatalogPage() {
           </div>
         )}
       </div>
+
+      {/* Create Catalog Modal */}
+      {showCreateModal && (
+        <CreateCatalogModal
+          onClose={() => setShowCreateModal(false)}
+          onCreate={handleCreateCatalog}
+        />
+      )}
     </div>
   );
 }
