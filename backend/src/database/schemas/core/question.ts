@@ -6,13 +6,14 @@ import {
   createUpdateSchema,
 } from "drizzle-zod";
 import z from "zod";
+import { relations } from "drizzle-orm";
+import { options } from "./option";
 
 export const questions = sqliteTable("questions", {
   id: text("id")
     .primaryKey()
     .$default(() => Bun.randomUUIDv7()),
-  title: text("title").notNull(),
-  content: text("content").notNull(),
+  text: text("title").notNull(),
   catalogId: text("catalog_id")
     .references(() => catalogs.id)
     .notNull(),
@@ -25,14 +26,17 @@ export const questions = sqliteTable("questions", {
     .notNull(),
 });
 
-export type Question = typeof questions.$inferSelect;
-export type NewQuestion = typeof questions.$inferInsert;
+export type SelectQuestion = typeof questions.$inferSelect;
+export type InsertQuestion = typeof questions.$inferInsert;
+
+export const questionRelations = relations(questions, ({ many }) => ({
+  options: many(options),
+}));
 
 export const createQuestionSchema = createInsertSchema(questions);
 export const updateQuestionSchema = createUpdateSchema(questions);
 export const selectQuestionSchema = createSelectSchema(questions, {
   id: z.string(),
-  title: z.string(),
-  content: z.string(),
+  text: z.string(),
   catalogId: z.string(),
 });

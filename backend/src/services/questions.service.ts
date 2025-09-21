@@ -12,8 +12,7 @@ export const getCatalogQuestions = async ({
   return await db
     .select({
       id: t.questions.id,
-      title: t.questions.title,
-      content: t.questions.content,
+      text: t.questions.text,
       createdAt: t.questions.createdAt,
       updatedAt: t.questions.updatedAt,
     })
@@ -31,18 +30,15 @@ export const getCatalogQuestions = async ({
 export const createCatalogQuestion = async (
   catalogId: string,
   {
-    title,
-    content,
+    text,
   }: {
-    title: string;
-    content: string;
+    text: string;
   }
 ) => {
   return await db
     .insert(t.questions)
     .values({
-      title,
-      content,
+      text,
       catalogId: catalogId,
     })
     .returning()
@@ -52,18 +48,15 @@ export const createCatalogQuestion = async (
 export const updateCatalogQuestion = async (
   qid: string,
   {
-    title,
-    content,
+    text,
   }: {
-    title: string | undefined;
-    content: string | undefined;
+    text: string | undefined;
   }
 ) => {
   await db
     .update(t.questions)
     .set({
-      title,
-      content,
+      text,
     })
     .where(q.eq(t.questions.id, qid))
     .returning()

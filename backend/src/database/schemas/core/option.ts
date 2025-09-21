@@ -19,5 +19,5 @@ export const options = sqliteTable("options", {
     .notNull(),
 });
 
-export type Option = typeof options.$inferSelect;
-export type NewOption = typeof options.$inferInsert;
+export type SelectOption = typeof options.$inferSelect;
+export type InsertOption = typeof options.$inferInsert;

@@ -76,7 +76,7 @@ export function CatalogQuestionsSidebar({}: CatalogQuestionsSidebarProps) {
               }`}
             >
               <div className="font-medium text-sm line-clamp-2">
-                {question.title}
+                {question.text}
               </div>
             </button>
           );

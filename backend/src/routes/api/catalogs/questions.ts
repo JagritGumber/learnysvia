@@ -18,8 +18,8 @@ export const questionsRouter = new Elysia({ prefix: "/questions" })
   .use(betterAuth)
   .use(catalogMacro)
   .model({
-    createQuestion: createQuestionSchema.pick({ title: true, content: true }),
-    updateQuestion: updateQuestionSchema.pick({ title: true, content: true }),
+    createQuestion: createQuestionSchema.pick({ text: true }),
+    updateQuestion: updateQuestionSchema.pick({ text: true }),
   })
   .guard({
     auth: true,
@@ -47,11 +47,10 @@ export const questionsRouter = new Elysia({ prefix: "/questions" })
     "",
     async ({ params, body }) => {
       const { cid } = params;
-      const { title, content } = body;
+      const { text } = body;
 
       const newQuestion = createCatalogQuestion(cid, {
-        title,
-        content,
+        text,
       });
 
       return {
@@ -75,11 +74,10 @@ export const questionsRouter = new Elysia({ prefix: "/questions" })
           "/",
           async ({ params, body }) => {
             const { qid } = params;
-            const { title, content } = body;
+            const { text } = body;
 
             const updatedQuestion = await updateCatalogQuestion(qid, {
-              title,
-              content,
+              text,
             });
             return {
               success: true,
