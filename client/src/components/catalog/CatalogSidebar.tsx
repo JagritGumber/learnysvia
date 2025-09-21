@@ -1,25 +1,32 @@
+import { useCatalogs } from "@/queries/catalogs";
 import { useCatalogStore } from "@/store/catalog";
+import { AutoSizeLoader } from "../core/AutoSizeLoader";
 
-interface CatalogSidebarProps {
-  catalogs: Array<{
-    id: string;
-    name: string;
-    questionCount: number;
-  }>;
-  onCreateCatalog: () => void;
-}
+interface CatalogSidebarProps {}
 
-export function CatalogSidebar({
-  catalogs,
-  onCreateCatalog,
-}: CatalogSidebarProps) {
-  const { selectedCatalog, setSelectedCatalog, setSelectedQuestion } =
-    useCatalogStore();
+export function CatalogSidebar({}: CatalogSidebarProps) {
+  const { data: catalogs, isPending, error } = useCatalogs();
+  const selectedCatalog = useCatalogStore((state) => state.selectedCatalog);
+
+  const { setSelectedCatalog, setSelectedQuestion, setShowCreateModal } =
+    useCatalogStore.getState();
 
   const handleCatalogClick = (catalogId: string) => {
     setSelectedCatalog(catalogId);
     setSelectedQuestion(null);
   };
+
+  const handleCreateCatalog = () => {
+    setShowCreateModal(true);
+  };
+
+  if (isPending) {
+    return <AutoSizeLoader />;
+  }
+
+  if (error) {
+    return null;
+  }
 
   return (
     <div className="w-64 bg-base-100 border-r border-base-300">
@@ -29,13 +36,13 @@ export function CatalogSidebar({
         </h2>
         <button
           className="btn btn-primary btn-sm mt-2 w-full"
-          onClick={onCreateCatalog}
+          onClick={handleCreateCatalog}
         >
           + New Catalog
         </button>
       </div>
       <div className="p-2">
-        {catalogs.map((catalog) => (
+        {catalogs?.map((catalog) => (
           <button
             key={catalog.id}
             onClick={() => handleCatalogClick(catalog.id)}

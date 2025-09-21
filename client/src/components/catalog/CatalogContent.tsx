@@ -1,34 +1,11 @@
 import { Icon } from "@iconify/react";
 import { useCatalogStore } from "@/store/catalog";
-import { Question, Option } from "@/utils/polls-api";
 
-interface CatalogContentProps {
-  selectedCatalogData: {
-    id: string;
-    name: string;
-  } | null;
-  selectedQuestionData: Question | null;
-  options: Option[];
-  onEditQuestion: () => void;
-  onCreatePoll: () => void;
-  onDeleteQuestion: () => void;
-  onAddOption: () => void;
-  onEditOption: (optionId: number) => void;
-  onDeleteOption: (optionId: number) => void;
-}
+interface CatalogContentProps {}
 
-export function CatalogContent({
-  selectedCatalogData,
-  selectedQuestionData,
-  options,
-  onEditQuestion,
-  onCreatePoll,
-  onDeleteQuestion,
-  onAddOption,
-  onEditOption,
-  onDeleteOption,
-}: CatalogContentProps) {
-  const { selectedCatalog, selectedQuestion } = useCatalogStore();
+export function CatalogContent({}: CatalogContentProps) {
+  const selectedCatalog = useCatalogStore((state) => state.selectedCatalog);
+  const selectedQuestion = useCatalogStore((state) => state.selectedQuestion);
 
   if (!selectedCatalog) {
     return (
@@ -58,7 +35,7 @@ export function CatalogContent({
             className="text-5xl mb-4 text-base-content/50"
           />
           <h2 className="text-2xl font-bold text-base-content mb-4">
-            {selectedCatalogData?.name}
+            {selectedCatalog} Name
           </h2>
           <p className="text-base-content/70">
             Select a question from the sidebar to view its details and manage
@@ -74,11 +51,11 @@ export function CatalogContent({
       <div className="max-w-4xl mx-auto">
         <div className="bg-base-100 rounded-lg border border-base-300 p-6">
           <h3 className="text-2xl font-bold text-base-content mb-4">
-            {selectedQuestionData?.title}
+            {selectedQuestion} Title
           </h3>
           <div className="prose prose-lg max-w-none mb-6">
             <p className="text-base-content/80 leading-relaxed">
-              {selectedQuestionData?.content}
+              {selectedQuestion} Content
             </p>
           </div>
 
@@ -88,12 +65,12 @@ export function CatalogContent({
               <h4 className="text-lg font-semibold text-base-content">
                 Answer Options
               </h4>
-              <button className="btn btn-accent btn-sm" onClick={onAddOption}>
+              {/* <button className="btn btn-accent btn-sm" onClick={onAddOption}>
                 + Add Option
-              </button>
+              </button> */}
             </div>
             <div className="space-y-2">
-              {options.map((option) => (
+              {/* {options.map((option) => (
                 <div
                   key={option.id}
                   className={`p-3 rounded-lg border ${
@@ -123,11 +100,11 @@ export function CatalogContent({
                     </div>
                   </div>
                 </div>
-              ))}
+              ))} */}
             </div>
           </div>
 
-          <div className="flex gap-3">
+          {/* <div className="flex gap-3">
             <button className="btn btn-primary" onClick={onEditQuestion}>
               Edit Question
             </button>
@@ -137,7 +114,7 @@ export function CatalogContent({
             <button className="btn btn-ghost" onClick={onDeleteQuestion}>
               Delete
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

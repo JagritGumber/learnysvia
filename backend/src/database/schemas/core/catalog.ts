@@ -5,6 +5,7 @@ import {
   createInsertSchema,
   createUpdateSchema,
 } from "drizzle-zod";
+import z from "zod";
 
 export const catalogs = sqliteTable("catalogs", {
   id: text("id")
@@ -24,7 +25,12 @@ export const catalogs = sqliteTable("catalogs", {
     .notNull(),
 });
 
-export const selectCatalogSchema = createSelectSchema(catalogs);
+export const selectCatalogSchema = createSelectSchema(catalogs, {
+  id: z.string(),
+  name: z.string(),
+  description: z.string().optional(),
+  userId: z.string(),
+});
 export const createCatalogSchema = createInsertSchema(catalogs);
 export const updateCatalogSchema = createUpdateSchema(catalogs);
 

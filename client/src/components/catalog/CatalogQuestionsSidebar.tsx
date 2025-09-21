@@ -1,30 +1,43 @@
 import { Icon } from "@iconify/react";
 import { useCatalogStore } from "@/store/catalog";
-import { Question } from "@/utils/polls-api";
+import { useCatalogQuestions } from "@/queries/questions";
+import { AutoSizeLoader } from "../core/AutoSizeLoader";
 
-interface CatalogQuestionsSidebarProps {
-  questions: Question[];
-  selectedCatalogData: {
-    id: string;
-    name: string;
-  } | null;
-  onDeleteCatalog: () => void;
-  onCreateQuestion: () => void;
-}
+interface CatalogQuestionsSidebarProps {}
 
-export function CatalogQuestionsSidebar({
-  questions,
-  selectedCatalogData,
-  onDeleteCatalog,
-  onCreateQuestion
-}: CatalogQuestionsSidebarProps) {
-  const { selectedQuestion, setSelectedQuestion } = useCatalogStore();
+export function CatalogQuestionsSidebar({}: CatalogQuestionsSidebarProps) {
+  const { setSelectedQuestion, setShowDeleteModal } =
+    useCatalogStore.getState();
+  const selectedCatalog = useCatalogStore((state) => state.selectedCatalog);
+  const selectedQuestion = useCatalogStore((state) => state.selectedQuestion);
+  const {
+    data: catalogWithQuestions,
+    isPending,
+    error,
+  } = useCatalogQuestions(selectedCatalog);
 
-  const handleQuestionClick = (questionId: number) => {
+  const handleDeleteCatalog = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleQuestionClick = (questionId: string) => {
     setSelectedQuestion(questionId);
   };
 
-  if (!selectedCatalogData) {
+  const handleCreateQuestion = () => {
+    // TODO: Implement create question functionality
+    console.log("Create question clicked");
+  };
+
+  if (isPending) {
+    return <AutoSizeLoader className="w-80" />;
+  }
+
+  if (error) {
+    return null;
+  }
+
+  if (!catalogWithQuestions) {
     return null;
   }
 
@@ -33,38 +46,41 @@ export function CatalogQuestionsSidebar({
       <div className="p-4 border-b border-base-300">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold text-base-content">
-            {selectedCatalogData.name} Questions
+            {catalogWithQuestions.name} Questions
           </h3>
           <button
             className="btn btn-ghost btn-sm btn-circle text-error"
-            onClick={onDeleteCatalog}
+            onClick={handleDeleteCatalog}
           >
             <Icon icon="lineicons:trash-3" className="size-5" />
           </button>
         </div>
         <button
           className="btn btn-accent btn-sm mt-2 w-full"
-          onClick={onCreateQuestion}
+          onClick={handleCreateQuestion}
         >
           + New Question
         </button>
       </div>
       <div className="p-2 max-h-[calc(100vh-200px)] overflow-y-auto">
-        {questions.map((question) => (
-          <button
-            key={question.id}
-            onClick={() => handleQuestionClick(question.id)}
-            className={`w-full text-left p-3 rounded-lg mb-2 transition-colors ${
-              selectedQuestion === question.id
-                ? "bg-secondary text-secondary-content"
-                : "hover:bg-base-200 text-base-content"
-            }`}
-          >
-            <div className="font-medium text-sm line-clamp-2">
-              {question.title}
-            </div>
-          </button>
-        ))}
+        {catalogWithQuestions?.questions?.map((question) => {
+          if (!question) return null;
+          return (
+            <button
+              key={question.id}
+              onClick={() => handleQuestionClick(question.id)}
+              className={`w-full text-left p-3 rounded-lg mb-2 transition-colors ${
+                selectedQuestion === question.id
+                  ? "bg-secondary text-secondary-content"
+                  : "hover:bg-base-200 text-base-content"
+              }`}
+            >
+              <div className="font-medium text-sm line-clamp-2">
+                {question.title}
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

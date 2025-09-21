@@ -28,14 +28,19 @@ export const questionsRouter = new Elysia({ prefix: "/questions" })
       cid: z.string(),
     }),
   })
-  .get("", async ({ params, user, status }) => {
+  .get("", async ({ params, user, status, catalog }) => {
     const { cid } = params;
 
     const catalogQuestions = await getCatalogQuestions({
       catalogId: cid,
       userId: user.id,
     });
-    return status(200, catalogQuestions);
+    return status(200, {
+      id: catalog.id,
+      name: catalog.name,
+      description: catalog.description,
+      questions: catalogQuestions,
+    });
   })
 
   .post(
