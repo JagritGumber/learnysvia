@@ -69,3 +69,19 @@ export const updateCatalogQuestion = async (
     .returning()
     .get();
 };
+
+export const deleteCatalogQuestion = async (qid: string) => {
+  return await db
+    .delete(t.questions)
+    .where(q.eq(t.questions.id, qid))
+    .returning()
+    .get();
+};
+
+export const getCatalogQuestion = async (qid: string) => {
+  return await db
+    .select()
+    .from(t.questions)
+    .where(q.eq(t.questions.id, qid))
+    .get();
+};

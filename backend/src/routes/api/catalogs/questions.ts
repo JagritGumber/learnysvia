@@ -7,6 +7,8 @@ import { betterAuth } from "@/macros/better-auth";
 import z from "zod";
 import {
   createCatalogQuestion,
+  deleteCatalogQuestion,
+  getCatalogQuestion,
   getCatalogQuestions,
   updateCatalogQuestion,
 } from "@/services/questions.service";
@@ -66,172 +68,41 @@ export const questionsRouter = new Elysia({ prefix: "/questions" })
       }),
     },
     (app) =>
-      app.patch(
-        "/",
-        async ({ params, body }) => {
-          const { qid } = params;
-          const { title, content } = body;
+      app
+        .patch(
+          "/",
+          async ({ params, body }) => {
+            const { qid } = params;
+            const { title, content } = body;
 
-          const updatedQuestion = await updateCatalogQuestion(qid, {
-            title,
-            content,
-          });
+            const updatedQuestion = await updateCatalogQuestion(qid, {
+              title,
+              content,
+            });
+            return {
+              success: true,
+              question: updatedQuestion,
+            };
+          },
+          {
+            body: "updateQuestion",
+          }
+        )
+        .delete("/", async ({ params }) => {
+          const { qid } = params;
+
+          const deletedQuestion = await deleteCatalogQuestion(qid);
           return {
             success: true,
-            question: updatedQuestion,
+            question: deletedQuestion,
           };
-        },
-        {
-          body: "updateQuestion",
-        }
-      )
+        })
+        .get("/", async ({ params }) => {
+          const { qid } = params;
+          const selectedQuestion = await getCatalogQuestion(qid);
+
+          return {
+            question: selectedQuestion,
+          };
+        })
   );
-
-// .delete("/questions", async ({ params, user }) => {
-//   const { id } = params;
-//   const catalog = await db
-//     .select()
-//     .from(catalogs)
-//     .innerJoin(questions, eq(questions.catalogId, catalogs.id))
-//     .where(and(eq(questions.id, parseInt(id)), eq(catalogs.userId, user.id)))
-//     .get();
-
-//   if (!catalog) {
-//     throw new Error("Question not found or unauthorized");
-//   }
-//   await db.delete(questions).where(eq(questions.id, parseInt(id)));
-//   return {
-//     success: true,
-//   };
-// })
-// .get("/questions/:questionId/options", async ({ params, user }) => {
-//   const { questionId } = params;
-//   const questionOptions = await db
-//     .select({
-//       id: options.id,
-//       text: options.text,
-//       isCorrect: options.isCorrect,
-//       createdAt: options.createdAt,
-//       updatedAt: options.updatedAt,
-//     })
-//     .from(options)
-//     .innerJoin(questions, eq(options.questionId, questions.id))
-//     .innerJoin(catalogs, eq(questions.catalogId, catalogs.id))
-//     .where(
-//       and(
-//         eq(options.questionId, parseInt(questionId)),
-//         eq(catalogs.userId, user.id)
-//       )
-//     )
-//     .orderBy(options.createdAt);
-
-//   return {
-//     success: true,
-//     options: questionOptions,
-//   };
-// })
-
-// .post("/questions/:questionId/options", async ({ params, body, user }) => {
-//   const { questionId } = params;
-//   const { text, isCorrect } = body;
-
-//   // Verify question ownership through catalog
-//   const catalog = await db
-//     .select()
-//     .from(catalogs)
-//     .innerJoin(questions, eq(questions.catalogId, catalogs.id))
-//     .where(
-//       and(
-//         eq(questions.id, parseInt(questionId)),
-//         eq(catalogs.userId, user.id)
-//       )
-//     )
-//     .get();
-
-//   if (!catalog) {
-//     throw new Error("Question not found or unauthorized");
-//   }
-
-//   const newOption = await db
-//     .insert(options)
-//     .values({
-//       text,
-//       isCorrect,
-//       questionId: parseInt(questionId),
-//     })
-//     .returning()
-//     .get();
-
-//   return {
-//     success: true,
-//     option: newOption,
-//   };
-// })
-
-// .put(
-//   "/options",
-//   async ({ params, body, user }) => {
-//     const { id } = params;
-//     const { text, isCorrect } = body;
-
-//     const catalog = await db
-//       .select()
-//       .from(catalogs)
-//       .innerJoin(questions, eq(questions.catalogId, catalogs.id))
-//       .innerJoin(options, eq(options.questionId, questions.id))
-//       .where(and(eq(options.id, parseInt(id)), eq(catalogs.userId, user.id)))
-//       .get();
-
-//     if (!catalog) {
-//       throw new Error("Option not found or unauthorized");
-//     }
-
-//     const updatedOption = await db
-//       .update(options)
-//       .set({
-//         text,
-//         isCorrect,
-//         updatedAt: new Date(),
-//       })
-//       .where(eq(options.id, parseInt(id)))
-//       .returning()
-//       .get();
-
-//     return {
-//       success: true,
-//       option: updatedOption,
-//     };
-//   },
-//   { auth: true }
-// )
-
-// .delete(
-//   "/options/",
-//   async ({ params, user }) => {
-//     if (!user?.id) {
-//       throw new Error("Unauthorized");
-//     }
-
-//     const { id } = params;
-
-//     // Verify ownership through catalog
-//     const catalog = await db
-//       .select()
-//       .from(catalogs)
-//       .innerJoin(questions, eq(questions.catalogId, catalogs.id))
-//       .innerJoin(options, eq(options.questionId, questions.id))
-//       .where(and(eq(options.id, parseInt(id)), eq(catalogs.userId, user.id)))
-//       .get();
-
-//     if (!catalog) {
-//       throw new Error("Option not found or unauthorized");
-//     }
-
-//     await db.delete(options).where(eq(options.id, parseInt(id)));
-
-//     return {
-//       success: true,
-//     };
-//   },
-//   { auth: true }
-// );
