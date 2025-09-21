@@ -1,11 +1,14 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { catalogs } from "./catalog";
+import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 
 export const questions = sqliteTable("questions", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: text("id")
+    .primaryKey()
+    .$default(() => Bun.randomUUIDv7()),
   title: text("title").notNull(),
   content: text("content").notNull(),
-  catalogId: integer("catalog_id")
+  catalogId: text("catalog_id")
     .references(() => catalogs.id)
     .notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })
@@ -19,3 +22,6 @@ export const questions = sqliteTable("questions", {
 
 export type Question = typeof questions.$inferSelect;
 export type NewQuestion = typeof questions.$inferInsert;
+
+export const createQuestionSchema = createInsertSchema(questions);
+export const updateQuestionSchema = createUpdateSchema(questions);

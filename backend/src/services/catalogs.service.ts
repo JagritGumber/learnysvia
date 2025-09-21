@@ -1,6 +1,7 @@
 import { db } from "@/database/db";
 import * as t from "@/database/schemas";
 import * as q from "drizzle-orm";
+import { Z } from "node_modules/better-auth/dist/shared/better-auth.BaMSx6K3.cjs";
 
 export const getUserCatalogs = async (userId: string) => {
   return await db
@@ -20,6 +21,17 @@ export const getUserCatalogs = async (userId: string) => {
     .where(q.eq(t.catalogs.userId, userId))
     .groupBy(t.catalogs.id)
     .orderBy(t.catalogs.createdAt);
+};
+
+export const getUserCatalog = async (
+  cid: string,
+  { userId }: { userId: string }
+) => {
+  return await db
+    .select()
+    .from(t.catalogs)
+    .where(q.and(q.eq(t.catalogs.id, cid), q.eq(t.catalogs.userId, userId)))
+    .get();
 };
 
 export const createEmptyCatalog = async ({

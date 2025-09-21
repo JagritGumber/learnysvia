@@ -8,6 +8,7 @@ import {
 } from "@/services/catalogs.service";
 import Elysia from "elysia";
 import z from "zod";
+import { questionsRouter } from "./catalogs/questions";
 
 export const catalogsRouter = new Elysia({ prefix: "/catalogs" })
   .model({
@@ -50,10 +51,10 @@ export const catalogsRouter = new Elysia({ prefix: "/catalogs" })
     }
   )
   .group(
-    "/:id",
+    "/:cid",
     {
       params: z.object({
-        id: z.string(),
+        cid: z.string(),
       }),
     },
     (app) =>
@@ -61,10 +62,10 @@ export const catalogsRouter = new Elysia({ prefix: "/catalogs" })
         .patch(
           "/",
           async ({ params, body, user }) => {
-            const { id } = params;
+            const { cid } = params;
             const { name, description } = body;
 
-            const updatedCatalog = await updateCatalog(id, {
+            const updatedCatalog = await updateCatalog(cid, {
               name,
               description,
               userId: user.id,
@@ -79,15 +80,16 @@ export const catalogsRouter = new Elysia({ prefix: "/catalogs" })
           }
         )
         .delete("/", async ({ params, user }) => {
-          const { id } = params;
+          const { cid } = params;
 
           const deletedCatalog = deleteCatalog({
             userId: user.id,
-            catalogId: id,
+            catalogId: cid,
           });
 
           return {
             catalog: deletedCatalog,
           };
         })
+        .use(questionsRouter)
   );
