@@ -17,6 +17,7 @@ import {
   getRoomByIdentifierWithParticipantCount,
   startRoomById,
 } from "@/services/rooms.service";
+import { getActiveRoomParticipants } from "@/services/participants.service";
 import { pollsRouter } from "./rooms/polls";
 
 // Generate unique room code
@@ -223,8 +224,14 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
               return status(404, "Room not found");
             }
 
+            // Get participants for this room
+            const participants = await getActiveRoomParticipants(rid);
+
             return status(200, {
-              room: roomData,
+              room: {
+                ...roomData,
+                participants,
+              },
             });
           } catch (error) {
             console.error("Failed to fetch room:", error);

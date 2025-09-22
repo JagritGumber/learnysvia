@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import z from "zod";
 import { usePollMutations } from "@/mutations/polls.mutations";
 import { usePollById } from "@/queries/pollById.query";
+import { authClient } from "@/utils/auth-client";
 
 const searchSchema = z.object({
   pid: z.string(),
@@ -36,7 +37,8 @@ function RoomPage() {
   const [showParticipantsPanel, setShowParticipantsPanel] = useState(false);
   const [showCreatePollModal, setShowCreatePollModal] = useState(false);
   const [selectedPollId, setSelectedPollId] = useState<string | null>(null);
-  const { createPoll } = usePollMutations();
+  const { createPoll, submitPollAnswer } = usePollMutations();
+  const { data: user } = authClient.useSession();
 
   // Fetch selected poll data
   const {
@@ -47,6 +49,15 @@ function RoomPage() {
 
   const handleCreatePoll = async (questionId: string) => {
     await createPoll.mutateAsync({ roomId: data?.room?.id, questionId });
+  };
+
+  const handleSubmitPollAnswer = async () => {
+    if (!selectedPollId || !data?.room?.id) return;
+
+    await submitPollAnswer.mutateAsync({
+      roomId: data.room.id,
+      pollId: selectedPollId,
+    });
   };
 
   const startWebsocketConnection = async () => {
@@ -348,9 +359,7 @@ function RoomPage() {
                           <span className="text-sm font-medium text-base-content/70">
                             Status:
                           </span>
-                          <div className="badge badge-outline mt-1">
-                            Active
-                          </div>
+                          <div className="badge badge-outline mt-1">Active</div>
                         </div>
                       </div>
                     </div>
@@ -386,6 +395,61 @@ function RoomPage() {
                   </div>
                 </div>
 
+                {/* Poll Answer Section */}
+                <div className="card bg-base-100 shadow-sm mt-6">
+                  <div className="card-body">
+                    <h3 className="card-title text-lg mb-4">Your Response</h3>
+                    {user && data?.room?.participants ? (
+                      <div className="space-y-4">
+                        {data.room.participants.find(
+                          (p) => p.userId === user.user.id
+                        )?.role === "host" ? (
+                          <div className="alert alert-info">
+                            <Icon icon="lineicons:info" className="size-4" />
+                            <span>
+                              You are the host of this room. Poll hosts cannot
+                              submit answers.
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            <p className="text-base-content/70">
+                              Submit your answer to participate in this poll.
+                            </p>
+                            <button
+                              className="btn btn-primary w-full"
+                              onClick={handleSubmitPollAnswer}
+                              disabled={submitPollAnswer.isPending}
+                            >
+                              {submitPollAnswer.isPending ? (
+                                <>
+                                  <div className="loading loading-spinner loading-sm mr-2"></div>
+                                  Submitting...
+                                </>
+                              ) : (
+                                <>
+                                  <Icon
+                                    icon="lineicons:check"
+                                    className="size-4 mr-2"
+                                  />
+                                  Submit Answer
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="alert alert-warning">
+                        <Icon icon="lineicons:warning" className="size-4" />
+                        <span>
+                          Please wait while we load your session information...
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 {/* Poll Statistics */}
                 <div className="card bg-base-100 shadow-sm mt-6">
                   <div className="card-body">
@@ -400,7 +464,9 @@ function RoomPage() {
                       <div className="stat">
                         <div className="stat-title">Correct Answers</div>
                         <div className="stat-value text-success">
-                          {selectedPoll.question?.options?.filter(option => option.isCorrect).length || 0}
+                          {selectedPoll.question?.options?.filter(
+                            (option) => option.isCorrect
+                          ).length || 0}
                         </div>
                       </div>
                     </div>

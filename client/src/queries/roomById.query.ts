@@ -1,3 +1,4 @@
+import { SelectParticipant, SelectRoom } from "@/shared/types/room";
 import { api } from "@/utils/treaty";
 import { useQuery } from "@tanstack/react-query";
 
@@ -13,6 +14,8 @@ export const useRoomById = (roomId: string) =>
             : JSON.stringify(response.error.value)
         );
       }
-      return response.data;
+      return response.data as {
+        room: SelectRoom & { participants?: SelectParticipant[] };
+      };
     },
   });

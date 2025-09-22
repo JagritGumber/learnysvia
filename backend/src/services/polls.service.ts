@@ -45,3 +45,42 @@ export const getRoomPollById = async (rid: string, pid: string) => {
     },
   });
 };
+
+export const submitPollAnswer = async (
+  pid: string,
+  uid: string,
+) => {
+  // Check if user already answered this poll
+  const existingAnswer = await db.query.pollAnswer.findFirst({
+    where: q.and(q.eq(t.pollAnswer.pollId, pid), q.eq(t.pollAnswer.userId, uid)),
+  });
+
+  if (existingAnswer) {
+    throw new Error("User has already answered this poll");
+  }
+
+  return await db
+    .insert(t.pollAnswer)
+    .values({
+      pollId: pid,
+      userId: uid,
+    })
+    .returning()
+    .get();
+};
+
+export const getPollAnswers = async (pid: string) => {
+  return await db.query.pollAnswer.findMany({
+    where: q.eq(t.pollAnswer.pollId, pid),
+    with: {
+      user: true,
+    },
+  });
+};
+
+export const hasUserAnsweredPoll = async (pid: string, uid: string) => {
+  const answer = await db.query.pollAnswer.findFirst({
+    where: q.and(q.eq(t.pollAnswer.pollId, pid), q.eq(t.pollAnswer.userId, uid)),
+  });
+  return !!answer;
+};

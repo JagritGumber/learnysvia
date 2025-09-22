@@ -1,5 +1,6 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { poll } from "./poll.table";
+import { user } from "../auth";
 import { relations } from "drizzle-orm";
 
 export const pollAnswer = sqliteTable("poll_answer", {
@@ -9,6 +10,9 @@ export const pollAnswer = sqliteTable("poll_answer", {
   pollId: text("poll_id")
     .notNull()
     .references(() => poll.id),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$default(() => new Date()),
@@ -21,9 +25,13 @@ export const pollAnswer = sqliteTable("poll_answer", {
 export type InsertPollAnswer = typeof pollAnswer.$inferInsert;
 export type SelectPollAnswer = typeof pollAnswer.$inferSelect;
 
-export const pollRelations = relations(pollAnswer, ({ one }) => ({
+export const pollAnswerRelations = relations(pollAnswer, ({ one }) => ({
   poll: one(poll, {
     fields: [pollAnswer.pollId],
     references: [poll.id],
+  }),
+  user: one(user, {
+    fields: [pollAnswer.userId],
+    references: [user.id],
   }),
 }));
