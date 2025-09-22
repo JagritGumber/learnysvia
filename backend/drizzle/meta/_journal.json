@@ -134,6 +134,13 @@
       "when": 1758488961958,
       "tag": "0018_good_mephisto",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "6",
+      "when": 1758559308224,
+      "tag": "0019_remarkable_the_renegades",
+      "breakpoints": true
     }
   ]
 }
