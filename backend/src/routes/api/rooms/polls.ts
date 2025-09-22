@@ -6,6 +6,7 @@ import {
   submitPollAnswer,
   getPollAnswers,
   hasUserAnsweredPoll,
+  deleteRoomPoll,
 } from "@/services/polls.service";
 import { Elysia } from "elysia";
 import z from "zod";
@@ -55,6 +56,7 @@ export const pollsRouter = new Elysia({
       params: z.object({
         pid: z.string(),
       }),
+      auth: true
     },
     (app) =>
       app
@@ -67,6 +69,18 @@ export const pollsRouter = new Elysia({
             return status(500);
           }
         })
+        .delete("/", async ({ status, params: { pid, rid } }) => {
+          try {
+            const deletedPoll = await deleteRoomPoll(rid, pid);
+            return status(200, deletedPoll);
+          } catch (e) {
+            console.error("Internal server error while deleting the poll", e);
+            if (e instanceof Error && e.message.includes("not found")) {
+              return status(404, e.message);
+            }
+            return status(500, "Internal Server Error");
+          }
+        })
         .group(
           "/answers",
           (answersApp) =>
@@ -75,9 +89,6 @@ export const pollsRouter = new Elysia({
                 "/",
                 async ({ status, params: { pid }, user }) => {
                   try {
-                    if (!user?.id) {
-                      return status(401, "Unauthorized");
-                    }
                     const answer = await submitPollAnswer(pid, user.id);
                     return status(201, answer);
                   } catch (e) {
@@ -97,9 +108,6 @@ export const pollsRouter = new Elysia({
               })
               .get("/me", async ({ status, params: { pid }, user }) => {
                 try {
-                  if (!user?.id) {
-                    return status(401, "Unauthorized");
-                  }
                   const hasAnswered = await hasUserAnsweredPoll(pid, user.id);
                   return status(200, { hasAnswered });
                 } catch (e) {

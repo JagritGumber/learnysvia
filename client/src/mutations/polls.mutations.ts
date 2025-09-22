@@ -57,7 +57,11 @@ export const usePollMutations = () => {
       }
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (_data, { roomId, pollId }) => {
+      queryClient.invalidateQueries({ queryKey: ["rooms", "polls", roomId] });
+      queryClient.invalidateQueries({
+        queryKey: ["rooms", "polls", roomId, pollId],
+      });
       toast.success("Poll answer submitted successfully");
     },
     onError: (error) => {
@@ -65,5 +69,39 @@ export const usePollMutations = () => {
     },
   });
 
-  return { createPoll, submitPollAnswer };
+  const deletePoll = useMutation({
+    mutationFn: async ({
+      roomId,
+      pollId,
+    }: {
+      roomId: string;
+      pollId: string;
+    }) => {
+      const response = await api.api
+        .rooms({ rid: roomId })
+        .polls({ pid: pollId })
+        .delete();
+
+      if (response.error) {
+        throw new Error(
+          typeof response.error.value === "string"
+            ? response.error.value
+            : JSON.stringify(response.error.value)
+        );
+      }
+      return response.data;
+    },
+    onSuccess: (_data, { roomId, pollId }) => {
+      queryClient.invalidateQueries({ queryKey: ["rooms", "polls", roomId] });
+      queryClient.invalidateQueries({
+        queryKey: ["rooms", "polls", roomId, pollId],
+      });
+      toast.success("Poll deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete poll: ${error.message}`);
+    },
+  });
+
+  return { createPoll, submitPollAnswer, deletePoll };
 };

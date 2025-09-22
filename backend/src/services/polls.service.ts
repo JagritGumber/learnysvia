@@ -84,3 +84,26 @@ export const hasUserAnsweredPoll = async (pid: string, uid: string) => {
   });
   return !!answer;
 };
+
+export const deleteRoomPoll = async (rid: string, pid: string) => {
+  // First check if the poll exists and belongs to the room
+  const poll = await db.query.poll.findFirst({
+    where: q.and(q.eq(t.poll.roomId, rid), q.eq(t.poll.id, pid)),
+  });
+
+  if (!poll) {
+    throw new Error("Poll not found or doesn't belong to this room");
+  }
+
+  // Delete poll answers first (due to foreign key constraints)
+  await db.delete(t.pollAnswer).where(q.eq(t.pollAnswer.pollId, pid));
+
+  // Delete the poll
+  const deletedPoll = await db
+    .delete(t.poll)
+    .where(q.and(q.eq(t.poll.roomId, rid), q.eq(t.poll.id, pid)))
+    .returning()
+    .get();
+
+  return deletedPoll;
+};

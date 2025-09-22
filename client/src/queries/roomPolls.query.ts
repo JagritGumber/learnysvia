@@ -1,10 +1,10 @@
 import { api } from "@/utils/treaty";
 import { useQuery } from "@tanstack/react-query";
-import {  SelectPollWithQuestionAndOptions } from "@/shared/types/poll";
+import { SelectPollWithQuestionAndOptions } from "@/shared/types/poll";
 
 export const useRoomPolls = (rid: string) =>
   useQuery({
-    queryKey: ["rooms", rid],
+    queryKey: ["rooms", "polls", rid],
     queryFn: async () => {
       const response = await api.api.rooms({ rid }).polls.get();
 

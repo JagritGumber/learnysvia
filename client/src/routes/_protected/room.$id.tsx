@@ -37,8 +37,9 @@ function RoomPage() {
   const [showParticipantsPanel, setShowParticipantsPanel] = useState(false);
   const [showCreatePollModal, setShowCreatePollModal] = useState(false);
   const [selectedPollId, setSelectedPollId] = useState<string | null>(null);
-  const { createPoll, submitPollAnswer } = usePollMutations();
-  const { data: user } = authClient.useSession();
+  const { createPoll, submitPollAnswer, deletePoll } = usePollMutations();
+  const { data: session } = authClient.useSession();
+  const participants = useWebsocketStore((state) => state.participants);
 
   // Fetch selected poll data
   const {
@@ -58,6 +59,22 @@ function RoomPage() {
       roomId: data.room.id,
       pollId: selectedPollId,
     });
+  };
+
+  const handleDeletePoll = async () => {
+    if (!selectedPollId || !data?.room?.id) return;
+
+    if (
+      window.confirm(
+        "Are you sure you want to delete this poll? This action cannot be undone."
+      )
+    ) {
+      await deletePoll.mutateAsync({
+        roomId: data.room.id,
+        pollId: selectedPollId,
+      });
+      setSelectedPollId(null);
+    }
   };
 
   const startWebsocketConnection = async () => {
@@ -324,6 +341,22 @@ function RoomPage() {
                     </h1>
                   </div>
                   <div className="flex gap-2">
+                    {session &&
+                      participants?.find((p) => p.userId === session.user.id)
+                        ?.role === "host" && (
+                        <button
+                          className="btn btn-ghost btn-sm text-error hover:bg-error hover:text-error-content"
+                          onClick={handleDeletePoll}
+                          disabled={deletePoll.isPending}
+                          title="Delete Poll"
+                        >
+                          {deletePoll.isPending ? (
+                            <div className="loading loading-spinner loading-sm"></div>
+                          ) : (
+                            <Icon icon="lineicons:trash-3" className="size-4" />
+                          )}
+                        </button>
+                      )}
                     <button
                       className="btn btn-ghost btn-sm"
                       onClick={() => setShowShareModal(true)}
@@ -399,10 +432,10 @@ function RoomPage() {
                 <div className="card bg-base-100 shadow-sm mt-6">
                   <div className="card-body">
                     <h3 className="card-title text-lg mb-4">Your Response</h3>
-                    {user && data?.room?.participants ? (
+                    {session && data?.room?.participants ? (
                       <div className="space-y-4">
                         {data.room.participants.find(
-                          (p) => p.userId === user.user.id
+                          (p) => p.userId === session.user.id
                         )?.role === "host" ? (
                           <div className="alert alert-info">
                             <Icon icon="lineicons:info" className="size-4" />

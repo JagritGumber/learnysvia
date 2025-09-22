@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export const usePollById = (roomId: string, pollId: string) =>
   useQuery({
-    queryKey: ["polls", roomId, pollId],
+    queryKey: ["rooms", "polls", roomId, pollId],
     queryFn: async () => {
       const response = await api.api
         .rooms({ rid: roomId })
