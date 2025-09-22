@@ -1,6 +1,6 @@
 import { api } from "@/utils/treaty";
 import { useQuery } from "@tanstack/react-query";
-import { SelectPoll } from "@/shared/types/poll";
+import {  SelectPollWithQuestionAndOptions } from "@/shared/types/poll";
 
 export const useRoomPolls = (rid: string) =>
   useQuery({
@@ -15,6 +15,6 @@ export const useRoomPolls = (rid: string) =>
             : JSON.stringify(response.error.value)
         );
       }
-      return response.data as SelectPoll[];
+      return response.data as SelectPollWithQuestionAndOptions[];
     },
   });

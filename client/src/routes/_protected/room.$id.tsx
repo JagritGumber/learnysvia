@@ -9,6 +9,7 @@ import { useWebsocketStore } from "@/store/websocket";
 import { api } from "@/utils/treaty";
 import toast from "react-hot-toast";
 import z from "zod";
+import { usePollMutations } from "@/mutations/polls.mutations";
 
 const searchSchema = z.object({
   pid: z.string(),
@@ -27,16 +28,10 @@ function RoomPage() {
   const [showParticipantsPanel, setShowParticipantsPanel] = useState(false);
   const [showCreatePollModal, setShowCreatePollModal] = useState(false);
   const search = Route.useSearch();
+  const { createPoll } = usePollMutations();
 
   const handleCreatePoll = async (questionId: string) => {
-    try {
-      // TODO: Implement poll creation API call
-      console.log("Creating poll with question:", questionId);
-      toast.success("Poll created successfully!");
-    } catch (error) {
-      console.error("Failed to create poll:", error);
-      toast.error("Failed to create poll");
-    }
+    await createPoll.mutateAsync({ roomId: data?.room?.id, questionId });
   };
 
   const startWebsocketConnection = async () => {
@@ -128,17 +123,9 @@ function RoomPage() {
   }
 
   return (
-    <div className="drawer drawer-start min-h-[calc(100svh-6rem)] overflow-hidden bg-base-100 flex flex-col">
-      <input
-        id="participants-drawer"
-        type="checkbox"
-        className="drawer-toggle"
-        checked={showParticipantsPanel}
-        onChange={() => setShowParticipantsPanel(!showParticipantsPanel)}
-      />
-
+    <div className="min-h-[calc(100vh-64px)] bg-base-100 flex">
       {/* Main Content */}
-      <div className="drawer-content flex flex-col">
+      <div className="flex-1 flex flex-col">
         <div className="flex-1 flex items-center justify-center p-4">
           {/* Host View - Empty State */}
           <div className="text-center max-w-md mx-auto">
@@ -191,6 +178,15 @@ function RoomPage() {
           </div>
         </div>
       </div>
+
+      {/* Participants Drawer */}
+      <input
+        id="participants-drawer"
+        type="checkbox"
+        className="drawer-toggle"
+        checked={showParticipantsPanel}
+        onChange={() => setShowParticipantsPanel(!showParticipantsPanel)}
+      />
       <RoomParticipantsDrawer
         setShowParticipantsPanel={setShowParticipantsPanel}
         roomId={search.rid}
