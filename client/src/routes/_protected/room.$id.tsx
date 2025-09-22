@@ -11,6 +11,7 @@ import { api } from "@/utils/treaty";
 import toast from "react-hot-toast";
 import z from "zod";
 import { usePollMutations } from "@/mutations/polls.mutations";
+import { usePollById } from "@/queries/pollById.query";
 
 const searchSchema = z.object({
   pid: z.string(),
@@ -34,7 +35,15 @@ function RoomPage() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showParticipantsPanel, setShowParticipantsPanel] = useState(false);
   const [showCreatePollModal, setShowCreatePollModal] = useState(false);
+  const [selectedPollId, setSelectedPollId] = useState<string | null>(null);
   const { createPoll } = usePollMutations();
+
+  // Fetch selected poll data
+  const {
+    data: selectedPoll,
+    isPending: pollLoading,
+    error: pollError,
+  } = usePollById(search.rid, selectedPollId || "");
 
   const handleCreatePoll = async (questionId: string) => {
     await createPoll.mutateAsync({ roomId: data?.room?.id, questionId });
@@ -200,7 +209,12 @@ function RoomPage() {
             pollsData.map((poll) => (
               <button
                 key={poll.id}
-                className="w-full text-left p-3 rounded-lg mb-2 transition-colors hover:bg-base-200 text-base-content"
+                onClick={() => setSelectedPollId(poll.id)}
+                className={`w-full text-left p-3 rounded-lg mb-2 transition-colors text-base-content ${
+                  selectedPollId === poll.id
+                    ? "bg-primary/10 border border-primary/20"
+                    : "hover:bg-base-200"
+                }`}
               >
                 <div className="font-medium text-sm line-clamp-2 mb-2">
                   {poll.question?.text || "Untitled Poll"}
@@ -234,9 +248,7 @@ function RoomPage() {
                   icon="lineicons:document"
                   className="text-4xl mb-4 text-base-content/40 mx-auto"
                 />
-                <p className="text-sm text-base-content/60">
-                  No polls yet
-                </p>
+                <p className="text-sm text-base-content/60">No polls yet</p>
                 <p className="text-xs text-base-content/40 mt-1">
                   Create your first poll to get started
                 </p>
@@ -248,43 +260,216 @@ function RoomPage() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="text-center max-w-md mx-auto">
-            <div className="mb-8">
-              <Icon
-                icon="lineicons:document"
-                className="text-6xl mb-6 text-primary mx-auto"
-              />
-              <h1 className="text-3xl font-bold text-base-content mb-2">
-                Select a Poll
-              </h1>
-              <p className="text-lg text-base-content/70 mb-4">
-                Choose a poll from the sidebar to view details and manage it
-              </p>
-              <p className="text-base-content/70 mb-6">
-                Or create a new poll to get started
-              </p>
-            </div>
+        <div className="flex-1 p-4">
+          {selectedPollId ? (
+            // Show selected poll
+            pollLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <div className="loading loading-spinner loading-lg mb-4"></div>
+                  <p className="text-base-content/70">Loading poll...</p>
+                </div>
+              </div>
+            ) : pollError ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <Icon
+                    icon="lineicons:warning"
+                    className="text-6xl mb-6 text-warning mx-auto"
+                  />
+                  <h2 className="text-2xl font-semibold text-base-content mb-4">
+                    Error Loading Poll
+                  </h2>
+                  <p className="text-base-content/70 mb-6">
+                    {typeof pollError === "string"
+                      ? pollError
+                      : pollError?.message || "Failed to load poll"}
+                  </p>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setSelectedPollId(null)}
+                  >
+                    Back to Polls
+                  </button>
+                </div>
+              </div>
+            ) : selectedPoll ? (
+              <div className="max-w-4xl mx-auto">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => setSelectedPollId(null)}
+                    >
+                      <Icon
+                        icon="lineicons:arrow-left"
+                        className="size-4 mr-2"
+                      />
+                      Back to Polls
+                    </button>
+                    <div className="divider divider-horizontal"></div>
+                    <h1 className="text-2xl font-bold text-base-content">
+                      {selectedPoll.question?.text || "Untitled Poll"}
+                    </h1>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => setShowShareModal(true)}
+                    >
+                      <Icon icon="lineicons:share" className="size-4" />
+                    </button>
+                  </div>
+                </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col gap-4">
-              <button
-                className="btn btn-primary btn-lg"
-                onClick={() => setShowCreatePollModal(true)}
-              >
-                <Icon icon="lineicons:plus" className="w-5 h-5 mr-2" />
-                Create Poll
-              </button>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Poll Details */}
+                  <div className="card bg-base-100 shadow-sm">
+                    <div className="card-body">
+                      <h3 className="card-title text-lg mb-4">Poll Details</h3>
+                      <div className="space-y-3">
+                        <div>
+                          <span className="text-sm font-medium text-base-content/70">
+                            Question:
+                          </span>
+                          <p className="text-base-content mt-1">
+                            {selectedPoll.question?.text}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium text-base-content/70">
+                            Created:
+                          </span>
+                          <p className="text-base-content mt-1">
+                            {new Date(selectedPoll.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium text-base-content/70">
+                            Status:
+                          </span>
+                          <div className="badge badge-outline mt-1">
+                            Active
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-              <button
-                className="btn btn-outline btn-lg"
-                onClick={() => setShowShareModal(true)}
-              >
-                <Icon icon="lineicons:share" className="w-5 h-5 mr-2" />
-                Share Room
-              </button>
+                  {/* Options */}
+                  <div className="card bg-base-100 shadow-sm">
+                    <div className="card-body">
+                      <h3 className="card-title text-lg mb-4">Options</h3>
+                      {selectedPoll.question?.options &&
+                      selectedPoll.question.options.length > 0 ? (
+                        <div className="space-y-2">
+                          {selectedPoll.question.options.map((option) => (
+                            <div
+                              key={option.id}
+                              className="p-3 bg-base-200 rounded-lg"
+                            >
+                              <span className="font-medium">{option.text}</span>
+                              {option.isCorrect && (
+                                <div className="badge badge-success badge-xs ml-2">
+                                  Correct
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-base-content/60">
+                          No options available
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Poll Statistics */}
+                <div className="card bg-base-100 shadow-sm mt-6">
+                  <div className="card-body">
+                    <h3 className="card-title text-lg mb-4">Statistics</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="stat">
+                        <div className="stat-title">Total Options</div>
+                        <div className="stat-value text-secondary">
+                          {selectedPoll.question?.options?.length || 0}
+                        </div>
+                      </div>
+                      <div className="stat">
+                        <div className="stat-title">Correct Answers</div>
+                        <div className="stat-value text-success">
+                          {selectedPoll.question?.options?.filter(option => option.isCorrect).length || 0}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <Icon
+                    icon="lineicons:document"
+                    className="text-6xl mb-6 text-base-content/40 mx-auto"
+                  />
+                  <h2 className="text-2xl font-semibold text-base-content mb-4">
+                    Poll Not Found
+                  </h2>
+                  <p className="text-base-content/70 mb-6">
+                    The selected poll could not be found or has been deleted.
+                  </p>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setSelectedPollId(null)}
+                  >
+                    Back to Polls
+                  </button>
+                </div>
+              </div>
+            )
+          ) : (
+            // Show default state when no poll is selected
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center max-w-md mx-auto">
+                <div className="mb-8">
+                  <Icon
+                    icon="lineicons:document"
+                    className="text-6xl mb-6 text-primary mx-auto"
+                  />
+                  <h1 className="text-3xl font-bold text-base-content mb-2">
+                    Select a Poll
+                  </h1>
+                  <p className="text-lg text-base-content/70 mb-4">
+                    Choose a poll from the sidebar to view details and manage it
+                  </p>
+                  <p className="text-base-content/70 mb-6">
+                    Or create a new poll to get started
+                  </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-4">
+                  <button
+                    className="btn btn-primary btn-lg"
+                    onClick={() => setShowCreatePollModal(true)}
+                  >
+                    <Icon icon="lineicons:plus" className="w-5 h-5 mr-2" />
+                    Create Poll
+                  </button>
+
+                  <button
+                    className="btn btn-outline btn-lg"
+                    onClick={() => setShowShareModal(true)}
+                  >
+                    <Icon icon="lineicons:share" className="w-5 h-5 mr-2" />
+                    Share Room
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Bottom Bar */}

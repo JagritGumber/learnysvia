@@ -1,5 +1,9 @@
 import { betterAuth } from "@/macros/better-auth";
-import { createRoomPoll, getRoomPolls } from "@/services/polls.service";
+import {
+  createRoomPoll,
+  getRoomPollById,
+  getRoomPolls,
+} from "@/services/polls.service";
 import { Elysia } from "elysia";
 import z from "zod";
 
@@ -41,4 +45,22 @@ export const pollsRouter = new Elysia({
     {
       body: "createPoll",
     }
+  )
+  .group(
+    "/:pid",
+    {
+      params: z.object({
+        pid: z.string(),
+      }),
+    },
+    (app) =>
+      app.get("/", ({ status, params: { pid, rid } }) => {
+        try {
+          const poll = getRoomPollById(rid, pid);
+          return status(200, poll);
+        } catch (e) {
+          console.error("Internal server error while getting the poll", e);
+          return status(500);
+        }
+      })
   );

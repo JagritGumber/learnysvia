@@ -32,3 +32,16 @@ export const createRoomPoll = async (
     .returning()
     .get();
 };
+
+export const getRoomPollById = async (rid: string, pid: string) => {
+  return await db.query.poll.findFirst({
+    where: q.and(q.eq(t.poll.roomId, rid), q.eq(t.poll.id, pid)),
+    with: {
+      question: {
+        with: {
+          options: true,
+        },
+      },
+    },
+  });
+};
