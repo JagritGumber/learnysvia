@@ -1,18 +1,37 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ShareRoomModal } from "@/components/modals/ShareRoomModal";
 import { CreatePollModal } from "@/components/modals/CreatePollModal";
 import { Icon } from "@iconify/react";
 import { useRoomById } from "@/queries/roomById.query";
 import { useRoomPolls } from "@/queries/roomPolls.query";
-
-import { useWebsocketStore } from "@/store/websocket";
-import { api } from "@/utils/treaty";
-import toast from "react-hot-toast";
-import z from "zod";
-import { usePollMutations } from "@/mutations/polls.mutations";
 import { usePollById } from "@/queries/pollById.query";
-import { authClient } from "@/utils/auth-client";
+import z from "zod";
+
+// Import new components
+import {
+  RoomLoadingState,
+  PollsLoadingState,
+  PollLoadingState,
+} from "@/components/room/RoomLoadingState";
+import {
+  RoomErrorState,
+  PollsErrorState,
+  PollErrorState,
+} from "@/components/room/RoomErrorState";
+import {
+  EmptyPollsState,
+  DefaultRoomState,
+  PollNotFoundState,
+} from "@/components/room/RoomEmptyStates";
+import { PollDetails, PollOptions } from "@/components/room/PollDetails";
+import { PollAnswerSection } from "@/components/room/PollAnswerSection";
+import { PollStatistics } from "@/components/room/PollStatistics";
+import { ParticipantsPanel } from "@/components/room/ParticipantsPanel";
+
+// Import custom hooks
+import { useRoomWebSocket } from "@/hooks/useRoomWebSocket";
+import { usePollManagement } from "@/hooks/usePollManagement";
 
 const searchSchema = z.object({
   pid: z.string(),
@@ -33,13 +52,23 @@ function RoomPage() {
     isPending: pollsPending,
     error: pollsError,
   } = useRoomPolls(search.rid);
-  const [showShareModal, setShowShareModal] = useState(false);
 
+  // State management
+  const [showShareModal, setShowShareModal] = useState(false);
   const [showCreatePollModal, setShowCreatePollModal] = useState(false);
-  const [selectedPollId, setSelectedPollId] = useState<string | null>(null);
-  const { createPoll, submitPollAnswer, deletePoll } = usePollMutations();
-  const { data: session } = authClient.useSession();
-  const participants = useWebsocketStore((state) => state.participants);
+
+  // Custom hooks
+  useRoomWebSocket({ roomId: id, participantId: search.pid });
+  const {
+    selectedPollId,
+    setSelectedPollId,
+    handleCreatePoll,
+    handleSubmitPollAnswer,
+    handleDeletePoll,
+    canDeletePoll,
+    isSubmittingAnswer,
+    isDeletingPoll,
+  } = usePollManagement({ roomId: search.rid });
 
   // Fetch selected poll data
   const {
@@ -48,162 +77,25 @@ function RoomPage() {
     error: pollError,
   } = usePollById(search.rid, selectedPollId || "");
 
-  const handleCreatePoll = async (questionId: string) => {
-    await createPoll.mutateAsync({ roomId: data?.room?.id, questionId });
-  };
-
-  const handleSubmitPollAnswer = async () => {
-    if (!selectedPollId || !data?.room?.id) return;
-
-    await submitPollAnswer.mutateAsync({
-      roomId: data.room.id,
-      pollId: selectedPollId,
-    });
-  };
-
-  const handleDeletePoll = async () => {
-    if (!selectedPollId || !data?.room?.id) return;
-
-    if (
-      window.confirm(
-        "Are you sure you want to delete this poll? This action cannot be undone."
-      )
-    ) {
-      await deletePoll.mutateAsync({
-        roomId: data.room.id,
-        pollId: selectedPollId,
-      });
-      setSelectedPollId(null);
-    }
-  };
-
-  const startWebsocketConnection = async () => {
-    if (useWebsocketStore.getState().websocket) {
-      console.log("websocket already subscribed");
-      return;
-    }
-    console.log("Connecting websocket");
-
-    try {
-      const ws = api.ws.rooms({ id })({ pid: search.pid }).subscribe();
-      useWebsocketStore.getState().setWebsocket(ws);
-      ws.on("open", (event) => {
-        console.log("WebSocket connected", event);
-      });
-
-      ws.on("message", (event) => {
-        if (event.data[422]) {
-          console.error("Data validation failed", event.data);
-          return;
-        }
-        const data = event.data as unknown as (typeof event.data)[200];
-        const channelSignal = event.data as unknown as string;
-
-        if (data?.event === "participants:result") {
-          useWebsocketStore.getState().setParticipants(data?.participants);
-          useWebsocketStore.getState().setLoadingParticipants(false);
-        } else if (
-          data?.event === "participant:updated" ||
-          channelSignal === "participants:notfresh"
-        ) {
-          useWebsocketStore.getState().fetchParticipants(search.rid);
-        } else if (data?.event === "error") {
-          useWebsocketStore.getState().setParticipantsError(data?.message);
-          useWebsocketStore.getState().setLoadingParticipants(false);
-          toast.error(`Participants error: ${data.message}`);
-        }
-      });
-
-      ws.on("error", (error) => {
-        console.error("WebSocket error:", error);
-        useWebsocketStore
-          .getState()
-          .setParticipantsError("WebSocket connection error");
-        toast.error("Connection error occurred");
-      });
-
-      ws.on("close", (event) => {
-        console.log("WebSocket closed", event);
-        useWebsocketStore.getState().setWebsocket(null);
-        useWebsocketStore.getState().setParticipants([]);
-        useWebsocketStore.getState().setParticipantsError(null);
-      });
-    } catch (error) {
-      console.error("Failed to connect to the room", error);
-      toast.error("Failed to connect to the room, Please try again later");
-    }
-  };
-
-  useEffect(() => {
-    startWebsocketConnection();
-  }, []);
-
+  // Early returns for loading and error states
   if (isPending) {
-    return (
-      <div className="min-h-screen bg-base-100 flex items-center justify-center">
-        <div className="loading loading-spinner loading-lg"></div>
-      </div>
-    );
+    return <RoomLoadingState />;
   }
 
   if (error || !data?.room) {
-    return (
-      <div className="min-h-screen bg-base-100 flex flex-col items-center justify-center">
-        <Icon icon="lineicons:ban" className="text-8xl mb-6 text-error" />
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold text-base-content mb-4">
-            {typeof error === "string"
-              ? error
-              : error?.message || "Room not found"}
-          </h2>
-          <p className="text-base-content/70 mb-6">
-            The room you're looking for doesn't exist or you don't have access
-            to it.
-          </p>
-        </div>
-      </div>
-    );
+    return <RoomErrorState error={error} />;
+  }
+
+  if (pollsPending) {
+    return <PollsLoadingState />;
+  }
+
+  if (pollsError) {
+    return <PollsErrorState error={pollsError} />;
   }
 
   // Show polls if they exist, otherwise show empty state
   const hasPolls = pollsData && pollsData.length > 0;
-
-  // Show loading state while polls are being fetched
-  if (pollsPending) {
-    return (
-      <div className="min-h-[calc(100vh-64px)] bg-base-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="loading loading-spinner loading-lg mb-4"></div>
-          <p className="text-base-content/70">Loading polls...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error state for polls
-  if (pollsError) {
-    return (
-      <div className="min-h-[calc(100vh-64px)] bg-base-100 flex flex-col items-center justify-center">
-        <Icon icon="lineicons:warning" className="text-6xl mb-6 text-warning" />
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold text-base-content mb-4">
-            Error Loading Polls
-          </h2>
-          <p className="text-base-content/70 mb-6">
-            {typeof pollsError === "string"
-              ? pollsError
-              : pollsError?.message || "Failed to load polls"}
-          </p>
-          <button
-            className="btn btn-primary"
-            onClick={() => window.location.reload()}
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-base-100 flex">
@@ -270,18 +162,9 @@ function RoomPage() {
               </button>
             ))
           ) : (
-            <div className="flex items-center justify-center h-full text-center p-4">
-              <div>
-                <Icon
-                  icon="lineicons:document"
-                  className="text-4xl mb-4 text-base-content/40 mx-auto"
-                />
-                <p className="text-sm text-base-content/60">No polls yet</p>
-                <p className="text-xs text-base-content/40 mt-1">
-                  Create your first poll to get started
-                </p>
-              </div>
-            </div>
+            <EmptyPollsState
+              onCreatePoll={() => setShowCreatePollModal(true)}
+            />
           )}
         </div>
       </div>
@@ -292,35 +175,12 @@ function RoomPage() {
           {selectedPollId ? (
             // Show selected poll
             pollLoading ? (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center">
-                  <div className="loading loading-spinner loading-lg mb-4"></div>
-                  <p className="text-base-content/70">Loading poll...</p>
-                </div>
-              </div>
+              <PollLoadingState />
             ) : pollError ? (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center">
-                  <Icon
-                    icon="lineicons:warning"
-                    className="text-6xl mb-6 text-warning mx-auto"
-                  />
-                  <h2 className="text-2xl font-semibold text-base-content mb-4">
-                    Error Loading Poll
-                  </h2>
-                  <p className="text-base-content/70 mb-6">
-                    {typeof pollError === "string"
-                      ? pollError
-                      : pollError?.message || "Failed to load poll"}
-                  </p>
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => setSelectedPollId(null)}
-                  >
-                    Back to Polls
-                  </button>
-                </div>
-              </div>
+              <PollErrorState
+                error={pollError}
+                onBack={() => setSelectedPollId(null)}
+              />
             ) : selectedPoll ? (
               <div className="max-w-4xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
@@ -341,22 +201,20 @@ function RoomPage() {
                     </h1>
                   </div>
                   <div className="flex gap-2">
-                    {session &&
-                      participants?.find((p) => p.userId === session.user.id)
-                        ?.role === "host" && (
-                        <button
-                          className="btn btn-ghost btn-sm text-error hover:bg-error hover:text-error-content"
-                          onClick={handleDeletePoll}
-                          disabled={deletePoll.isPending}
-                          title="Delete Poll"
-                        >
-                          {deletePoll.isPending ? (
-                            <div className="loading loading-spinner loading-sm"></div>
-                          ) : (
-                            <Icon icon="lineicons:trash-3" className="size-4" />
-                          )}
-                        </button>
-                      )}
+                    {canDeletePoll && (
+                      <button
+                        className="btn btn-ghost btn-sm text-error hover:bg-error hover:text-error-content"
+                        onClick={handleDeletePoll}
+                        disabled={isDeletingPoll}
+                        title="Delete Poll"
+                      >
+                        {isDeletingPoll ? (
+                          <div className="loading loading-spinner loading-sm"></div>
+                        ) : (
+                          <Icon icon="lineicons:trash-3" className="size-4" />
+                        )}
+                      </button>
+                    )}
                     <button
                       className="btn btn-ghost btn-sm"
                       onClick={() => setShowShareModal(true)}
@@ -367,264 +225,30 @@ function RoomPage() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Poll Details */}
-                  <div className="card bg-base-100 shadow-sm">
-                    <div className="card-body">
-                      <h3 className="card-title text-lg mb-4">Poll Details</h3>
-                      <div className="space-y-3">
-                        <div>
-                          <span className="text-sm font-medium text-base-content/70">
-                            Question:
-                          </span>
-                          <p className="text-base-content mt-1">
-                            {selectedPoll.question?.text}
-                          </p>
-                        </div>
-                        <div>
-                          <span className="text-sm font-medium text-base-content/70">
-                            Created:
-                          </span>
-                          <p className="text-base-content mt-1">
-                            {new Date(selectedPoll.createdAt).toLocaleString()}
-                          </p>
-                        </div>
-                        <div>
-                          <span className="text-sm font-medium text-base-content/70">
-                            Status:
-                          </span>
-                          <div className="badge badge-outline mt-1">Active</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Options */}
-                  <div className="card bg-base-100 shadow-sm">
-                    <div className="card-body">
-                      <h3 className="card-title text-lg mb-4">Options</h3>
-                      {selectedPoll.question?.options &&
-                      selectedPoll.question.options.length > 0 ? (
-                        <div className="space-y-2">
-                          {selectedPoll.question.options.map((option) => (
-                            <div
-                              key={option.id}
-                              className="p-3 bg-base-200 rounded-lg"
-                            >
-                              <span className="font-medium">{option.text}</span>
-                              {option.isCorrect && (
-                                <div className="badge badge-success badge-xs ml-2">
-                                  Correct
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-base-content/60">
-                          No options available
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                  <PollDetails poll={selectedPoll} />
+                  <PollOptions poll={selectedPoll} />
                 </div>
 
-                {/* Poll Answer Section */}
-                <div className="card bg-base-100 shadow-sm mt-6">
-                  <div className="card-body">
-                    <h3 className="card-title text-lg mb-4">Your Response</h3>
-                    {session && data?.room?.participants ? (
-                      <div className="space-y-4">
-                        {data.room.participants.find(
-                          (p) => p.userId === session.user.id
-                        )?.role === "host" ? (
-                          <div className="alert alert-info">
-                            <Icon icon="lineicons:info" className="size-4" />
-                            <span>
-                              You are the host of this room. Poll hosts cannot
-                              submit answers.
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="space-y-3">
-                            <p className="text-base-content/70">
-                              Submit your answer to participate in this poll.
-                            </p>
-                            <button
-                              className="btn btn-primary w-full"
-                              onClick={handleSubmitPollAnswer}
-                              disabled={submitPollAnswer.isPending}
-                            >
-                              {submitPollAnswer.isPending ? (
-                                <>
-                                  <div className="loading loading-spinner loading-sm mr-2"></div>
-                                  Submitting...
-                                </>
-                              ) : (
-                                <>
-                                  <Icon
-                                    icon="lineicons:check"
-                                    className="size-4 mr-2"
-                                  />
-                                  Submit Answer
-                                </>
-                              )}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="alert alert-warning">
-                        <Icon icon="lineicons:warning" className="size-4" />
-                        <span>
-                          Please wait while we load your session information...
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <PollAnswerSection
+                  onSubmitAnswer={handleSubmitPollAnswer}
+                  isSubmitting={isSubmittingAnswer}
+                />
 
-                {/* Poll Statistics */}
-                <div className="card bg-base-100 shadow-sm mt-6">
-                  <div className="card-body">
-                    <h3 className="card-title text-lg mb-4">Statistics</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="stat">
-                        <div className="stat-title">Total Options</div>
-                        <div className="stat-value text-secondary">
-                          {selectedPoll.question?.options?.length || 0}
-                        </div>
-                      </div>
-                      <div className="stat">
-                        <div className="stat-title">Correct Answers</div>
-                        <div className="stat-value text-success">
-                          {selectedPoll.question?.options?.filter(
-                            (option) => option.isCorrect
-                          ).length || 0}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <PollStatistics poll={selectedPoll} />
               </div>
             ) : (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center">
-                  <Icon
-                    icon="lineicons:document"
-                    className="text-6xl mb-6 text-base-content/40 mx-auto"
-                  />
-                  <h2 className="text-2xl font-semibold text-base-content mb-4">
-                    Poll Not Found
-                  </h2>
-                  <p className="text-base-content/70 mb-6">
-                    The selected poll could not be found or has been deleted.
-                  </p>
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => setSelectedPollId(null)}
-                  >
-                    Back to Polls
-                  </button>
-                </div>
-              </div>
+              <PollNotFoundState onBack={() => setSelectedPollId(null)} />
             )
           ) : (
-            // Show default state when no poll is selected
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center max-w-md mx-auto">
-                <div className="mb-8">
-                  <Icon
-                    icon="lineicons:document"
-                    className="text-6xl mb-6 text-primary mx-auto"
-                  />
-                  <h1 className="text-3xl font-bold text-base-content mb-2">
-                    Select a Poll
-                  </h1>
-                  <p className="text-lg text-base-content/70 mb-4">
-                    Choose a poll from the sidebar to view details and manage it
-                  </p>
-                  <p className="text-base-content/70 mb-6">
-                    Or create a new poll to get started
-                  </p>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col gap-4">
-                  <button
-                    className="btn btn-primary btn-lg"
-                    onClick={() => setShowCreatePollModal(true)}
-                  >
-                    <Icon icon="lineicons:plus" className="w-5 h-5 mr-2" />
-                    Create Poll
-                  </button>
-
-                  <button
-                    className="btn btn-outline btn-lg"
-                    onClick={() => setShowShareModal(true)}
-                  >
-                    <Icon icon="lineicons:share" className="w-5 h-5 mr-2" />
-                    Share Room
-                  </button>
-                </div>
-              </div>
-            </div>
+            <DefaultRoomState
+              onCreatePoll={() => setShowCreatePollModal(true)}
+              onShareRoom={() => setShowShareModal(true)}
+            />
           )}
         </div>
       </div>
 
-      {/* Participants Panel */}
-      <div className="w-80 bg-base-100 border-l border-base-300 flex flex-col">
-        <div className="p-4 border-b border-base-300">
-          <h3 className="text-lg font-semibold text-base-content">
-            Participants
-          </h3>
-          <div className="text-sm text-base-content/60 mt-1">
-            {participants?.length || 0} online
-          </div>
-        </div>
-        <div className="flex-1 p-2 max-h-[calc(100vh-200px)] overflow-y-auto">
-          {participants && participants.length > 0 ? (
-            participants.map((participant) => (
-              <div
-                key={participant.userId}
-                className="flex items-center gap-3 p-3 rounded-lg mb-2 hover:bg-base-200 transition-colors"
-              >
-                <div className="avatar placeholder">
-                  <div className="bg-neutral text-neutral-content rounded-full w-8 h-8 flex items-center justify-center">
-                    <span className="text-sm font-medium">
-                      {participant.displayName?.charAt(0)?.toUpperCase() || "U"}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-sm text-base-content truncate">
-                    {participant.displayName || "Unknown User"}
-                  </div>
-                  <div className="text-xs text-base-content/60 capitalize">
-                    {participant.role}
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-success" />
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="flex items-center justify-center h-full text-center p-4">
-              <div>
-                <Icon
-                  icon="lineicons:users"
-                  className="text-4xl mb-4 text-base-content/40 mx-auto"
-                />
-                <p className="text-sm text-base-content/60">No participants</p>
-                <p className="text-xs text-base-content/40 mt-1">
-                  Waiting for others to join
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      <ParticipantsPanel />
 
       {showShareModal && data.room && (
         <ShareRoomModal

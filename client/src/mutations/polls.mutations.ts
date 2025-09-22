@@ -27,7 +27,8 @@ export const usePollMutations = () => {
       }
       return response.data as SelectPoll;
     },
-    onSuccess: () => {
+    onSuccess: (_data, { roomId }) => {
+      queryClient.invalidateQueries({ queryKey: ["rooms", "polls", roomId] });
       toast.success("Created new poll successfully");
     },
     onError: (error) => {
