@@ -5,7 +5,9 @@ import { env } from "@/env";
 import { auth } from "./utils/auth";
 import { wsRouter } from "./routes/ws";
 
-export const app = new Elysia()
+export const app = new Elysia({
+  precompile: true,
+})
   .get("/", () => "Hello Elysia")
   .use(
     cors({

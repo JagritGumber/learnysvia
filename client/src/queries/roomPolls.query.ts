@@ -1,11 +1,13 @@
 import { api } from "@/utils/treaty";
 import { useQuery } from "@tanstack/react-query";
+import { SelectPoll } from "@/shared/types/poll";
 
-export const useRoomById = (roomId: string) =>
+export const useRoomPolls = (rid: string) =>
   useQuery({
-    queryKey: ["room", roomId],
+    queryKey: ["rooms", rid],
     queryFn: async () => {
-      const response = await api.api.rooms({ rid: roomId }).get();
+      const response = await api.api.rooms({ rid }).polls.get();
+
       if (response.error) {
         throw new Error(
           typeof response.error.value === "string"
@@ -13,6 +15,6 @@ export const useRoomById = (roomId: string) =>
             : JSON.stringify(response.error.value)
         );
       }
-      return response.data;
+      return response.data as SelectPoll[];
     },
   });

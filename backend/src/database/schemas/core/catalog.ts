@@ -32,7 +32,12 @@ export const selectCatalogSchema = createSelectSchema(catalogs, {
   userId: z.string(),
 });
 export const createCatalogSchema = createInsertSchema(catalogs);
-export const updateCatalogSchema = createUpdateSchema(catalogs);
+export const updateCatalogSchema = createUpdateSchema(catalogs, {
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  userId: z.string(),
+});
 
 export type SelectCatalog = typeof catalogs.$inferSelect;
 export type InsertCatalog = typeof catalogs.$inferInsert;

@@ -25,3 +25,4 @@ export type SelectCatalogWithParticipantCount = Omit<
 > & {
   questionCount: number;
 };
+

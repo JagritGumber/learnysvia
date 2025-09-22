@@ -10,7 +10,7 @@ export const useRoomMutations = () => {
 
   const deleteRoom = useMutation({
     mutationFn: async ({ id }: { id: string }) => {
-      const response = await api.api.rooms({ id }).delete();
+      const response = await api.api.rooms({ rid: id }).delete();
       if (response.error) {
         throw new Error(
           typeof response.error.value === "string"

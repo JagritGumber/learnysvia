@@ -17,6 +17,7 @@ import {
   getRoomByIdentifierWithParticipantCount,
   startRoomById,
 } from "@/services/rooms.service";
+import { pollsRouter } from "./rooms/polls";
 
 // Generate unique room code
 function generateRoomCode(): string {
@@ -208,15 +209,15 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
     }
   )
   .group(
-    "/:id",
+    "/:rid",
     {
-      params: z.object({ id: z.string() }),
+      params: z.object({ rid: z.string() }),
     },
     (app) =>
       app
-        .get("/", async ({ params: { id }, status }) => {
+        .get("/", async ({ params: { rid }, status }) => {
           try {
-            const roomData = await getRoomByIdentifierWithParticipantCount(id);
+            const roomData = await getRoomByIdentifierWithParticipantCount(rid);
 
             if (!roomData) {
               return status(404, "Room not found");
@@ -232,13 +233,13 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
         })
         .put(
           "/",
-          async ({ params: { id }, body, status, user }) => {
+          async ({ params: { rid }, body, status, user }) => {
             try {
               // Check if user owns the room
               const roomData = await db
                 .select()
                 .from(room)
-                .where(and(eq(room.id, id), eq(room.createdBy, user.id)))
+                .where(and(eq(room.id, rid), eq(room.createdBy, user.id)))
                 .limit(1);
 
               if (roomData.length === 0) {
@@ -248,7 +249,7 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
               const updatedRoom = await db
                 .update(room)
                 .set(body)
-                .where(eq(room.id, id))
+                .where(eq(room.id, rid))
                 .returning();
 
               return { room: updatedRoom[0] };
@@ -261,13 +262,13 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
             body: "updateRoom",
           }
         )
-        .delete("/", async ({ params: { id }, status, user }) => {
+        .delete("/", async ({ params: { rid }, status, user }) => {
           try {
             // Check if user owns the room
             const roomData = await db
               .select()
               .from(room)
-              .where(and(eq(room.id, id), eq(room.createdBy, user.id)))
+              .where(and(eq(room.id, rid), eq(room.createdBy, user.id)))
               .limit(1);
 
             if (roomData.length === 0) {
@@ -275,8 +276,8 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
             }
             await db
               .delete(roomParticipant)
-              .where(eq(roomParticipant.roomId, id));
-            await db.delete(room).where(eq(room.id, id));
+              .where(eq(roomParticipant.roomId, rid));
+            await db.delete(room).where(eq(room.id, rid));
 
             return status(204);
           } catch (error) {
@@ -284,4 +285,5 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
             return status(500, "Failed to delete room");
           }
         })
+        .use(pollsRouter)
   );
