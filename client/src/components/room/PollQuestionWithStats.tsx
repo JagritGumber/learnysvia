@@ -1,5 +1,7 @@
 import { usePollAnswers } from "@/queries/pollAnswers.query";
 import { SelectPollWithQuestionAndOptions } from "@/shared/types/poll";
+import { usePollManagement } from "@/hooks/usePollManagement";
+import { Icon } from "@iconify/react";
 
 interface PollQuestionWithStatsProps {
   poll: SelectPollWithQuestionAndOptions;
@@ -13,20 +15,38 @@ export function PollQuestionWithStats({
   // Get poll answers to calculate statistics
   const { data: pollAnswers } = usePollAnswers(roomId, poll.id);
 
+  // Get poll management functions for delete functionality
+  const { handleDeletePoll, canDeletePoll, isDeletingPoll } = usePollManagement({
+    roomId,
+  });
+
   const totalParticipants = poll.totalParticipantsAtCreation || 0;
   const answeredCount = pollAnswers?.length || 0;
 
   return (
     <div className="p-8 w-full bg-base-100 h-full">
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-base-content mb-3">
-          Question
-        </label>
-        <div className="bg-base-200 rounded-md p-4">
-          <p className="text-base-content text-lg">
-            {poll.question?.text || "No question text"}
-          </p>
+      {/* Header with delete button */}
+      <div className="flex justify-between items-start mb-6">
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-base-content mb-3">
+            Question
+          </label>
+          <div className="bg-base-200 rounded-md p-4">
+            <p className="text-base-content text-lg">
+              {poll.question?.text || "No question text"}
+            </p>
+          </div>
         </div>
+        {canDeletePoll && (
+          <button
+            className={`btn btn-ghost btn-sm btn-circle ml-4 ${isDeletingPoll ? "loading" : ""}`}
+            onClick={handleDeletePoll}
+            title="Delete Poll"
+            disabled={isDeletingPoll}
+          >
+            <Icon icon="lineicons:trash-3" className="size-4" />
+          </button>
+        )}
       </div>
 
       <div>

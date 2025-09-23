@@ -6,9 +6,6 @@ import { useState } from "react";
 import { DefaultRoomState, EmptyPollsState } from "./RoomEmptyStates";
 import { PollLoadingState } from "./RoomLoadingState";
 import { PollErrorState } from "./RoomErrorState";
-import { PollDetails, PollOptions } from "./PollDetails";
-import { PollAnswerSection } from "./PollAnswerSection";
-import { PollStatistics } from "./PollStatistics";
 import { ParticipantsPanel } from "./ParticipantsPanel";
 import { ShareRoomModal } from "../modals/ShareRoomModal";
 import { useRoomById } from "@/queries/roomById.query";
@@ -20,16 +17,8 @@ export interface RoomHostViewProps {
 }
 
 export const RoomHostView = ({ rid }: RoomHostViewProps) => {
-  const {
-    selectedPollId,
-    setSelectedPollId,
-    handleCreatePoll,
-    handleSubmitPollAnswer,
-    handleDeletePoll,
-    canDeletePoll,
-    isSubmittingAnswer,
-    isDeletingPoll,
-  } = usePollManagement({ roomId: rid });
+  const { selectedPollId, setSelectedPollId, handleCreatePoll } =
+    usePollManagement({ roomId: rid });
 
   const {
     data: selectedPoll,
@@ -78,7 +67,9 @@ export const RoomHostView = ({ rid }: RoomHostViewProps) => {
             pollsData.map((poll) => (
               <button
                 key={poll.id}
-                onClick={() => setSelectedPollId(poll.id)}
+                onClick={() => {
+                  setSelectedPollId(poll.id);
+                }}
                 className={`w-full text-left p-3 rounded-lg mb-2 transition-colors text-base-content ${
                   selectedPollId === poll.id
                     ? "bg-primary/10 border border-primary/20"

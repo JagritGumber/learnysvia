@@ -1,5 +1,7 @@
 import { SelectPollWithQuestionAndOptions } from "@/shared/types/poll";
 import { usePollAnswers } from "@/queries/pollAnswers.query";
+import { usePollManagement } from "@/hooks/usePollManagement";
+import { Icon } from "@iconify/react";
 
 interface PollStatisticsProps {
   poll: SelectPollWithQuestionAndOptions;
@@ -9,6 +11,11 @@ interface PollStatisticsProps {
 export function PollStatistics({ poll, roomId }: PollStatisticsProps) {
   // Get poll answers to calculate statistics
   const { data: pollAnswers } = usePollAnswers(roomId, poll.id);
+
+  // Get poll management functions for delete functionality
+  const { handleDeletePoll, canDeletePoll, isDeletingPoll } = usePollManagement(
+    { roomId }
+  );
 
   // Use stored participant count from poll creation (consistent)
   const totalParticipants = poll.totalParticipantsAtCreation || 0;
@@ -52,7 +59,19 @@ export function PollStatistics({ poll, roomId }: PollStatisticsProps) {
   return (
     <div className="card bg-base-100 shadow-sm">
       <div className="card-body">
-        <h3 className="card-title text-lg mb-4">Poll Progress & Statistics</h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="card-title text-lg">Poll Progress & Statistics</h3>
+          {canDeletePoll && (
+            <button
+              className={`btn btn-ghost btn-sm btn-circle ${isDeletingPoll ? "loading" : ""}`}
+              onClick={handleDeletePoll}
+              title="Delete Poll"
+              disabled={isDeletingPoll}
+            >
+              <Icon icon="lineicons:trash-3" className="size-4" />
+            </button>
+          )}
+        </div>
 
         {/* Progress Section */}
         <div className="mb-6">

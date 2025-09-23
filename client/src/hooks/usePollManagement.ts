@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useMemo } from "react";
 import { usePollMutations } from "@/mutations/polls.mutations";
 import { authClient } from "@/utils/auth-client";
 import { useWebsocketStore } from "@/store/websocket";
+import { usePollManagementStore } from "@/store/pollManagement.store";
 import { useShallow } from "zustand/shallow";
 
 interface UsePollManagementProps {
@@ -9,7 +10,10 @@ interface UsePollManagementProps {
 }
 
 export function usePollManagement({ roomId }: UsePollManagementProps) {
-  const [selectedPollId, setSelectedPollId] = useState<string | null>(null);
+  const { setSelectedPollId, clearSelectedPoll } = usePollManagementStore();
+  const selectedPollId = usePollManagementStore(
+    useShallow((state) => state.selectedPollId)
+  );
   const { createPoll, submitPollAnswer, deletePoll } = usePollMutations();
   const { data: session } = authClient.useSession();
   const participants = useWebsocketStore(
@@ -49,6 +53,7 @@ export function usePollManagement({ roomId }: UsePollManagementProps) {
   };
 
   const handleDeletePoll = async () => {
+    console.log(selectedPollId);
     if (!selectedPollId) return;
 
     if (
@@ -60,18 +65,17 @@ export function usePollManagement({ roomId }: UsePollManagementProps) {
         roomId,
         pollId: selectedPollId,
       });
-      setSelectedPollId(null);
+      clearSelectedPoll();
     }
   };
 
-  const canDeletePoll = () => {
-    console.log(participants);
+  const canDeletePoll = useMemo(() => {
     if (!session || !participants) return false;
     const currentParticipant = participants.find(
       (p) => p.userId === session.user.id
     );
     return currentParticipant?.role === "host";
-  };
+  }, [session, participants]);
 
   return {
     selectedPollId,
@@ -79,7 +83,7 @@ export function usePollManagement({ roomId }: UsePollManagementProps) {
     handleCreatePoll,
     handleSubmitPollAnswer,
     handleDeletePoll,
-    canDeletePoll: canDeletePoll(),
+    canDeletePoll,
     isCreatingPoll: createPoll.isPending,
     isSubmittingAnswer: submitPollAnswer.isPending,
     isDeletingPoll: deletePoll.isPending,
