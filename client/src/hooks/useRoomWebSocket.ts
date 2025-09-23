@@ -4,6 +4,7 @@ import { api } from "@/utils/treaty";
 import toast from "react-hot-toast";
 import { SelectPollWithQuestionAndOptions } from "@/shared/types/poll";
 import { usePollStore } from "@/store/poll.store";
+import { useNavigate } from "@tanstack/react-router";
 
 interface UseRoomWebSocketProps {
   roomId: string;
@@ -15,6 +16,7 @@ export function useRoomWebSocket({
   participantId,
 }: UseRoomWebSocketProps) {
   const setPoll = usePollStore.getState().setPoll;
+  const navigate = useNavigate();
 
   const startWebsocketConnection = async () => {
     if (useWebsocketStore.getState().websocket) {
@@ -63,6 +65,13 @@ export function useRoomWebSocket({
           useWebsocketStore.getState().setParticipantsError(data?.message);
           useWebsocketStore.getState().setLoadingParticipants(false);
           toast.error(`Participants error: ${data.message}`);
+        } else if (data?.event === "redirect:join") {
+          navigate({
+            to: "/join/$code",
+            params: {
+              code: data?.code,
+            },
+          });
         }
       });
 

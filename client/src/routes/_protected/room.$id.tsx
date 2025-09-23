@@ -50,8 +50,6 @@ function RoomPage() {
     currentParticipant?.role === "host" ||
     currentParticipant?.role === "co_host";
 
-  // Fetch selected poll data
-
   // Early returns for loading and error states
   if (isPending) {
     return <RoomLoadingState />;

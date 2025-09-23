@@ -50,6 +50,10 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
       event: z.literal("poll:result"),
       poll: selectPollSchema.nullable(),
     }),
+    z.object({
+      event: z.literal("redirect:join"),
+      code: z.string(),
+    }),
   ]),
   params: z.object({
     id: z.string(),
@@ -69,6 +73,14 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
       ws.close();
     }
     const participant = await addWsIdForParticipant(ws.data.params.pid, ws.id);
+    if (!participant) {
+      ws.send({
+        event: "redirect:join",
+        code: room.code,
+      });
+      return;
+    }
+
     ws.send({
       event: "participant:updated",
       participant,
