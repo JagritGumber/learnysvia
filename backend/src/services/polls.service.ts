@@ -25,12 +25,16 @@ export const createRoomPoll = async (
     timeLimit?: number;
   }
 ) => {
+  const timeLimitMinutes = timeLimit ?? 1;
+  const expiresAt = new Date(Date.now() + timeLimitMinutes * 60_000);
+
   const poll = await db
     .insert(t.poll)
     .values({
       questionId,
       roomId: rid,
       timeLimit: timeLimit || 1,
+      expiresAt,
     })
     .returning()
     .get();
@@ -117,4 +121,15 @@ export const deleteRoomPoll = async (rid: string, pid: string) => {
     .get();
 
   return deletedPoll;
+};
+
+export const getNewlyCreatedPoll = async (rid: string) => {
+  const now = new Date();
+
+  const poll = await db.query.poll.findFirst({
+    where: q.and(q.eq(t.poll.roomId, rid), q.gt(t.poll.expiresAt, now)),
+    orderBy: [q.desc(t.poll.createdAt)],
+  });
+
+  return poll ?? null;
 };

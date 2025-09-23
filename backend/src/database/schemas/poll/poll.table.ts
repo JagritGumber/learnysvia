@@ -14,6 +14,7 @@ export const poll = sqliteTable("poll", {
     .notNull()
     .references(() => room.id),
   timeLimit: integer("time_limit").notNull().default(1),
+  expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$default(() => new Date()),
