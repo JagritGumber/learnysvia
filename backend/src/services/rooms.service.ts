@@ -45,13 +45,18 @@ export const getRoomByIdentifierWithParticipantCount = async (
   )?.[0];
 };
 
-export const addRoomHost = async (roomId: string, hostId: string) => {
+export const addRoomHost = async (
+  roomId: string,
+  hostId: string,
+  name: string
+) => {
   return (
     await db
       .insert(t.roomParticipant)
       .values({
         roomId,
         userId: hostId,
+        displayName: name,
         participantType: "authenticated",
         role: "host",
       })

@@ -94,7 +94,11 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
             });
             return status(201, participant);
           }
-          const participant = await addRoomHost(roomInfo.id, user.id);
+          const participant = await addRoomHost(
+            roomInfo.id,
+            user.id,
+            user.name
+          );
           return status(201, participant);
         }
 
