@@ -20,16 +20,32 @@ export function usePollManagement({ roomId }: UsePollManagementProps) {
     questionId: string,
     timeLimit: number = 1
   ) => {
-    await createPoll.mutateAsync({ roomId, questionId, timeLimit });
+    const result = await createPoll.mutateAsync({
+      roomId,
+      questionId,
+      timeLimit,
+    });
+    // Automatically select the newly created poll
+    setSelectedPollId(result.id);
   };
 
-  const handleSubmitPollAnswer = async () => {
+  const handleSubmitPollAnswer = async (optionId?: string) => {
     if (!selectedPollId) return;
 
-    await submitPollAnswer.mutateAsync({
-      roomId,
-      pollId: selectedPollId,
-    });
+    if (optionId) {
+      await submitPollAnswer.mutateAsync({
+        roomId,
+        pollId: selectedPollId,
+        optionId,
+      });
+    } else {
+      // Skip the poll if no option selected
+      await submitPollAnswer.mutateAsync({
+        roomId,
+        pollId: selectedPollId,
+        optionId: "", // Empty string for skip
+      });
+    }
   };
 
   const handleDeletePoll = async () => {

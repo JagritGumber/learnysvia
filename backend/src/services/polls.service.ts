@@ -28,6 +28,14 @@ export const createRoomPoll = async (
   const timeLimitMinutes = timeLimit ?? 1;
   const expiresAt = new Date(Date.now() + timeLimitMinutes * 60_000);
 
+  // Get current participant count (excluding hosts) for consistent statistics
+  const participants = await db.query.roomParticipant.findMany({
+    where: q.eq(t.roomParticipant.roomId, rid),
+  });
+
+  const participantsWhoNeedToAnswer = participants.filter(p => p.role !== 'host');
+  const totalParticipantsAtCreation = participantsWhoNeedToAnswer.length;
+
   const poll = await db
     .insert(t.poll)
     .values({
@@ -35,6 +43,7 @@ export const createRoomPoll = async (
       roomId: rid,
       timeLimit: timeLimit || 1,
       expiresAt,
+      totalParticipantsAtCreation,
     })
     .returning()
     .get();
@@ -75,7 +84,7 @@ export const submitPollAnswer = async (
     throw new Error("User has already answered this poll");
   }
 
-  return await db
+  const answer = await db
     .insert(t.pollAnswer)
     .values({
       pollId: pid,
@@ -85,6 +94,11 @@ export const submitPollAnswer = async (
     })
     .returning()
     .get();
+
+  // Check if poll should be completed after this answer
+  await checkAndCompletePoll(pid);
+
+  return answer;
 };
 
 export const getPollAnswers = async (pid: string) => {
@@ -184,4 +198,81 @@ export const getNewlyCreatedPoll = async (rid: string) => {
   });
 
   return poll ?? null;
+};
+
+// Calculate and store final poll results
+export const calculateAndStorePollResults = async (pid: string) => {
+  const poll = await db.query.poll.findFirst({
+    where: q.eq(t.poll.id, pid),
+    with: {
+      question: {
+        with: {
+          options: true,
+        },
+      },
+    },
+  });
+
+  if (!poll) {
+    throw new Error("Poll not found");
+  }
+
+  // Get all answers for this poll
+  const answers = await db.query.pollAnswer.findMany({
+    where: q.eq(t.pollAnswer.pollId, pid),
+  });
+
+  // Calculate results for each option
+  const results = poll.question.options.map((option) => {
+    const optionAnswers = answers.filter(answer => answer.optionId === option.id);
+    const count = optionAnswers.length;
+    const percentage = poll.totalParticipantsAtCreation > 0
+      ? (count / poll.totalParticipantsAtCreation) * 100
+      : 0;
+
+    return {
+      optionId: option.id,
+      optionText: option.text,
+      count,
+      percentage: Math.round(percentage * 100) / 100, // Round to 2 decimal places
+      isCorrect: option.isCorrect,
+    };
+  });
+
+  // Store the results and mark poll as completed
+  await db
+    .update(t.poll)
+    .set({
+      finalResults: JSON.stringify(results),
+      isCompleted: true,
+    })
+    .where(q.eq(t.poll.id, pid));
+
+  return results;
+};
+
+// Check if poll should be completed and calculate results
+export const checkAndCompletePoll = async (pid: string) => {
+  const poll = await db.query.poll.findFirst({
+    where: q.eq(t.poll.id, pid),
+  });
+
+  if (!poll || poll.isCompleted) {
+    return null;
+  }
+
+  const answers = await db.query.pollAnswer.findMany({
+    where: q.eq(t.pollAnswer.pollId, pid),
+  });
+
+  // Complete poll if all participants have answered or poll has expired
+  const shouldComplete =
+    answers.length >= poll.totalParticipantsAtCreation ||
+    new Date() > new Date(poll.expiresAt);
+
+  if (shouldComplete) {
+    return await calculateAndStorePollResults(pid);
+  }
+
+  return null;
 };

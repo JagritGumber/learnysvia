@@ -169,6 +169,20 @@
       "when": 1758653032089,
       "tag": "0023_lying_xavin",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "6",
+      "when": 1758658275854,
+      "tag": "0024_absurd_nightshade",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "6",
+      "when": 1758659171264,
+      "tag": "0025_green_colossus",
+      "breakpoints": true
     }
   ]
 }

@@ -183,14 +183,17 @@ export const RoomHostView = ({ rid }: RoomHostViewProps) => {
                   <PollOptions poll={selectedPoll} />
                 </div>
 
-                <PollAnswerSection
-                  onSubmitAnswer={handleSubmitPollAnswer}
-                  isSubmitting={isSubmittingAnswer}
-                  poll={selectedPoll}
-                  roomId={rid}
-                />
+                {/* Only show answer section for non-host participants */}
+                {canDeletePoll === false && (
+                  <PollAnswerSection
+                    onSubmitAnswer={handleSubmitPollAnswer}
+                    isSubmitting={isSubmittingAnswer}
+                    poll={selectedPoll}
+                    roomId={rid}
+                  />
+                )}
 
-                <PollStatistics poll={selectedPoll} />
+                <PollStatistics poll={selectedPoll} roomId={rid} />
               </div>
             ) : (
               <PollNotFoundState onBack={() => setSelectedPollId(null)} />
