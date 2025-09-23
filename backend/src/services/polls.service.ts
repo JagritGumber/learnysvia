@@ -1,9 +1,10 @@
 import { db } from "@/database/db";
 import * as t from "@/database/schemas";
+import type { PollResults } from "@/shared/types/poll";
 import * as q from "drizzle-orm";
 
 export const getRoomPolls = async (rid: string) => {
-  return await db.query.poll.findMany({
+  const polls = await db.query.poll.findMany({
     where: q.eq(t.poll.roomId, rid),
     with: {
       question: {
@@ -13,6 +14,20 @@ export const getRoomPolls = async (rid: string) => {
       },
     },
   });
+
+  const mappedPolls: t.SelectPoll[] = [];
+
+  for (const poll of polls) {
+    const mappedPoll = {
+      ...poll,
+      finalResults: JSON.parse(
+        poll.finalResults as unknown as string
+      ) as PollResults[],
+    };
+    mappedPolls.push(mappedPoll);
+  }
+
+  return mappedPolls;
 };
 
 export const createRoomPoll = async (
@@ -33,7 +48,9 @@ export const createRoomPoll = async (
     where: q.eq(t.roomParticipant.roomId, rid),
   });
 
-  const participantsWhoNeedToAnswer = participants.filter(p => p.role !== 'host');
+  const participantsWhoNeedToAnswer = participants.filter(
+    (p) => p.role !== "host"
+  );
   const totalParticipantsAtCreation = participantsWhoNeedToAnswer.length;
 
   const poll = await db
@@ -55,7 +72,7 @@ export const createRoomPoll = async (
 };
 
 export const getRoomPollById = async (rid: string, pid: string) => {
-  return await db.query.poll.findFirst({
+  const poll = await db.query.poll.findFirst({
     where: q.and(q.eq(t.poll.roomId, rid), q.eq(t.poll.id, pid)),
     with: {
       question: {
@@ -65,6 +82,17 @@ export const getRoomPollById = async (rid: string, pid: string) => {
       },
     },
   });
+
+  if (!poll) return null;
+
+  const mappedPoll = {
+    ...poll,
+    finalResults: JSON.parse(
+      poll.finalResults as unknown as string
+    ) as PollResults[],
+  };
+
+  return mappedPoll as t.SelectPoll;
 };
 
 export const submitPollAnswer = async (
@@ -102,7 +130,7 @@ export const submitPollAnswer = async (
 };
 
 export const getPollAnswers = async (pid: string) => {
-  return await db.query.pollAnswer.findMany({
+  const answers = await db.query.pollAnswer.findMany({
     where: q.eq(t.pollAnswer.pollId, pid),
     with: {
       user: true,
@@ -117,6 +145,7 @@ export const getPollAnswers = async (pid: string) => {
       },
     },
   });
+  return answers;
 };
 
 export const hasUserAnsweredPoll = async (pid: string, uid: string) => {
@@ -224,11 +253,14 @@ export const calculateAndStorePollResults = async (pid: string) => {
 
   // Calculate results for each option
   const results = poll.question.options.map((option) => {
-    const optionAnswers = answers.filter(answer => answer.optionId === option.id);
+    const optionAnswers = answers.filter(
+      (answer) => answer.optionId === option.id
+    );
     const count = optionAnswers.length;
-    const percentage = poll.totalParticipantsAtCreation > 0
-      ? (count / poll.totalParticipantsAtCreation) * 100
-      : 0;
+    const percentage =
+      poll.totalParticipantsAtCreation > 0
+        ? (count / poll.totalParticipantsAtCreation) * 100
+        : 0;
 
     return {
       optionId: option.id,
@@ -243,7 +275,7 @@ export const calculateAndStorePollResults = async (pid: string) => {
   await db
     .update(t.poll)
     .set({
-      finalResults: JSON.stringify(results),
+      finalResults: results,
       isCompleted: true,
     })
     .where(q.eq(t.poll.id, pid));

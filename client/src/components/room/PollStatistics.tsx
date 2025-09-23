@@ -1,6 +1,5 @@
 import {
   SelectPollWithQuestionAndOptions,
-  PollResults,
 } from "@/shared/types/poll";
 import { usePollAnswers } from "@/queries/pollAnswers.query";
 
@@ -20,8 +19,10 @@ export function PollStatistics({ poll, roomId }: PollStatisticsProps) {
   const correctAnswers =
     poll.question?.options?.filter((option) => option.isCorrect).length || 0;
 
+  console.log(poll);
+
   // Use stored final results if available, otherwise calculate in real-time
-  const finalResults = poll.finalResults as PollResults[] | undefined;
+  const finalResults = poll.finalResults;
   const answerDistribution =
     finalResults ||
     poll.question?.options?.map((option) => {
