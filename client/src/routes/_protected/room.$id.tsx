@@ -32,6 +32,8 @@ import { ParticipantsPanel } from "@/components/room/ParticipantsPanel";
 // Import custom hooks
 import { useRoomWebSocket } from "@/hooks/useRoomWebSocket";
 import { usePollManagement } from "@/hooks/usePollManagement";
+import { useWebsocketStore } from "@/store/websocket";
+import { authClient } from "@/utils/auth-client";
 
 const searchSchema = z.object({
   pid: z.string(),
@@ -70,6 +72,16 @@ function RoomPage() {
     isDeletingPoll,
   } = usePollManagement({ roomId: search.rid });
 
+  // Check if current user is the host
+  const { data: session } = authClient.useSession();
+  const participants = useWebsocketStore((state) => state.participants);
+  const currentParticipant = participants.find(
+    (p) => p.userId === session?.user?.id
+  );
+  const isHost =
+    currentParticipant?.role === "host" ||
+    currentParticipant?.role === "co_host";
+
   // Fetch selected poll data
   const {
     data: selectedPoll,
@@ -96,6 +108,23 @@ function RoomPage() {
 
   // Show polls if they exist, otherwise show empty state
   const hasPolls = pollsData && pollsData.length > 0;
+
+  // If not the host, show waiting message
+  if (!isHost) {
+    return (
+      <div className="min-h-[calc(100vh-64px)] bg-base-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="loading loading-spinner loading-lg text-primary mb-4"></div>
+          <h2 className="text-2xl font-semibold text-base-content mb-2">
+            Waiting for a poll to come
+          </h2>
+          <p className="text-base-content/60">
+            The host will start a poll soon
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-base-100 flex">

@@ -50,7 +50,7 @@ function RouteComponent() {
         </div>
         <ul className="tabs flex-nowrap p-0 min-h-0">
           {tabs.map((tab) => (
-            <Link to={tab.route}>
+            <Link to={tab.route} key={tab.route}>
               <li
                 className={clsx("tab text-nowrap", {
                   "tab-active": location.pathname === tab.route,
