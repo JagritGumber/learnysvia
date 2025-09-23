@@ -7,6 +7,7 @@ import {
   getPollAnswers,
   hasUserAnsweredPoll,
   deleteRoomPoll,
+  skipRoomPoll,
 } from "@/services/polls.service";
 import { Elysia } from "elysia";
 import z from "zod";
@@ -76,6 +77,18 @@ export const pollsRouter = new Elysia({
             return status(200, deletedPoll);
           } catch (e) {
             console.error("Internal server error while deleting the poll", e);
+            if (e instanceof Error && e.message.includes("not found")) {
+              return status(404, e.message);
+            }
+            return status(500, "Internal Server Error");
+          }
+        })
+        .post("/skip", async ({ status, params: { pid, rid }, user }) => {
+          try {
+            const skippedPoll = await skipRoomPoll(rid, pid, user.id);
+            return status(200, skippedPoll);
+          } catch (e) {
+            console.error("Internal server error while skipping the poll", e);
             if (e instanceof Error && e.message.includes("not found")) {
               return status(404, e.message);
             }

@@ -58,7 +58,11 @@ export const getRoomPollById = async (rid: string, pid: string) => {
   });
 };
 
-export const submitPollAnswer = async (pid: string, uid: string, oid: string) => {
+export const submitPollAnswer = async (
+  pid: string,
+  uid: string,
+  oid: string
+) => {
   // Check if user already answered this poll
   const existingAnswer = await db.query.pollAnswer.findFirst({
     where: q.and(
@@ -77,6 +81,7 @@ export const submitPollAnswer = async (pid: string, uid: string, oid: string) =>
       pollId: pid,
       userId: uid,
       optionId: oid,
+      status: "answered",
     })
     .returning()
     .get();
@@ -108,6 +113,36 @@ export const hasUserAnsweredPoll = async (pid: string, uid: string) => {
     ),
   });
   return !!answer;
+};
+
+export const skipRoomPoll = async (rid: string, pid: string, uid: string) => {
+  // First check if the poll exists and belongs to the room
+  const poll = await db.query.poll.findFirst({
+    where: q.and(q.eq(t.poll.roomId, rid), q.eq(t.poll.id, pid)),
+  });
+
+  if (!poll) {
+    throw new Error("Poll not found or doesn't belong to this room");
+  }
+
+  // Check if user already has an answer for this poll
+  const existingAnswer = await db.query.pollAnswer.findFirst({
+    where: q.and(
+      q.eq(t.pollAnswer.pollId, pid),
+      q.eq(t.pollAnswer.userId, uid)
+    ),
+  });
+
+  if (!existingAnswer) {
+    // Create a skipped poll answer record for this specific user
+    await db.insert(t.pollAnswer).values({
+      pollId: pid,
+      userId: uid,
+      status: "skipped",
+    });
+  }
+
+  return poll;
 };
 
 export const deleteRoomPoll = async (rid: string, pid: string) => {

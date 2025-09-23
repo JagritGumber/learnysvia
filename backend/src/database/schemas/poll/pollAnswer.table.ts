@@ -15,8 +15,10 @@ export const pollAnswer = sqliteTable("poll_answer", {
     .notNull()
     .references(() => user.id),
   optionId: text("option_id")
+    .references(() => options.id), // Made optional for skipped polls
+  status: text("status", { enum: ["answered", "skipped"] })
     .notNull()
-    .references(() => options.id),
+    .default("answered"),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$default(() => new Date()),
