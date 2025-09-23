@@ -3,6 +3,11 @@
   themes: cupcake --default;
 }
 
+html,
+body {
+  scroll-behavior: smooth;
+}
+
 body {
   @apply m-0;
   font-family:

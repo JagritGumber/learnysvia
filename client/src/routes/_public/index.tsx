@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Icon } from "@iconify/react";
 import { authClient } from "@/utils/auth-client";
 import { PollPreview } from "@/components/room/PollPreview";
+import toast from "react-hot-toast";
 
 export const Route = createFileRoute("/_public/")({
   component: App,
@@ -19,7 +20,7 @@ export default function App() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="lg:pr-8">
                 <h1 className="text-4xl lg:text-5xl font-extrabold leading-tight mb-6">
-                  Teacher's Assistant
+                  Learnysvia
                 </h1>
                 <p className="text-lg lg:text-xl text-base-content/80 mb-8 max-w-2xl">
                   Real-time polls for instant student comprehension insights —
@@ -85,7 +86,7 @@ export default function App() {
         </section>
 
         {/* WHY WE BUILT THIS */}
-        <section className="pt-16 pb-20 bg-base-100 w-full border-t border-b border-base-300">
+        <section className="pt-16 pb-20 bg-base-200 w-full border-t border-b border-base-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold mb-4">
@@ -132,7 +133,7 @@ export default function App() {
               </div>
 
               <div className="lg:pl-8">
-                <div className="p-6 rounded-lg bg-base-200 border border-base-300">
+                <div className="p-6 rounded-lg bg-base-100 border border-base-300">
                   <h3 className="text-xl font-semibold mb-4">
                     Student Privacy First
                   </h3>
@@ -177,7 +178,7 @@ export default function App() {
         {/* FEATURES */}
         <section
           id="features"
-          className="pt-16 pb-20 bg-base-200 w-full border-t border-b border-base-300"
+          className="pt-16 pb-20 bg-base-100 w-full border-t border-b border-base-300"
         >
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="text-center mb-12">
@@ -210,10 +211,10 @@ export default function App() {
               ].map((f) => (
                 <div
                   key={f.title}
-                  className="p-4 rounded-lg bg-base-100 border border-base-300"
+                  className="p-4 rounded-lg bg-base-200 border border-base-300"
                 >
                   <div
-                    className={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${f.color} text-white mb-4`}
+                    className={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${f.color} text-base-content mb-4`}
                   >
                     <Icon icon={f.icon} className="text-xl" />
                   </div>
@@ -228,7 +229,7 @@ export default function App() {
         </section>
 
         {/* HOW IT WORKS */}
-        <section id="how-it-works" className="pt-16 pb-20 bg-base-100">
+        <section id="how-it-works" className="pt-16 pb-20 bg-base-200">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl font-bold mb-4">How it works</h2>
@@ -240,7 +241,7 @@ export default function App() {
             {/* Teacher Flow */}
             <div className="mb-16">
               <div className="text-center mb-8">
-                <h3 className="text-2xl font-semibold text-primary mb-2">
+                <h3 className="text-2xl font-semibold text-primary-content mb-2">
                   Teacher Flow
                 </h3>
                 <p className="text-base-content/70">
@@ -254,7 +255,7 @@ export default function App() {
                     <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
                       <Icon
                         icon="lineicons:user"
-                        className="text-2xl text-white"
+                        className="text-2xl text-base-content"
                       />
                     </div>
                     <h4 className="card-title text-lg justify-center">
@@ -271,7 +272,7 @@ export default function App() {
                     <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
                       <Icon
                         icon="lineicons:home"
-                        className="text-2xl text-white"
+                        className="text-2xl text-base-content"
                       />
                     </div>
                     <h4 className="card-title text-lg justify-center">
@@ -288,7 +289,7 @@ export default function App() {
                     <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
                       <Icon
                         icon="lineicons:bar-chart"
-                        className="text-2xl text-white"
+                        className="text-2xl text-base-content"
                       />
                     </div>
                     <h4 className="card-title text-lg justify-center">
@@ -306,7 +307,7 @@ export default function App() {
             {/* Student Flow */}
             <div>
               <div className="text-center mb-8">
-                <h3 className="text-2xl font-semibold text-secondary mb-2">
+                <h3 className="text-2xl font-semibold text-secondary-content mb-2">
                   Student Flow
                 </h3>
                 <p className="text-base-content/70">
@@ -320,7 +321,7 @@ export default function App() {
                     <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center mx-auto mb-4">
                       <Icon
                         icon="lineicons:link"
-                        className="text-2xl text-white"
+                        className="text-2xl text-base-content"
                       />
                     </div>
                     <h4 className="card-title text-lg justify-center">
@@ -337,7 +338,7 @@ export default function App() {
                     <div className="w-16 h-16 bg-info rounded-full flex items-center justify-center mx-auto mb-4">
                       <Icon
                         icon="lineicons:check"
-                        className="text-2xl text-white"
+                        className="text-2xl text-base-content"
                       />
                     </div>
                     <h4 className="card-title text-lg justify-center">
@@ -355,7 +356,7 @@ export default function App() {
                     <div className="w-16 h-16 bg-warning rounded-full flex items-center justify-center mx-auto mb-4">
                       <Icon
                         icon="lineicons:thumbs-up"
-                        className="text-2xl text-white"
+                        className="text-2xl text-base-content"
                       />
                     </div>
                     <h4 className="card-title text-lg justify-center">Done!</h4>
@@ -370,7 +371,7 @@ export default function App() {
         </section>
 
         {/* CALL TO ACTION */}
-        <section className="pt-16 pb-20 bg-base-200 w-full border-t border-b border-base-300">
+        <section className="pt-16 pb-20 bg-base-100 w-full border-t border-b border-base-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
             <div className="max-w-4xl mx-auto">
               <h3 className="text-3xl font-bold mb-4">
@@ -401,7 +402,7 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             {/* Brand */}
             <div className="md:col-span-1">
-              <h4 className="font-bold text-lg mb-4">Teacher's Assistant</h4>
+              <h4 className="font-bold text-lg mb-4">Learnysvia</h4>
               <p className="text-base-content/70 text-sm mb-4">
                 Real-time polls for instant student comprehension insights.
               </p>
@@ -409,17 +410,20 @@ export default function App() {
                 <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
                   <Icon
                     icon="lineicons:graduation"
-                    className="text-sm text-white"
+                    className="text-sm text-base-content"
                   />
                 </div>
                 <div className="w-8 h-8 bg-secondary rounded flex items-center justify-center">
                   <Icon
                     icon="lineicons:pie-chart"
-                    className="text-sm text-white"
+                    className="text-sm text-base-content"
                   />
                 </div>
                 <div className="w-8 h-8 bg-accent rounded flex items-center justify-center">
-                  <Icon icon="lineicons:book" className="text-sm text-white" />
+                  <Icon
+                    icon="lineicons:book"
+                    className="text-sm text-base-content"
+                  />
                 </div>
               </div>
             </div>
@@ -454,16 +458,48 @@ export default function App() {
               <h5 className="font-semibold mb-4">Support</h5>
               <ul className="space-y-2">
                 <li>
-                  <a className="link link-hover text-sm">Help Center</a>
+                  <a
+                    className="link link-hover text-sm"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toast("this feature is not there bro 🤗");
+                    }}
+                  >
+                    Help Center
+                  </a>
                 </li>
                 <li>
-                  <a className="link link-hover text-sm">Contact Us</a>
+                  <a
+                    className="link link-hover text-sm"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toast("this feature is not there bro 🤗");
+                    }}
+                  >
+                    Contact Us
+                  </a>
                 </li>
                 <li>
-                  <a className="link link-hover text-sm">Privacy Policy</a>
+                  <a
+                    className="link link-hover text-sm"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toast("this feature is not there bro 🤗");
+                    }}
+                  >
+                    Privacy Policy
+                  </a>
                 </li>
                 <li>
-                  <a className="link link-hover text-sm">Terms of Service</a>
+                  <a
+                    className="link link-hover text-sm"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toast("this feature is not there bro 🤗");
+                    }}
+                  >
+                    Terms of Service
+                  </a>
                 </li>
               </ul>
             </div>
@@ -472,8 +508,8 @@ export default function App() {
           {/* Bottom Bar */}
           <div className="pt-8 border-t border-base-content/10 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-sm text-base-content/70">
-              © {new Date().getFullYear()} Teacher's Assistant — Built for
-              teachers, by teachers
+              © {new Date().getFullYear()} Learnysvia — Built for teachers, by
+              teachers
             </div>
             <div className="flex items-center gap-4 text-sm text-base-content/70">
               <span>Made with ❤️ for educators</span>
