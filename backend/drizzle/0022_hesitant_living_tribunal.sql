@@ -1,0 +1,1 @@
+ALTER TABLE `poll` ADD `expires_at` integer NOT NULL;
