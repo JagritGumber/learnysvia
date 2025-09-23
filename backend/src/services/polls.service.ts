@@ -129,6 +129,13 @@ export const getNewlyCreatedPoll = async (rid: string) => {
   const poll = await db.query.poll.findFirst({
     where: q.and(q.eq(t.poll.roomId, rid), q.gt(t.poll.expiresAt, now)),
     orderBy: [q.desc(t.poll.createdAt)],
+    with: {
+      question: {
+        with: {
+          options: true,
+        },
+      },
+    },
   });
 
   return poll ?? null;

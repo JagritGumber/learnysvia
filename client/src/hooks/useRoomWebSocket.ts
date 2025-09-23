@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useWebsocketStore } from "@/store/websocket";
 import { api } from "@/utils/treaty";
 import toast from "react-hot-toast";
+import { SelectPollWithQuestionAndOptions } from "@/shared/types/poll";
+import { usePollStore } from "@/store/poll.store";
 
 interface UseRoomWebSocketProps {
   roomId: string;
@@ -12,6 +14,8 @@ export function useRoomWebSocket({
   roomId,
   participantId,
 }: UseRoomWebSocketProps) {
+  const setPoll = usePollStore.getState().setPoll;
+
   const startWebsocketConnection = async () => {
     if (useWebsocketStore.getState().websocket) {
       console.log("websocket already subscribed");
@@ -52,6 +56,8 @@ export function useRoomWebSocket({
           // Handle polls result if needed
           console.log("Received polls result:", data.polls);
         } else if (data?.event === "poll:result") {
+          const poll = data?.poll as SelectPollWithQuestionAndOptions;
+          setPoll(poll);
         } else if (data?.event === "error") {
           useWebsocketStore.getState().setParticipantsError(data?.message);
           useWebsocketStore.getState().setLoadingParticipants(false);
