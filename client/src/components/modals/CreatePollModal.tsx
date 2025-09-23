@@ -210,7 +210,7 @@ export function CreatePollModal({
                       <div className="flex-1 flex items-center justify-center">
                         <div className="text-center">
                           <Icon
-                            icon="lineicons:document"
+                            icon="lineicons:file-multiple"
                             className="text-6xl mb-4 text-base-content/30"
                           />
                           <h4 className="font-semibold text-base-content mb-2">
@@ -226,19 +226,17 @@ export function CreatePollModal({
                 </div>
               )
             ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center">
-                  <Icon
-                    icon="lineicons:folder"
-                    className="text-6xl mb-4 text-base-content/30"
-                  />
-                  <h4 className="font-semibold text-base-content mb-2">
-                    Select a Catalog
-                  </h4>
-                  <p className="text-base-content/70 text-sm">
-                    Choose a catalog from the sidebar to browse questions.
-                  </p>
-                </div>
+              <div className="flex-1 flex flex-col items-center justify-center">
+                <Icon
+                  icon="lineicons:folder"
+                  className="text-6xl mb-4 text-base-content/30"
+                />
+                <h4 className="font-semibold text-base-content mb-2">
+                  Select a Catalog
+                </h4>
+                <p className="text-base-content/70 text-sm">
+                  Choose a catalog from the sidebar to browse questions.
+                </p>
               </div>
             )}
           </div>
@@ -298,16 +296,14 @@ export function CreatePollModal({
                   )}
                 </div>
               ) : (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-center">
-                    <Icon
-                      icon="lineicons:eye"
-                      className="text-6xl mb-4 text-base-content/30"
-                    />
-                    <p className="text-base-content/70 text-sm">
-                      Select a question to preview
-                    </p>
-                  </div>
+                <div className="flex items-center flex-col justify-center h-full">
+                  <Icon
+                    icon="lineicons:eye"
+                    className="text-6xl mb-4 text-base-content/30"
+                  />
+                  <p className="text-base-content/70 text-sm">
+                    Select a question to preview
+                  </p>
                 </div>
               )}
             </div>
