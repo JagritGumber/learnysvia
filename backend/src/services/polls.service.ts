@@ -19,18 +19,26 @@ export const createRoomPoll = async (
   rid: string,
   {
     questionId,
+    timeLimit,
   }: {
     questionId: string;
+    timeLimit?: number;
   }
 ) => {
-  return await db
+  const poll = await db
     .insert(t.poll)
     .values({
       questionId,
       roomId: rid,
+      timeLimit: timeLimit || 1,
     })
     .returning()
     .get();
+
+  const { app } = await import("../index.js");
+  app.server?.publish(`room_${rid}`, "poll:created");
+
+  return poll;
 };
 
 export const getRoomPollById = async (rid: string, pid: string) => {
@@ -46,13 +54,13 @@ export const getRoomPollById = async (rid: string, pid: string) => {
   });
 };
 
-export const submitPollAnswer = async (
-  pid: string,
-  uid: string,
-) => {
+export const submitPollAnswer = async (pid: string, uid: string) => {
   // Check if user already answered this poll
   const existingAnswer = await db.query.pollAnswer.findFirst({
-    where: q.and(q.eq(t.pollAnswer.pollId, pid), q.eq(t.pollAnswer.userId, uid)),
+    where: q.and(
+      q.eq(t.pollAnswer.pollId, pid),
+      q.eq(t.pollAnswer.userId, uid)
+    ),
   });
 
   if (existingAnswer) {
@@ -80,7 +88,10 @@ export const getPollAnswers = async (pid: string) => {
 
 export const hasUserAnsweredPoll = async (pid: string, uid: string) => {
   const answer = await db.query.pollAnswer.findFirst({
-    where: q.and(q.eq(t.pollAnswer.pollId, pid), q.eq(t.pollAnswer.userId, uid)),
+    where: q.and(
+      q.eq(t.pollAnswer.pollId, pid),
+      q.eq(t.pollAnswer.userId, uid)
+    ),
   });
   return !!answer;
 };

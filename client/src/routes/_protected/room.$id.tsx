@@ -232,6 +232,8 @@ function RoomPage() {
                 <PollAnswerSection
                   onSubmitAnswer={handleSubmitPollAnswer}
                   isSubmitting={isSubmittingAnswer}
+                  poll={selectedPoll}
+                  roomId={search.rid}
                 />
 
                 <PollStatistics poll={selectedPoll} />

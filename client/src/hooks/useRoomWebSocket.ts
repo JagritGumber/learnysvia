@@ -8,7 +8,10 @@ interface UseRoomWebSocketProps {
   participantId: string;
 }
 
-export function useRoomWebSocket({ roomId, participantId }: UseRoomWebSocketProps) {
+export function useRoomWebSocket({
+  roomId,
+  participantId,
+}: UseRoomWebSocketProps) {
   const startWebsocketConnection = async () => {
     if (useWebsocketStore.getState().websocket) {
       console.log("websocket already subscribed");
@@ -17,7 +20,9 @@ export function useRoomWebSocket({ roomId, participantId }: UseRoomWebSocketProp
     console.log("Connecting websocket");
 
     try {
-      const ws = api.ws.rooms({ id: roomId })({ pid: participantId }).subscribe();
+      const ws = api.ws
+        .rooms({ id: roomId })({ pid: participantId })
+        .subscribe();
       useWebsocketStore.getState().setWebsocket(ws);
       ws.on("open", (event) => {
         console.log("WebSocket connected", event);
@@ -39,6 +44,13 @@ export function useRoomWebSocket({ roomId, participantId }: UseRoomWebSocketProp
           channelSignal === "participants:notfresh"
         ) {
           useWebsocketStore.getState().fetchParticipants(roomId);
+        } else if (channelSignal === "poll:created") {
+          // Invalidate polls query to refresh the list
+          useWebsocketStore.getState().invalidatePolls(roomId);
+          toast.success("New poll created!");
+        } else if (data?.event === "polls:result") {
+          // Handle polls result if needed
+          console.log("Received polls result:", data.polls);
         } else if (data?.event === "error") {
           useWebsocketStore.getState().setParticipantsError(data?.message);
           useWebsocketStore.getState().setLoadingParticipants(false);

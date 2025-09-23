@@ -1,6 +1,7 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { questions, room } from "../core";
 import { relations } from "drizzle-orm";
+import { createSelectSchema } from "drizzle-zod";
 
 export const poll = sqliteTable("poll", {
   id: text("id")
@@ -12,6 +13,7 @@ export const poll = sqliteTable("poll", {
   roomId: text("room_id")
     .notNull()
     .references(() => room.id),
+  timeLimit: integer("time_limit").notNull().default(1),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$default(() => new Date()),
@@ -34,3 +36,5 @@ export const pollRelations = relations(poll, ({ one }) => ({
 
 export type InsertPoll = typeof poll.$inferInsert;
 export type SelectPoll = typeof poll.$inferSelect;
+
+export const selectPollSchema = createSelectSchema(poll);

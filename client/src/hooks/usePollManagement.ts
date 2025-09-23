@@ -13,8 +13,8 @@ export function usePollManagement({ roomId }: UsePollManagementProps) {
   const { data: session } = authClient.useSession();
   const participants = useWebsocketStore((state) => state.participants);
 
-  const handleCreatePoll = async (questionId: string) => {
-    await createPoll.mutateAsync({ roomId, questionId });
+  const handleCreatePoll = async (questionId: string, timeLimit: number = 1) => {
+    await createPoll.mutateAsync({ roomId, questionId, timeLimit });
   };
 
   const handleSubmitPollAnswer = async () => {

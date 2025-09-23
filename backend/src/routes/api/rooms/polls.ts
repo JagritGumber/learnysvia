@@ -18,6 +18,7 @@ export const pollsRouter = new Elysia({
   .model({
     createPoll: z.object({
       questionId: z.string(),
+      timeLimit: z.number().min(1).max(60).optional().default(1),
     }),
   })
   .guard({
@@ -37,9 +38,9 @@ export const pollsRouter = new Elysia({
   })
   .post(
     "/",
-    async ({ status, params: { rid }, body: { questionId } }) => {
+    async ({ status, params: { rid }, body: { questionId, timeLimit } }) => {
       try {
-        const poll = await createRoomPoll(rid, { questionId });
+        const poll = await createRoomPoll(rid, { questionId, timeLimit });
         return status(201, poll);
       } catch (e) {
         console.error("Internal server error while creating a poll", e);
@@ -56,7 +57,7 @@ export const pollsRouter = new Elysia({
       params: z.object({
         pid: z.string(),
       }),
-      auth: true
+      auth: true,
     },
     (app) =>
       app
@@ -81,39 +82,43 @@ export const pollsRouter = new Elysia({
             return status(500, "Internal Server Error");
           }
         })
-        .group(
-          "/answers",
-          (answersApp) =>
-            answersApp
-              .post(
-                "/",
-                async ({ status, params: { pid }, user }) => {
-                  try {
-                    const answer = await submitPollAnswer(pid, user.id);
-                    return status(201, answer);
-                  } catch (e) {
-                    console.error("Internal server error while submitting poll answer", e);
-                    return status(500, "Internal Server Error");
-                  }
-                }
-              )
-              .get("/", async ({ status, params: { pid } }) => {
-                try {
-                  const answers = await getPollAnswers(pid);
-                  return status(200, answers);
-                } catch (e) {
-                  console.error("Internal server error while getting poll answers", e);
-                  return status(500, "Internal Server Error");
-                }
-              })
-              .get("/me", async ({ status, params: { pid }, user }) => {
-                try {
-                  const hasAnswered = await hasUserAnsweredPoll(pid, user.id);
-                  return status(200, { hasAnswered });
-                } catch (e) {
-                  console.error("Internal server error while checking if user answered poll", e);
-                  return status(500, "Internal Server Error");
-                }
-              })
+        .group("/answers", (answersApp) =>
+          answersApp
+            .post("/", async ({ status, params: { pid }, user }) => {
+              try {
+                const answer = await submitPollAnswer(pid, user.id);
+                return status(201, answer);
+              } catch (e) {
+                console.error(
+                  "Internal server error while submitting poll answer",
+                  e
+                );
+                return status(500, "Internal Server Error");
+              }
+            })
+            .get("/", async ({ status, params: { pid } }) => {
+              try {
+                const answers = await getPollAnswers(pid);
+                return status(200, answers);
+              } catch (e) {
+                console.error(
+                  "Internal server error while getting poll answers",
+                  e
+                );
+                return status(500, "Internal Server Error");
+              }
+            })
+            .get("/me", async ({ status, params: { pid }, user }) => {
+              try {
+                const hasAnswered = await hasUserAnsweredPoll(pid, user.id);
+                return status(200, { hasAnswered });
+              } catch (e) {
+                console.error(
+                  "Internal server error while checking if user answered poll",
+                  e
+                );
+                return status(500, "Internal Server Error");
+              }
+            })
         )
   );

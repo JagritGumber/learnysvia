@@ -1,10 +1,14 @@
-import { selectRoomParticipantSchema } from "@/database/schemas";
+import {
+  selectPollSchema,
+  selectRoomParticipantSchema,
+} from "@/database/schemas";
 import {
   addWsIdForParticipant,
   getActiveRoomParticipants,
   removeParticipant,
 } from "@/services/participants.service";
 import { getRoomByIdentifierWithParticipantCount } from "@/services/rooms.service";
+import { getRoomPolls } from "@/services/polls.service";
 import { Elysia } from "elysia";
 import z from "zod";
 import { app } from "@/index";
@@ -15,11 +19,20 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
       event: z.literal("participants:get"),
       roomId: z.string(),
     }),
+    z.object({
+      event: z.literal("poll:get"),
+      roomId: z.string(),
+    }),
   ]),
   response: z.union([
     z.object({
       event: z.literal("participants:result"),
       participants: z.array(selectRoomParticipantSchema),
+      message: z.string(),
+    }),
+    z.object({
+      event: z.literal("polls:result"),
+      polls: z.array(selectPollSchema),
       message: z.string(),
     }),
     z.object({
@@ -84,6 +97,13 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
         message: "Successfully fetched participants",
       });
       app.server?.publish(`room_${ws.data.params.id}`, "participants:fresh");
+    } else if (data.event === "poll:get") {
+      const polls = await getRoomPolls(data.roomId);
+      ws.send({
+        event: "polls:result",
+        polls,
+        message: "Successfully fetched polls",
+      });
     }
   },
 });

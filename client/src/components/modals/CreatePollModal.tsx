@@ -7,7 +7,7 @@ import { useQuestionById } from "@/queries/questionById.query";
 interface CreatePollModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreatePoll: (questionId: string) => void;
+  onCreatePoll: (questionId: string, timeLimit: number) => void;
 }
 
 export function CreatePollModal({
@@ -18,6 +18,7 @@ export function CreatePollModal({
   const [selectedCatalog, setSelectedCatalog] = useState<string>("");
   const [selectedQuestion, setSelectedQuestion] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [timeLimit, setTimeLimit] = useState<number>(1);
 
   const { data: catalogs } = useCatalogs();
   const { data: questionsData, isPending: questionsLoading } =
@@ -39,12 +40,13 @@ export function CreatePollModal({
 
   const handleCreatePoll = () => {
     if (selectedQuestion) {
-      onCreatePoll(selectedQuestion);
+      onCreatePoll(selectedQuestion, timeLimit);
       onClose();
       // Reset state
       setSelectedCatalog("");
       setSelectedQuestion("");
       setSearchQuery("");
+      setTimeLimit(1); // Reset time limit
     }
   };
 
@@ -309,6 +311,28 @@ export function CreatePollModal({
                 </div>
               )}
             </div>
+
+            {/* Time Limit Input */}
+            {selectedQuestion && (
+              <div className="p-4 border-b border-base-300">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Time Limit (minutes)</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="60"
+                    value={timeLimit}
+                    onChange={(e) =>
+                      setTimeLimit(parseInt(e.target.value) || 1)
+                    }
+                    className="input input-bordered input-sm"
+                    placeholder="1"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="p-4 border-t border-base-300">

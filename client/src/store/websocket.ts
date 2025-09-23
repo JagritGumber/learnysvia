@@ -45,6 +45,7 @@ export interface UseWebsocketStore {
   setLoadingParticipants: (loading: boolean) => void;
   setParticipantsError: (error: string | null) => void;
   fetchParticipants: (roomId: string) => void;
+  invalidatePolls: (roomId: string) => void;
 }
 
 export const useWebsocketStore = create<UseWebsocketStore>((set, get) => ({
@@ -68,6 +69,17 @@ export const useWebsocketStore = create<UseWebsocketStore>((set, get) => ({
     setLoadingParticipants(true);
     websocket.send({
       event: "participants:get",
+      roomId,
+    });
+  },
+  invalidatePolls(roomId) {
+    const { websocket } = get();
+    if (!websocket) {
+      return;
+    }
+
+    websocket.send({
+      event: "poll:get",
       roomId,
     });
   },

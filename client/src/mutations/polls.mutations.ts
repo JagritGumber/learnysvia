@@ -10,12 +10,15 @@ export const usePollMutations = () => {
     mutationFn: async ({
       roomId,
       questionId,
+      timeLimit,
     }: {
       roomId: string;
       questionId: string;
+      timeLimit?: number;
     }) => {
       const response = await api.api.rooms({ rid: roomId }).polls.post({
         questionId,
+        timeLimit,
       });
 
       if (response.error) {
