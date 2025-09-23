@@ -29,11 +29,7 @@ export function CatalogContent({}: CatalogContentProps) {
   } = useQuestionById(selectedCatalog, selectedQuestion);
 
   // Use the query to fetch catalog data
-  const {
-    data: catalogData,
-    isLoading: catalogLoading,
-    error: catalogError,
-  } = useCatalogById(selectedCatalog);
+  const { data: catalogData } = useCatalogById(selectedCatalog);
 
   if (!selectedCatalog) {
     return (
@@ -96,7 +92,10 @@ export function CatalogContent({}: CatalogContentProps) {
     return (
       <div className="flex-1 bg-base-100 p-6">
         <div className="text-center py-12">
-          <Icon icon="lineicons:warning" className="text-6xl mb-4 text-error mx-auto" />
+          <Icon
+            icon="lineicons:warning"
+            className="text-6xl mb-4 text-error mx-auto"
+          />
           <h3 className="text-xl font-bold text-error mb-2">
             Error Loading Question
           </h3>

@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { type Room } from "../../utils/rooms-api";
 import { ShareRoomModal } from "../modals/ShareRoomModal";
 import { useNavigate } from "@tanstack/react-router";
 import { Icon } from "@iconify/react";
+import { SelectRoom } from "@/shared/types/room";
 
 interface RoomCardProps {
-  room: Room;
+  room: SelectRoom;
   onDelete: ({ id }: { id: string }) => Promise<void>;
 }
 
@@ -34,7 +34,7 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
 
   return (
     <>
-      <div className="card bg-base-100 border border-base-300">
+      <div className="card bg-base-100 border border-base-300 shadow">
         <div className="card-body">
           {/* Header */}
           <div className="flex justify-between items-start mb-3">
