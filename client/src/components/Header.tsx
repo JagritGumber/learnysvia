@@ -22,7 +22,7 @@ export default function Header() {
           </ul>
         </div> */}
         <Link to="/" className="btn btn-ghost text-xl">
-          Rewiredu
+          Learnysvia
         </Link>
       </div>
       <div className="navbar-end">

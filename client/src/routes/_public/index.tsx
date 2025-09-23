@@ -509,7 +509,7 @@ export default function App() {
           <div className="pt-8 border-t border-base-content/10 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-sm text-base-content/70">
               © {new Date().getFullYear()} Learnysvia — Built for teachers, by
-              teachers
+              students.
             </div>
             <div className="flex items-center gap-4 text-sm text-base-content/70">
               <span>Made with ❤️ for educators</span>

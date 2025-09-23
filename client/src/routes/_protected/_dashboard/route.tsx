@@ -45,7 +45,7 @@ function RouteComponent() {
       <nav className="navbar bg-base-100 border border-base-300 shadow-sm min-h-0 w-full">
         <div className="navbar-start">
           <Link to="/" className="btn btn-ghost text-xl">
-            Rewiredu
+            Learnysvia
           </Link>
         </div>
         <ul className="tabs flex-nowrap p-0 min-h-0">

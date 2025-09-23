@@ -58,9 +58,9 @@ function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-base-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-base-200 flex items-center justify-center p-4">
       <div className="w-full max-w-sm mx-auto">
-        <div className="card bg-base-100 border border-base-300 shadow-lg">
+        <div className="card bg-base-100 border border-base-300 shadow">
           <div className="card-body p-6 sm:p-8">
             <div className="text-center mb-6">
               <h1 className="text-2xl sm:text-3xl font-bold text-base-content mb-2">
@@ -149,9 +149,7 @@ function Auth() {
             </form>
 
             <div className="text-center mt-6">
-              <p className="text-xs text-base-content/60">
-                Rewiredu — Discord/Slack for online classrooms
-              </p>
+              <p className="text-xs text-base-content/60">Learnysvia</p>
             </div>
           </div>
         </div>
