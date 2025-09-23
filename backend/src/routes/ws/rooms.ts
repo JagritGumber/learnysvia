@@ -10,10 +10,9 @@ import {
 } from "@/services/participants.service";
 import {
   getRoomByIdentifierWithParticipantCount,
-  updateRoomStatusByIdentifier,
   markHostAsLeft,
 } from "@/services/rooms.service";
-import { getNewlyCreatedPoll, getRoomPolls } from "@/services/polls.service";
+import { getNewlyCreatedPoll } from "@/services/polls.service";
 import { Elysia } from "elysia";
 import z from "zod";
 import { app } from "@/index";
