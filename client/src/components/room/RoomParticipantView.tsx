@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Icon } from "@iconify/react";
 import { usePollStore } from "@/store/poll.store";
 import { usePollMutations } from "@/mutations/polls.mutations";
 
@@ -22,9 +23,15 @@ export const RoomParticipantView = () => {
     }
   };
 
+  const handleBackToRoom = () => {
+    // This could navigate back to room view or close the poll view
+    // For now, we'll just reset the poll state
+    usePollStore.getState().setPoll(null);
+  };
+
   if (!poll) {
     return (
-      <div className="min-h-[calc(100vh-64px)] bg-base-100 flex items-center justify-center">
+      <div className="min-h-[calc(100vh-64px)] bg-base-200 flex items-center justify-center p-6">
         <div className="text-center">
           <div className="loading loading-spinner loading-lg text-primary mb-4"></div>
           <h2 className="text-2xl font-semibold text-base-content mb-2">
@@ -37,62 +44,81 @@ export const RoomParticipantView = () => {
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-base-100 p-4">
+    <div className="min-h-[calc(100vh-64px)] bg-base-200 p-6">
       <div className="max-w-4xl mx-auto">
-        {/* Poll Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-base-content mb-4">
-            Poll Question
-          </h1>
-          <div className="card bg-base-200 shadow-lg">
-            <div className="card-body">
-              <p className="text-lg text-base-content">
-                {poll.question.text}
-              </p>
-            </div>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-2xl font-bold text-base-content">
+            Answer Poll
+          </h3>
+          <button
+            className="btn btn-ghost btn-sm btn-circle"
+            onClick={handleBackToRoom}
+          >
+            <Icon icon="lineicons:close" className="size-5" />
+          </button>
+        </div>
+
+        {/* Poll Question */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-base-content mb-2">
+            Question
+          </label>
+          <div className="bg-base-100 p-4 rounded-lg border border-base-300">
+            <p className="text-base-content">
+              {poll.question.text}
+            </p>
           </div>
         </div>
 
         {/* Poll Options */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-          {poll.question.options.map((option) => (
-            <div
-              key={option.id}
-              className={`card cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                selectedOptionId === option.id
-                  ? "bg-primary text-primary-content shadow-lg ring-2 ring-primary"
-                  : "bg-base-200 hover:bg-base-300"
-              }`}
-              onClick={() => setSelectedOptionId(option.id)}
-            >
-              <div className="card-body p-6">
-                <div className="flex items-center space-x-4">
-                  <div
-                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                      selectedOptionId === option.id
-                        ? "bg-primary-content border-primary-content"
-                        : "border-base-content"
-                    }`}
-                  >
-                    {selectedOptionId === option.id && (
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    )}
-                  </div>
-                  <p className="text-base-content flex-1">{option.text}</p>
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-base-content mb-3">
+            Select Your Answer
+          </label>
+          <div className="space-y-3">
+            {poll.question.options.map((option, index) => (
+              <div
+                key={option.id}
+                className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                  selectedOptionId === option.id
+                    ? "border-primary bg-primary/5"
+                    : "border-base-300 bg-base-100 hover:border-base-content/50"
+                }`}
+                onClick={() => setSelectedOptionId(option.id)}
+              >
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <span className="text-sm font-medium text-base-content min-w-fit">
+                    {String.fromCharCode(65 + index)}.
+                  </span>
+                  <span className="text-base-content flex-1">{option.text}</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="poll-answer"
+                    checked={selectedOptionId === option.id}
+                    onChange={() => setSelectedOptionId(option.id)}
+                    className="radio radio-primary"
+                  />
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Submit Button */}
-        <div className="text-center mt-8">
+        <div className="flex justify-end gap-3">
           <button
-            className={`btn btn-lg ${
-              selectedOptionId
-                ? "btn-primary"
-                : "btn-disabled"
-            }`}
+            type="button"
+            className="btn btn-outline"
+            onClick={handleBackToRoom}
+          >
+            Back to Room
+          </button>
+          <button
+            className="btn btn-primary"
             onClick={handleSubmitAnswer}
             disabled={!selectedOptionId || submitPollAnswer.isPending}
           >
@@ -105,11 +131,6 @@ export const RoomParticipantView = () => {
               "Submit Answer"
             )}
           </button>
-        </div>
-
-        {/* Poll Info */}
-        <div className="text-center mt-6 text-base-content/60">
-          <p>Select an option above and click submit to answer the poll</p>
         </div>
       </div>
     </div>
