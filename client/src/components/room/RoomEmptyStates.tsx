@@ -31,7 +31,7 @@ export function DefaultRoomState({
   onShareRoom,
 }: DefaultRoomStateProps) {
   return (
-    <div className="flex items-center justify-center h-full">
+    <div className="flex items-center justify-center h-full w-full">
       <div className="text-center max-w-md mx-auto">
         <div className="mb-8">
           <Icon

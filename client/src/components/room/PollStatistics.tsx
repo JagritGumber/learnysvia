@@ -1,6 +1,4 @@
-import {
-  SelectPollWithQuestionAndOptions,
-} from "@/shared/types/poll";
+import { SelectPollWithQuestionAndOptions } from "@/shared/types/poll";
 import { usePollAnswers } from "@/queries/pollAnswers.query";
 
 interface PollStatisticsProps {

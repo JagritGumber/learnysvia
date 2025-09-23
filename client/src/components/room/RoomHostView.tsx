@@ -3,11 +3,7 @@ import { usePollById } from "@/queries/pollById.query";
 import { useRoomPolls } from "@/queries/roomPolls.query";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
-import {
-  DefaultRoomState,
-  EmptyPollsState,
-  PollNotFoundState,
-} from "./RoomEmptyStates";
+import { DefaultRoomState, EmptyPollsState } from "./RoomEmptyStates";
 import { PollLoadingState } from "./RoomLoadingState";
 import { PollErrorState } from "./RoomErrorState";
 import { PollDetails, PollOptions } from "./PollDetails";
@@ -17,6 +13,7 @@ import { ParticipantsPanel } from "./ParticipantsPanel";
 import { ShareRoomModal } from "../modals/ShareRoomModal";
 import { useRoomById } from "@/queries/roomById.query";
 import { CreatePollModal } from "../modals/CreatePollModal";
+import { PollQuestionWithStats } from "./PollQuestionWithStats";
 
 export interface RoomHostViewProps {
   rid: string;
@@ -54,12 +51,10 @@ export const RoomHostView = ({ rid }: RoomHostViewProps) => {
   return (
     <div className="min-h-[calc(100vh-64px)] bg-base-100 flex">
       {/* Polls Sidebar */}
-      <div className="w-80 bg-base-100 border-r border-base-300 flex flex-col">
-        <div className="p-4 border-b border-base-300">
+      <div className="bg-base-100 border-r border-base-300 flex flex-col">
+        <div className="w-80 p-4 border-b border-base-300">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-base-content">
-              Active Polls
-            </h3>
+            <h3 className="text-lg font-semibold text-base-content">Polls</h3>
             <div className="flex gap-2">
               <button
                 className="btn btn-ghost btn-sm btn-circle"
@@ -90,26 +85,9 @@ export const RoomHostView = ({ rid }: RoomHostViewProps) => {
                     : "hover:bg-base-200"
                 }`}
               >
-                <div className="font-medium text-sm line-clamp-2 mb-2">
+                <div className="font-medium text-sm line-clamp-2 mb-1">
                   {poll.question?.text || "Untitled Poll"}
                 </div>
-                {poll.question?.options && poll.question.options.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    {poll.question.options.slice(0, 2).map((option) => (
-                      <span
-                        key={option.id}
-                        className="badge badge-outline badge-xs"
-                      >
-                        {option.text}
-                      </span>
-                    ))}
-                    {poll.question.options.length > 2 && (
-                      <span className="badge badge-outline badge-xs">
-                        +{poll.question.options.length - 2}
-                      </span>
-                    )}
-                  </div>
-                )}
                 <div className="text-xs text-base-content/60">
                   {new Date(poll.createdAt).toLocaleDateString()}
                 </div>
@@ -124,87 +102,30 @@ export const RoomHostView = ({ rid }: RoomHostViewProps) => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
-        <div className="flex-1 p-4">
-          {selectedPollId ? (
-            // Show selected poll
-            pollLoading ? (
-              <PollLoadingState />
-            ) : pollError ? (
-              <PollErrorState
-                error={pollError}
-                onBack={() => setSelectedPollId(null)}
-              />
-            ) : selectedPoll ? (
-              <div className="max-w-4xl mx-auto">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-4">
-                    <button
-                      className="btn btn-ghost btn-sm"
-                      onClick={() => setSelectedPollId(null)}
-                    >
-                      <Icon
-                        icon="lineicons:arrow-left"
-                        className="size-4 mr-2"
-                      />
-                      Back to Polls
-                    </button>
-                    <div className="divider divider-horizontal"></div>
-                    <h1 className="text-2xl font-bold text-base-content">
-                      {selectedPoll.question?.text || "Untitled Poll"}
-                    </h1>
-                  </div>
-                  <div className="flex gap-2">
-                    {canDeletePoll && (
-                      <button
-                        className="btn btn-ghost btn-sm text-error hover:bg-error hover:text-error-content"
-                        onClick={handleDeletePoll}
-                        disabled={isDeletingPoll}
-                        title="Delete Poll"
-                      >
-                        {isDeletingPoll ? (
-                          <div className="loading loading-spinner loading-sm"></div>
-                        ) : (
-                          <Icon icon="lineicons:trash-3" className="size-4" />
-                        )}
-                      </button>
-                    )}
-                    <button
-                      className="btn btn-ghost btn-sm"
-                      onClick={() => setShowShareModal(true)}
-                    >
-                      <Icon icon="lineicons:share" className="size-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <PollDetails poll={selectedPoll} />
-                  <PollOptions poll={selectedPoll} />
-                </div>
-
-                {/* Only show answer section for non-host participants */}
-                {canDeletePoll === false && (
-                  <PollAnswerSection
-                    onSubmitAnswer={handleSubmitPollAnswer}
-                    isSubmitting={isSubmittingAnswer}
-                    poll={selectedPoll}
-                    roomId={rid}
-                  />
-                )}
-
-                <PollStatistics poll={selectedPoll} roomId={rid} />
-              </div>
-            ) : (
-              <PollNotFoundState onBack={() => setSelectedPollId(null)} />
-            )
+      <div className="w-full">
+        {selectedPollId ? (
+          // Show selected poll
+          pollLoading ? (
+            <PollLoadingState />
+          ) : pollError ? (
+            <PollErrorState
+              error={pollError}
+              onBack={() => setSelectedPollId(null)}
+            />
+          ) : selectedPoll ? (
+            <PollQuestionWithStats poll={selectedPoll} roomId={rid} />
           ) : (
             <DefaultRoomState
               onCreatePoll={() => setShowCreatePollModal(true)}
               onShareRoom={() => setShowShareModal(true)}
             />
-          )}
-        </div>
+          )
+        ) : (
+          <DefaultRoomState
+            onCreatePoll={() => setShowCreatePollModal(true)}
+            onShareRoom={() => setShowShareModal(true)}
+          />
+        )}
       </div>
 
       <ParticipantsPanel />
