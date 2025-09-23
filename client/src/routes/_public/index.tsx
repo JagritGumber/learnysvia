@@ -84,6 +84,96 @@ export default function App() {
           </div>
         </section>
 
+        {/* WHY WE BUILT THIS */}
+        <section className="pt-16 pb-20 bg-base-100 w-full border-t border-b border-base-300">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">
+                Why we built this tool
+              </h2>
+              <p className="text-base-content/70 max-w-2xl mx-auto">
+                The problem every teacher faces, and how we solve it.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <div className="p-6 rounded-lg bg-error/10 border border-error/20">
+                  <h3 className="text-xl font-semibold text-error mb-3">
+                    The Traditional Problem
+                  </h3>
+                  <p className="text-base-content/80 mb-4">
+                    Teachers can explain and explain, but they only discover how
+                    much the class understood on test day. By then, it's too
+                    late to re-explain difficult concepts.
+                  </p>
+                  <p className="text-base-content/80">
+                    Even with regular tests, teachers hardly know what specific
+                    topics students are finding hard to understand. They get
+                    scores, but not insights.
+                  </p>
+                </div>
+
+                <div className="p-6 rounded-lg bg-success/10 border border-success/20">
+                  <h3 className="text-xl font-semibold text-success mb-3">
+                    Our Solution
+                  </h3>
+                  <p className="text-base-content/80 mb-4">
+                    With simple-to-setup quick polls, teachers get real-time
+                    feedback during class. No more waiting for test day to
+                    discover comprehension gaps.
+                  </p>
+                  <p className="text-base-content/80">
+                    Teachers can immediately understand which topics the class
+                    didn't grasp and address them right away, while the material
+                    is still fresh.
+                  </p>
+                </div>
+              </div>
+
+              <div className="lg:pl-8">
+                <div className="p-6 rounded-lg bg-base-200 border border-base-300">
+                  <h3 className="text-xl font-semibold mb-4">
+                    Student Privacy First
+                  </h3>
+                  <p className="text-base-content/80 mb-4">
+                    All polls are completely anonymous for students. No names,
+                    no tracking, no judgment.
+                  </p>
+                  <p className="text-base-content/80 mb-4">
+                    This creates a safe environment where students can answer
+                    fearlessly without worrying about what others think or how
+                    it might affect their grades.
+                  </p>
+                  <p className="text-base-content/80">
+                    We just want them to answer honestly — no shyness, no
+                    hesitation. The goal is understanding, not evaluation.
+                  </p>
+                </div>
+
+                <div className="mt-6 p-4 rounded-lg bg-info/10 border border-info/20 h-full">
+                  <div className="flex items-start gap-3">
+                    <Icon
+                      icon="lineicons:lightbulb"
+                      className="text-2xl text-info mt-1"
+                    />
+                    <div>
+                      <h4 className="font-semibold text-xl text-info mb-2">
+                        Real Impact
+                      </h4>
+                      <p className="text-sm text-base-content/80">
+                        Teachers can now adjust their teaching in real-time,
+                        spend more time on challenging topics, and ensure no
+                        student gets left behind.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* FEATURES */}
         <section
           id="features"
