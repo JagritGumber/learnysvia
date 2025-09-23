@@ -462,7 +462,7 @@ export default function App() {
                     className="link link-hover text-sm"
                     onClick={(e) => {
                       e.preventDefault();
-                      toast("this feature is not there bro 🤗");
+                      toast("Thisfeature is not there bro 🤗");
                     }}
                   >
                     Help Center
@@ -473,7 +473,7 @@ export default function App() {
                     className="link link-hover text-sm"
                     onClick={(e) => {
                       e.preventDefault();
-                      toast("this feature is not there bro 🤗");
+                      toast("Thisfeature is not there bro 🤗");
                     }}
                   >
                     Contact Us
@@ -484,7 +484,7 @@ export default function App() {
                     className="link link-hover text-sm"
                     onClick={(e) => {
                       e.preventDefault();
-                      toast("this feature is not there bro 🤗");
+                      toast("Thisfeature is not there bro 🤗");
                     }}
                   >
                     Privacy Policy
@@ -495,7 +495,7 @@ export default function App() {
                     className="link link-hover text-sm"
                     onClick={(e) => {
                       e.preventDefault();
-                      toast("this feature is not there bro 🤗");
+                      toast("Thisfeature is not there bro 🤗");
                     }}
                   >
                     Terms of Service
