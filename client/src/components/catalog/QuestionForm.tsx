@@ -8,7 +8,8 @@ interface QuestionFormProps {}
 export function QuestionForm({}: QuestionFormProps) {
   const selectedCatalog = useCatalogStore((state) => state.selectedCatalog);
   const { createQuestion, updateQuestion } = useQuestionMutations();
-  const { setShowCreateQuestionForm, setShowEditQuestionForm } = useCatalogStore.getState();
+  const { setShowCreateQuestionForm, setShowEditQuestionForm } =
+    useCatalogStore.getState();
 
   // Use the store for all form state
   const {
@@ -78,7 +79,10 @@ export function QuestionForm({}: QuestionFormProps) {
         setShowCreateQuestionForm(false);
       }
     } catch (error) {
-      console.error(`Error ${isEditMode ? 'updating' : 'creating'} question:`, error);
+      console.error(
+        `Error ${isEditMode ? "updating" : "creating"} question:`,
+        error
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -94,7 +98,7 @@ export function QuestionForm({}: QuestionFormProps) {
   };
 
   return (
-    <div className=" flex-1 bg-base-200 p-6">
+    <div className=" flex-1 bg-base-100 p-6">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-2xl font-bold text-base-content">
           {isEditMode ? "Edit Question" : "Create New Question"}
@@ -213,8 +217,10 @@ export function QuestionForm({}: QuestionFormProps) {
                 <span className="loading loading-spinner loading-sm"></span>
                 {isEditMode ? "Updating..." : "Creating..."}
               </>
+            ) : isEditMode ? (
+              "Update Question"
             ) : (
-              isEditMode ? "Update Question" : "Create Question"
+              "Create Question"
             )}
           </button>
         </div>

@@ -3,6 +3,7 @@ import { betterAuth } from "@/macros/better-auth";
 import {
   createEmptyCatalog,
   deleteCatalog,
+  getUserCatalog,
   getUserCatalogs,
   updateCatalog,
 } from "@/services/catalogs.service";
@@ -63,6 +64,21 @@ export const catalogsRouter = new Elysia({ prefix: "/catalogs" })
     },
     (app) =>
       app
+        .get("/", async ({ params, user, status }) => {
+          try {
+            const { cid } = params;
+
+            const catalog = await getUserCatalog(cid, { userId: user.id });
+
+            if (!catalog) {
+              return status(404, { error: "Catalog not found" });
+            }
+
+            return status(200, catalog);
+          } catch (e) {
+            return status(500);
+          }
+        })
         .patch(
           "/",
           async ({ params, body, user, status }) => {

@@ -4,6 +4,7 @@ import { QuestionForm } from "./QuestionForm";
 import { useQuestionById } from "@/queries/questionById.query";
 import { useQuestionFormStore } from "@/store/questionForm.store";
 import { DeleteQuestionAlertModal } from "@/components/modals/DeleteQuestionAlertModal";
+import { useCatalogById } from "@/queries/catalogById.query";
 
 interface CatalogContentProps {}
 
@@ -27,13 +28,20 @@ export function CatalogContent({}: CatalogContentProps) {
     error,
   } = useQuestionById(selectedCatalog, selectedQuestion);
 
+  // Use the query to fetch catalog data
+  const {
+    data: catalogData,
+    isLoading: catalogLoading,
+    error: catalogError,
+  } = useCatalogById(selectedCatalog);
+
   if (!selectedCatalog) {
     return (
-      <div className="flex-1 p-6 bg-base-200">
+      <div className="flex-1 p-6 bg-base-100">
         <div className="text-center py-12">
           <Icon
             icon="lineicons:bar-chart"
-            className="text-6xl mb-4 text-base-content/50"
+            className="text-6xl mb-4 text-base-content/50 mx-auto"
           />
           <h1 className="text-3xl font-bold text-base-content mb-4">
             Poll Management Dashboard
@@ -52,15 +60,20 @@ export function CatalogContent({}: CatalogContentProps) {
 
   if (!selectedQuestion) {
     return (
-      <div className="flex-1 p-6 bg-base-200">
+      <div className="flex-1 p-6 bg-base-100">
         <div className="text-center py-12">
           <Icon
             icon="lineicons:notebook-1"
-            className="text-5xl mb-4 text-base-content/50"
+            className="text-5xl mb-4 text-base-content/50 mx-auto"
           />
           <h2 className="text-2xl font-bold text-base-content mb-4">
-            {selectedCatalog} Name
+            {catalogData?.name || "Loading catalog..."}
           </h2>
+          {catalogData?.description && (
+            <p className="text-base-content/70 mb-4">
+              {catalogData.description}
+            </p>
+          )}
           <p className="text-base-content/70">
             Select a question from the sidebar to view its details and manage
             options.
@@ -71,7 +84,7 @@ export function CatalogContent({}: CatalogContentProps) {
   }
   if (isLoading) {
     return (
-      <div className="flex-1 bg-base-200 p-6">
+      <div className="flex-1 bg-base-100 p-6">
         <div className="flex items-center justify-center py-12">
           <span className="loading loading-spinner loading-lg"></span>
         </div>
@@ -81,9 +94,9 @@ export function CatalogContent({}: CatalogContentProps) {
 
   if (error) {
     return (
-      <div className="flex-1 bg-base-200 p-6">
+      <div className="flex-1 bg-base-100 p-6">
         <div className="text-center py-12">
-          <Icon icon="lineicons:warning" className="text-6xl mb-4 text-error" />
+          <Icon icon="lineicons:warning" className="text-6xl mb-4 text-error mx-auto" />
           <h3 className="text-xl font-bold text-error mb-2">
             Error Loading Question
           </h3>
@@ -97,11 +110,11 @@ export function CatalogContent({}: CatalogContentProps) {
 
   if (!questionData?.question) {
     return (
-      <div className="flex-1 bg-base-200 p-6">
+      <div className="flex-1 bg-base-100 p-6">
         <div className="text-center py-12">
           <Icon
             icon="lineicons:question-circle"
-            className="text-6xl mb-4 text-base-content/50"
+            className="text-6xl mb-4 text-base-content/50 mx-auto"
           />
           <h3 className="text-xl font-bold text-base-content mb-2">
             Question Not Found
@@ -135,7 +148,7 @@ export function CatalogContent({}: CatalogContentProps) {
   };
 
   return (
-    <div className="flex-1 bg-base-200 p-6">
+    <div className="flex-1 bg-base-100 p-6">
       <h3 className="text-2xl font-bold text-base-content mb-4">
         {question.text}
       </h3>
@@ -192,7 +205,7 @@ export function CatalogContent({}: CatalogContentProps) {
             <div className="text-center py-8 text-base-content/60">
               <Icon
                 icon="lineicons:plus-circle"
-                className="text-4xl mb-2 text-base-content/30"
+                className="text-4xl mb-2 text-base-content/30 mx-auto"
               />
               <p>No options available for this question.</p>
             </div>

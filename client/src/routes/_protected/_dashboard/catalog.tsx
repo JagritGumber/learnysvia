@@ -33,7 +33,7 @@ function CatalogPage() {
         <div className="text-center">
           <Icon
             icon="lineicons:warning"
-            className="text-6xl mb-4 text-warning"
+            className="text-6xl mb-4 text-warning mx-auto"
           />
           <h1 className="text-2xl font-bold text-base-content mb-4">Error</h1>
           <p className="text-base-content/70 mb-4">{error.message}</p>
