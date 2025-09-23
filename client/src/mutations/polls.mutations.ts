@@ -43,14 +43,18 @@ export const usePollMutations = () => {
     mutationFn: async ({
       roomId,
       pollId,
+      optionId,
     }: {
       roomId: string;
       pollId: string;
+      optionId: string;
     }) => {
       const response = await api.api
         .rooms({ rid: roomId })
         .polls({ pid: pollId })
-        .answers.post();
+        .answers.post({
+          optionId,
+        });
 
       if (response.error) {
         throw new Error(

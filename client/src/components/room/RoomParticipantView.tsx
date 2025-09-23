@@ -16,6 +16,7 @@ export const RoomParticipantView = () => {
       await submitPollAnswer.mutateAsync({
         roomId,
         pollId: poll.id,
+        optionId: selectedOptionId,
       });
       setSelectedOptionId(null);
     } catch (error) {

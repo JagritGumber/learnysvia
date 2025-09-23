@@ -84,9 +84,9 @@ export const pollsRouter = new Elysia({
         })
         .group("/answers", (answersApp) =>
           answersApp
-            .post("/", async ({ status, params: { pid }, user }) => {
+            .post("/", async ({ status, params: { pid }, user, body }) => {
               try {
-                const answer = await submitPollAnswer(pid, user.id);
+                const answer = await submitPollAnswer(pid, user.id, body.optionId);
                 return status(201, answer);
               } catch (e) {
                 console.error(
@@ -95,6 +95,10 @@ export const pollsRouter = new Elysia({
                 );
                 return status(500, "Internal Server Error");
               }
+            }, {
+              body: z.object({
+                optionId: z.string(),
+              }),
             })
             .get("/", async ({ status, params: { pid } }) => {
               try {

@@ -1,6 +1,7 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { poll } from "./poll.table";
 import { user } from "../auth";
+import { options } from "../core/option";
 import { relations } from "drizzle-orm";
 
 export const pollAnswer = sqliteTable("poll_answer", {
@@ -13,6 +14,9 @@ export const pollAnswer = sqliteTable("poll_answer", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id),
+  optionId: text("option_id")
+    .notNull()
+    .references(() => options.id),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$default(() => new Date()),

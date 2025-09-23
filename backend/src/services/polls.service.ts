@@ -58,7 +58,7 @@ export const getRoomPollById = async (rid: string, pid: string) => {
   });
 };
 
-export const submitPollAnswer = async (pid: string, uid: string) => {
+export const submitPollAnswer = async (pid: string, uid: string, oid: string) => {
   // Check if user already answered this poll
   const existingAnswer = await db.query.pollAnswer.findFirst({
     where: q.and(
@@ -76,6 +76,7 @@ export const submitPollAnswer = async (pid: string, uid: string) => {
     .values({
       pollId: pid,
       userId: uid,
+      optionId: oid,
     })
     .returning()
     .get();
@@ -86,6 +87,15 @@ export const getPollAnswers = async (pid: string) => {
     where: q.eq(t.pollAnswer.pollId, pid),
     with: {
       user: true,
+      poll: {
+        with: {
+          question: {
+            with: {
+              options: true,
+            },
+          },
+        },
+      },
     },
   });
 };
