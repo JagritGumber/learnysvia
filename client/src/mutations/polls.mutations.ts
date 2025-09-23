@@ -78,6 +78,40 @@ export const usePollMutations = () => {
     },
   });
 
+  const skipPoll = useMutation({
+    mutationFn: async ({
+      roomId,
+      pollId,
+    }: {
+      roomId: string;
+      pollId: string;
+    }) => {
+      const response = await api.api
+        .rooms({ rid: roomId })
+        .polls({ pid: pollId })
+        .skip.post();
+
+      if (response.error) {
+        throw new Error(
+          typeof response.error.value === "string"
+            ? response.error.value
+            : JSON.stringify(response.error.value)
+        );
+      }
+      return response.data;
+    },
+    onSuccess: (_data, { roomId, pollId }) => {
+      queryClient.invalidateQueries({ queryKey: ["rooms", "polls", roomId] });
+      queryClient.invalidateQueries({
+        queryKey: ["rooms", "polls", roomId, pollId],
+      });
+      toast.success("Poll skipped");
+    },
+    onError: (error) => {
+      console.error(`Failed to skip poll: ${error.message}`);
+    },
+  });
+
   const deletePoll = useMutation({
     mutationFn: async ({
       roomId,
@@ -112,5 +146,5 @@ export const usePollMutations = () => {
     },
   });
 
-  return { createPoll, submitPollAnswer, deletePoll };
+  return { createPoll, submitPollAnswer, skipPoll, deletePoll };
 };

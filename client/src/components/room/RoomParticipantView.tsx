@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { usePollStore } from "@/store/poll.store";
 import { usePollMutations } from "@/mutations/polls.mutations";
+import { PollTimer } from "./PollTimer";
+import { usePollSound } from "@/hooks/usePollSound";
 
 export const RoomParticipantView = () => {
   const poll = usePollStore((state) => state.poll);
   const roomId = usePollStore((state) => state.roomId);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  const [hasPlayedSound, setHasPlayedSound] = useState(false);
   const { submitPollAnswer } = usePollMutations();
+  const { playChingSound } = usePollSound();
 
   const handleSubmitAnswer = async () => {
     console.log(poll, selectedOptionId, roomId);
@@ -20,6 +24,8 @@ export const RoomParticipantView = () => {
         optionId: selectedOptionId,
       });
       setSelectedOptionId(null);
+      // Set poll to null after successful submission
+      usePollStore.getState().setPoll(null);
     } catch (error) {
       console.error("Failed to submit poll answer:", error);
     }
@@ -30,6 +36,21 @@ export const RoomParticipantView = () => {
     // For now, we'll just reset the poll state
     usePollStore.getState().setPoll(null);
   };
+
+  // Play sound when poll appears
+  useEffect(() => {
+    if (poll && !hasPlayedSound) {
+      playChingSound();
+      setHasPlayedSound(true);
+    }
+  }, [poll, hasPlayedSound, playChingSound]);
+
+  // Reset sound flag when poll changes
+  useEffect(() => {
+    if (!poll) {
+      setHasPlayedSound(false);
+    }
+  }, [poll]);
 
   if (!poll) {
     return (
@@ -52,7 +73,10 @@ export const RoomParticipantView = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold text-base-content">Answer Poll</h3>
+          <div className="flex items-center gap-4">
+            <h3 className="text-2xl font-bold text-base-content">Answer Poll</h3>
+            <PollTimer poll={poll} />
+          </div>
           <button
             className="btn btn-ghost btn-sm btn-circle"
             onClick={handleBackToRoom}
