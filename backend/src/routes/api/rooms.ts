@@ -16,6 +16,7 @@ import {
   getRoomByIdentifier,
   getRoomByIdentifierWithParticipantCount,
   startRoomById,
+  updateUserName,
 } from "@/services/rooms.service";
 import { getActiveRoomParticipants } from "@/services/participants.service";
 import { pollsRouter } from "./rooms/polls";
@@ -69,6 +70,10 @@ export const roomsRouter = new Elysia({ prefix: "/rooms" })
         if (body.type === "anon") {
           if (roomInfo.status === "ended" || roomInfo.status === "not_started")
             return status(400, "Room is not running");
+
+          // Update the user's name in the auth system
+          await updateUserName(user.id, body.name);
+
           const participant = await addRoomParticipant(roomInfo.id, {
             type: "anon",
             name: body.name,

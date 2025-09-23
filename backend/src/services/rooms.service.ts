@@ -121,3 +121,13 @@ export const markHostAsLeft = async (roomId: string) => {
     .where(q.eq(t.room.id, roomId))
     .returning();
 };
+
+export const updateUserName = async (userId: string, name: string) => {
+  return await db
+    .update(t.user)
+    .set({
+      name,
+    })
+    .where(q.eq(t.user.id, userId))
+    .returning();
+};
