@@ -34,42 +34,32 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
 
   return (
     <>
-      <div className="card bg-base-100 border border-base-300 shadow">
-        <div className="card-body">
+      <div className="card bg-base-200 border border-base-300 hover:bg-base-300/50 transition-colors duration-200">
+        <div className="card-body p-6">
           {/* Header */}
-          <div className="flex justify-between items-start mb-3">
+          <div className="flex justify-between items-start mb-4">
             <div className="flex-1 min-w-0">
-              <h3 className="card-title text-lg font-bold truncate">
+              <h3 className="card-title text-lg font-bold truncate text-base-content">
                 {room.name}
               </h3>
               <p className="text-sm text-base-content/70 mt-1">
                 Code:{" "}
-                <span className="font-mono font-semibold">{room.code}</span>
+                <span className="font-mono font-semibold bg-base-100 px-2 py-1 rounded border">
+                  {room.code}
+                </span>
               </p>
             </div>
             <div className="flex gap-2 ml-2">
               <button
-                className="btn btn-ghost btn-sm btn-circle"
+                className="btn btn-ghost btn-sm btn-circle bg-base-100 hover:bg-base-200"
                 onClick={() => setShowShareModal(true)}
                 title="Share Room"
               >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
-                  />
-                </svg>
+                <Icon icon="lineicons:share" />
               </button>
               <div className="dropdown dropdown-end">
                 <button
-                  className="btn btn-ghost btn-sm btn-circle"
+                  className="btn btn-ghost btn-sm btn-circle bg-base-100 hover:bg-base-200"
                   title="More options"
                 >
                   <svg
@@ -86,7 +76,7 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
                     />
                   </svg>
                 </button>
-                <ul className="dropdown-content z-[1] menu p-2 bg-base-100 rounded-box w-52">
+                <ul className="dropdown-content z-[1] menu p-2 bg-base-100 rounded-box w-52 border border-base-300">
                   <li>
                     <button className="text-info w-full text-left">
                       <svg
@@ -150,15 +140,19 @@ export function RoomCard({ room, onDelete }: RoomCardProps) {
 
           {/* Description */}
           {room.description && (
-            <p className="text-sm text-base-content/80 mb-3 line-clamp-2">
+            <p className="text-sm text-base-content/80 mb-4 line-clamp-2 p-3 rounded-lg bg-base-100/50">
               {room.description}
             </p>
           )}
 
           {/* Stats */}
-          <div className="flex justify-end items-center text-sm text-base-content/70 mb-4">
+          <div className="flex justify-between items-center text-sm text-base-content/70 mb-4">
+            <div className="flex items-center gap-2">
+              <Icon icon="lineicons:users" className="w-4 h-4" />
+              <span>Room</span>
+            </div>
             <div
-              className={`badge ${room.isPublic ? "badge-success" : "badge-warning"}`}
+              className={`badge ${room.isPublic ? "badge-success" : "badge-warning"} border-0`}
             >
               {room.isPublic ? "Public" : "Private"}
             </div>

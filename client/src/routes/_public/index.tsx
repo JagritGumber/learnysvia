@@ -87,7 +87,7 @@ export default function App() {
         {/* FEATURES */}
         <section
           id="features"
-          className="pt-16 pb-20 bg-base-300 w-full border-t border-b border-base-300"
+          className="pt-16 pb-20 bg-base-200 w-full border-t border-b border-base-300"
         >
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="text-center mb-12">
@@ -120,7 +120,7 @@ export default function App() {
               ].map((f) => (
                 <div
                   key={f.title}
-                  className="p-4 rounded-lg bg-base-200 border border-base-300"
+                  className="p-4 rounded-lg bg-base-100 border border-base-300"
                 >
                   <div
                     className={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${f.color} text-white mb-4`}
@@ -159,7 +159,7 @@ export default function App() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="card bg-base-200 border border-base-300">
+                <div className="card bg-base-100 border border-base-300">
                   <div className="card-body text-center">
                     <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
                       <Icon
@@ -176,7 +176,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="card bg-base-200 border border-base-300">
+                <div className="card bg-base-100 border border-base-300">
                   <div className="card-body text-center">
                     <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
                       <Icon
@@ -193,7 +193,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="card bg-base-200 border border-base-300">
+                <div className="card bg-base-100 border border-base-300">
                   <div className="card-body text-center">
                     <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
                       <Icon
@@ -225,7 +225,7 @@ export default function App() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="card bg-base-200 border border-base-300">
+                <div className="card bg-base-100 border border-base-300">
                   <div className="card-body text-center">
                     <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center mx-auto mb-4">
                       <Icon
@@ -242,7 +242,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="card bg-base-200 border border-base-300">
+                <div className="card bg-base-100 border border-base-300">
                   <div className="card-body text-center">
                     <div className="w-16 h-16 bg-info rounded-full flex items-center justify-center mx-auto mb-4">
                       <Icon
@@ -260,7 +260,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="card bg-base-200 border border-base-300">
+                <div className="card bg-base-100 border border-base-300">
                   <div className="card-body text-center">
                     <div className="w-16 h-16 bg-warning rounded-full flex items-center justify-center mx-auto mb-4">
                       <Icon
@@ -268,9 +268,7 @@ export default function App() {
                         className="text-2xl text-white"
                       />
                     </div>
-                    <h4 className="card-title text-lg justify-center">
-                      Done!
-                    </h4>
+                    <h4 className="card-title text-lg justify-center">Done!</h4>
                     <p className="text-base-content/70">
                       That's it! Students just answer and continue with class.
                     </p>
@@ -319,10 +317,16 @@ export default function App() {
               </p>
               <div className="flex gap-4">
                 <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
-                  <Icon icon="lineicons:graduation" className="text-sm text-white" />
+                  <Icon
+                    icon="lineicons:graduation"
+                    className="text-sm text-white"
+                  />
                 </div>
                 <div className="w-8 h-8 bg-secondary rounded flex items-center justify-center">
-                  <Icon icon="lineicons:pie-chart" className="text-sm text-white" />
+                  <Icon
+                    icon="lineicons:pie-chart"
+                    className="text-sm text-white"
+                  />
                 </div>
                 <div className="w-8 h-8 bg-accent rounded flex items-center justify-center">
                   <Icon icon="lineicons:book" className="text-sm text-white" />
@@ -335,7 +339,10 @@ export default function App() {
               <h5 className="font-semibold mb-4">Quick Links</h5>
               <ul className="space-y-2">
                 <li>
-                  <Link to={session?.user ? "/rooms" : "/auth"} className="link link-hover text-sm">
+                  <Link
+                    to={session?.user ? "/rooms" : "/auth"}
+                    className="link link-hover text-sm"
+                  >
                     Start Teaching
                   </Link>
                 </li>
@@ -375,7 +382,8 @@ export default function App() {
           {/* Bottom Bar */}
           <div className="pt-8 border-t border-base-content/10 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-sm text-base-content/70">
-              © {new Date().getFullYear()} Teacher's Assistant — Built for teachers, by teachers
+              © {new Date().getFullYear()} Teacher's Assistant — Built for
+              teachers, by teachers
             </div>
             <div className="flex items-center gap-4 text-sm text-base-content/70">
               <span>Made with ❤️ for educators</span>
