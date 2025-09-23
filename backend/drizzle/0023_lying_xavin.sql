@@ -1,0 +1,1 @@
+ALTER TABLE `poll_answer` ADD `option_id` text NOT NULL REFERENCES options(id);

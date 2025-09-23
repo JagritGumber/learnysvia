@@ -55,6 +55,7 @@ export const usePollMutations = () => {
         .answers.post({
           optionId,
         });
+      console.log(response);
 
       if (response.error) {
         throw new Error(

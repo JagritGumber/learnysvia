@@ -4,12 +4,13 @@ import { usePollStore } from "@/store/poll.store";
 import { usePollMutations } from "@/mutations/polls.mutations";
 
 export const RoomParticipantView = () => {
-  const poll = usePollStore(state => state.poll);
-  const roomId = usePollStore(state => state.roomId)
+  const poll = usePollStore((state) => state.poll);
+  const roomId = usePollStore((state) => state.roomId);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const { submitPollAnswer } = usePollMutations();
 
   const handleSubmitAnswer = async () => {
+    console.log(poll, selectedOptionId, roomId);
     if (!poll || !selectedOptionId || !roomId) return;
 
     try {
@@ -38,7 +39,9 @@ export const RoomParticipantView = () => {
           <h2 className="text-2xl font-semibold text-base-content mb-2">
             Waiting for a poll to come
           </h2>
-          <p className="text-base-content/60">The host will start a poll soon</p>
+          <p className="text-base-content/60">
+            The host will start a poll soon
+          </p>
         </div>
       </div>
     );
@@ -49,9 +52,7 @@ export const RoomParticipantView = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold text-base-content">
-            Answer Poll
-          </h3>
+          <h3 className="text-2xl font-bold text-base-content">Answer Poll</h3>
           <button
             className="btn btn-ghost btn-sm btn-circle"
             onClick={handleBackToRoom}
@@ -66,9 +67,7 @@ export const RoomParticipantView = () => {
             Question
           </label>
           <div className="bg-base-100 p-4 rounded-lg border border-base-300">
-            <p className="text-base-content">
-              {poll.question.text}
-            </p>
+            <p className="text-base-content">{poll.question.text}</p>
           </div>
         </div>
 
@@ -92,7 +91,9 @@ export const RoomParticipantView = () => {
                   <span className="text-sm font-medium text-base-content min-w-fit">
                     {String.fromCharCode(65 + index)}.
                   </span>
-                  <span className="text-base-content flex-1">{option.text}</span>
+                  <span className="text-base-content flex-1">
+                    {option.text}
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-2">

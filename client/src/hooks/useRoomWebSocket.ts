@@ -28,6 +28,7 @@ export function useRoomWebSocket({
         .rooms({ id: roomId })({ pid: participantId })
         .subscribe();
       useWebsocketStore.getState().setWebsocket(ws);
+      usePollStore.getState().setRoomId(roomId);
       ws.on("open", (event) => {
         console.log("WebSocket connected", event);
       });

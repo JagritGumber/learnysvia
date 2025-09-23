@@ -84,22 +84,30 @@ export const pollsRouter = new Elysia({
         })
         .group("/answers", (answersApp) =>
           answersApp
-            .post("/", async ({ status, params: { pid }, user, body }) => {
-              try {
-                const answer = await submitPollAnswer(pid, user.id, body.optionId);
-                return status(201, answer);
-              } catch (e) {
-                console.error(
-                  "Internal server error while submitting poll answer",
-                  e
-                );
-                return status(500, "Internal Server Error");
+            .post(
+              "/",
+              async ({ status, params: { pid }, user, body }) => {
+                try {
+                  const answer = await submitPollAnswer(
+                    pid,
+                    user.id,
+                    body.optionId
+                  );
+                  return status(201, answer);
+                } catch (e) {
+                  console.error(
+                    "Internal server error while submitting poll answer",
+                    e
+                  );
+                  return status(500, "Internal Server Error");
+                }
+              },
+              {
+                body: z.object({
+                  optionId: z.string(),
+                }),
               }
-            }, {
-              body: z.object({
-                optionId: z.string(),
-              }),
-            })
+            )
             .get("/", async ({ status, params: { pid } }) => {
               try {
                 const answers = await getPollAnswers(pid);
