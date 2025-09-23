@@ -6,8 +6,13 @@ import {
   addWsIdForParticipant,
   getActiveRoomParticipants,
   removeParticipant,
+  cleanupAnonymousUser,
 } from "@/services/participants.service";
-import { getRoomByIdentifierWithParticipantCount, updateRoomStatusByIdentifier, markHostAsLeft } from "@/services/rooms.service";
+import {
+  getRoomByIdentifierWithParticipantCount,
+  updateRoomStatusByIdentifier,
+  markHostAsLeft,
+} from "@/services/rooms.service";
 import { getNewlyCreatedPoll, getRoomPolls } from "@/services/polls.service";
 import { Elysia } from "elysia";
 import z from "zod";
@@ -103,6 +108,11 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
     // If the leaving participant is the host, mark the host as left
     if (participant?.role === "host") {
       await markHostAsLeft(room.id);
+    }
+
+    // Delete anonymous users from auth system when they disconnect
+    if (participant?.participantType === "anonymous" && participant?.userId) {
+      await cleanupAnonymousUser(participant.userId);
     }
 
     ws.send({
