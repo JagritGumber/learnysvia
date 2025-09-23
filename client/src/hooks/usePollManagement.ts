@@ -2,6 +2,7 @@ import { useState } from "react";
 import { usePollMutations } from "@/mutations/polls.mutations";
 import { authClient } from "@/utils/auth-client";
 import { useWebsocketStore } from "@/store/websocket";
+import { useShallow } from "zustand/shallow";
 
 interface UsePollManagementProps {
   roomId: string;
@@ -11,9 +12,14 @@ export function usePollManagement({ roomId }: UsePollManagementProps) {
   const [selectedPollId, setSelectedPollId] = useState<string | null>(null);
   const { createPoll, submitPollAnswer, deletePoll } = usePollMutations();
   const { data: session } = authClient.useSession();
-  const participants = useWebsocketStore((state) => state.participants);
+  const participants = useWebsocketStore(
+    useShallow((state) => state.participants)
+  );
 
-  const handleCreatePoll = async (questionId: string, timeLimit: number = 1) => {
+  const handleCreatePoll = async (
+    questionId: string,
+    timeLimit: number = 1
+  ) => {
     await createPoll.mutateAsync({ roomId, questionId, timeLimit });
   };
 
@@ -43,8 +49,11 @@ export function usePollManagement({ roomId }: UsePollManagementProps) {
   };
 
   const canDeletePoll = () => {
+    console.log(participants);
     if (!session || !participants) return false;
-    const currentParticipant = participants.find((p) => p.userId === session.user.id);
+    const currentParticipant = participants.find(
+      (p) => p.userId === session.user.id
+    );
     return currentParticipant?.role === "host";
   };
 

@@ -58,7 +58,7 @@ function RoomPage() {
   const [showCreatePollModal, setShowCreatePollModal] = useState(false);
 
   // Custom hooks
-  useRoomWebSocket({ roomId: id, participantId: search.pid });
+  useRoomWebSocket({ roomId: search.rid, participantId: search.pid });
   const {
     selectedPollId,
     setSelectedPollId,
