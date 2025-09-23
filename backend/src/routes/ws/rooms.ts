@@ -46,6 +46,10 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
     z.object({
       event: z.literal("participant:removed"),
     }),
+    z.object({
+      event: z.literal("poll:result"),
+      poll: selectPollSchema,
+    }),
   ]),
   params: z.object({
     id: z.string(),

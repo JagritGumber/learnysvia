@@ -51,6 +51,8 @@ export function useRoomWebSocket({
         } else if (data?.event === "polls:result") {
           // Handle polls result if needed
           console.log("Received polls result:", data.polls);
+        } else if (data?.event === "poll:result") {
+          
         } else if (data?.event === "error") {
           useWebsocketStore.getState().setParticipantsError(data?.message);
           useWebsocketStore.getState().setLoadingParticipants(false);
