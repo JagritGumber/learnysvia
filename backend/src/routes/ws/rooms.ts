@@ -7,7 +7,7 @@ import {
   getActiveRoomParticipants,
   removeParticipant,
 } from "@/services/participants.service";
-import { getRoomByIdentifierWithParticipantCount } from "@/services/rooms.service";
+import { getRoomByIdentifierWithParticipantCount, updateRoomStatusByIdentifier, markHostAsLeft } from "@/services/rooms.service";
 import { getNewlyCreatedPoll, getRoomPolls } from "@/services/polls.service";
 import { Elysia } from "elysia";
 import z from "zod";
@@ -99,6 +99,12 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
       ws.close();
     }
     const participant = await removeParticipant(ws.data.params.pid);
+
+    // If the leaving participant is the host, mark the host as left
+    if (participant?.role === "host") {
+      await markHostAsLeft(room.id);
+    }
+
     ws.send({
       event: "participant:removed",
     });

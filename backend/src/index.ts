@@ -4,6 +4,8 @@ import cors from "@elysiajs/cors";
 import { env } from "@/env";
 import { auth } from "./utils/auth";
 import { wsRouter } from "./routes/ws";
+import { cron } from "@elysiajs/cron";
+import { closeTimedOutRooms } from "./services/room-cleanup.service";
 
 export const app = new Elysia({
   precompile: true,
@@ -20,6 +22,25 @@ export const app = new Elysia({
   .use(apiRouter)
   .use(wsRouter)
   .mount(auth.handler)
+  .use(
+    cron({
+      name: "room-cleanup",
+      pattern: "*/1 * * * *", // Every minute
+      run: async () => {
+        try {
+          const result = await closeTimedOutRooms();
+          if (result.closed > 0) {
+            console.log(`🧹 Room cleanup: Closed ${result.closed} timed out rooms`);
+            result.rooms.forEach(room => {
+              console.log(`   - Closed room "${room.name}" (${room.code})`);
+            });
+          }
+        } catch (error) {
+          console.error("❌ Room cleanup failed:", error);
+        }
+      },
+    })
+  )
   .listen(3000);
 
 export type App = typeof app;

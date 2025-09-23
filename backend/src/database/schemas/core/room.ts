@@ -22,6 +22,7 @@ export const room = sqliteTable("room", {
     .default("not_started"),
   maxParticipants: integer("max_participants").default(50),
   duration: text("duration").default("60m").notNull(),
+  hostLeftAt: integer("host_left_at", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" })
     .$default(() => new Date())
     .notNull(),

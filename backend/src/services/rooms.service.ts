@@ -111,3 +111,13 @@ export const updateRoomStatusByIdentifier = async (
     .where(q.or(q.eq(t.room.id, codeOrId), q.eq(t.room.code, codeOrId)))
     .returning();
 };
+
+export const markHostAsLeft = async (roomId: string) => {
+  return await db
+    .update(t.room)
+    .set({
+      hostLeftAt: new Date(),
+    })
+    .where(q.eq(t.room.id, roomId))
+    .returning();
+};

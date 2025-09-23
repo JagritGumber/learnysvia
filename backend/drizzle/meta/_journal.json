@@ -183,6 +183,13 @@
       "when": 1758659171264,
       "tag": "0025_green_colossus",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "6",
+      "when": 1758663603560,
+      "tag": "0026_safe_black_knight",
+      "breakpoints": true
     }
   ]
 }

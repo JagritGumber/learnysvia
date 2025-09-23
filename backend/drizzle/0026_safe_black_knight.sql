@@ -1,0 +1,1 @@
+ALTER TABLE `room` ADD `host_left_at` integer;
