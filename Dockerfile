@@ -33,13 +33,11 @@ RUN bun build \
     --outfile ./dist/index.js \
     src/index.ts
 
-# Production stage with nginx
+# Production stage with nginx and Node.js
 FROM nginx:alpine
 
-# Install Bun and required dependencies
-RUN apk add --no-cache ca-certificates curl unzip
-RUN curl -fsSL https://bun.sh/install | bash
-ENV PATH="/root/.bun/bin:$PATH"
+# Install Node.js and npm for running the JavaScript backend
+RUN apk add --no-cache nodejs npm ca-certificates
 
 # Copy built client files to nginx html directory
 COPY --from=client-build /app/dist /usr/share/nginx/html
@@ -55,4 +53,4 @@ EXPOSE 80
 
 # Start both nginx and backend server
 # Backend runs on port 3000, nginx proxies requests
-CMD bun run /app/dist/index.js & nginx -g 'daemon off;'
+CMD node /app/dist/index.js & nginx -g 'daemon off;'
