@@ -46,6 +46,7 @@ export interface UseWebsocketStore {
   setParticipantsError: (error: string | null) => void;
   fetchParticipants: (roomId: string) => void;
   invalidatePolls: (roomId: string) => void;
+  kickParticipant: (participantId: string) => void;
 }
 
 export const useWebsocketStore = create<UseWebsocketStore>((set, get) => ({
@@ -81,6 +82,17 @@ export const useWebsocketStore = create<UseWebsocketStore>((set, get) => ({
     websocket.send({
       event: "poll:get",
       roomId,
+    });
+  },
+  kickParticipant(participantId) {
+    const { websocket } = get();
+    if (!websocket) {
+      return;
+    }
+
+    websocket.send({
+      event: "participant:kick",
+      participantId,
     });
   },
 }));

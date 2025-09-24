@@ -18,7 +18,10 @@ import {
   startRoomById,
   updateUserName,
 } from "@/services/rooms.service";
-import { getActiveRoomParticipants } from "@/services/participants.service";
+import {
+  getActiveRoomParticipants,
+  removeParticipant,
+} from "@/services/participants.service";
 import { pollsRouter } from "./rooms/polls";
 
 // Generate unique room code

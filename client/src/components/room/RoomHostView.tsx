@@ -38,7 +38,7 @@ export const RoomHostView = ({ rid }: RoomHostViewProps) => {
   const hasPolls = pollsData && pollsData.length > 0;
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-base-100 flex">
+    <div className="min-h-[calc(100svh)] bg-base-100 flex">
       {/* Polls Sidebar */}
       <div className="bg-base-100 border-r border-base-300 flex flex-col">
         <div className="w-80 p-4 border-b border-base-300">

@@ -15,19 +15,19 @@ export const getRoomPolls = async (rid: string) => {
     },
   });
 
-  const mappedPolls: t.SelectPoll[] = [];
+  // const mappedPolls: t.SelectPoll[] = [];
 
-  for (const poll of polls) {
-    const mappedPoll = {
-      ...poll,
-      finalResults: JSON.parse(
-        poll.finalResults as unknown as string
-      ) as PollResults[],
-    };
-    mappedPolls.push(mappedPoll);
-  }
+  // for (const poll of polls) {
+  //   const mappedPoll = {
+  //     ...poll,
+  //     finalResults: JSON.parse(
+  //       poll.finalResults as unknown as string
+  //     ) as PollResults[],
+  //   };
+  //   mappedPolls.push(mappedPoll);
+  // }
 
-  return mappedPolls;
+  return polls;
 };
 
 export const createRoomPoll = async (
@@ -85,14 +85,14 @@ export const getRoomPollById = async (rid: string, pid: string) => {
 
   if (!poll) return null;
 
-  const mappedPoll = {
-    ...poll,
-    finalResults: JSON.parse(
-      poll.finalResults as unknown as string
-    ) as PollResults[],
-  };
+  // const mappedPoll = {
+  //   ...poll,
+  //   finalResults: JSON.parse(
+  //     poll.finalResults as unknown as string
+  //   ) as PollResults[],
+  // };
 
-  return mappedPoll as t.SelectPoll;
+  return poll as t.SelectPoll;
 };
 
 export const submitPollAnswer = async (

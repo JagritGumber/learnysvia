@@ -11,7 +11,7 @@ export function RoomLoadingState() {
 
 export function PollsLoadingState() {
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-base-100 flex items-center justify-center">
+    <div className="min-h-svh bg-base-100 flex items-center justify-center">
       <div className="text-center">
         <div className="loading loading-spinner loading-lg mb-4"></div>
         <p className="text-base-content/70">Loading polls...</p>

@@ -47,3 +47,13 @@ export const cleanupAnonymousUser = async (userId: string) => {
     console.error("Failed to delete anonymous user:", error);
   }
 };
+
+export const getParticipantById = async (participantId: string) => {
+  return (
+    await db
+      .select()
+      .from(t.roomParticipant)
+      .where(q.eq(t.roomParticipant.id, participantId))
+      .limit(1)
+  )?.[0];
+};

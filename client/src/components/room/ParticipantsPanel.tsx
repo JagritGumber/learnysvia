@@ -1,8 +1,17 @@
 import { Icon } from "@iconify/react";
 import { useWebsocketStore } from "@/store/websocket";
+import { useRoomById } from "@/queries/roomById.query";
+import { useParams } from "@tanstack/react-router";
 
 export function ParticipantsPanel() {
   const participants = useWebsocketStore((state) => state.participants);
+  const kickParticipant = useWebsocketStore((state) => state.kickParticipant);
+  const { id: roomId } = useParams({ from: "/_protected/room/$id" });
+  const { data: roomData } = useRoomById(roomId);
+
+  const isHost =
+    roomData?.room?.createdBy ===
+    participants?.find((p) => p.role === "host")?.userId;
 
   return (
     <div className="w-80 bg-base-100 border-l border-base-300 flex flex-col">
@@ -18,7 +27,7 @@ export function ParticipantsPanel() {
         {participants && participants.length > 0 ? (
           participants.map((participant) => (
             <div
-              key={participant.userId}
+              key={participant.id}
               className="flex items-center gap-3 p-3 rounded-lg mb-2 hover:bg-base-200 transition-colors"
             >
               <div className="avatar placeholder">
@@ -37,7 +46,15 @@ export function ParticipantsPanel() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-success" />
+                {isHost && participant.role !== "host" && (
+                  <button
+                    className="btn btn-ghost btn-xs btn-circle"
+                    onClick={() => kickParticipant(participant.id)}
+                    title="Kick participant"
+                  >
+                    <Icon icon="lineicons:close" className="size-3" />
+                  </button>
+                )}
               </div>
             </div>
           ))

@@ -54,7 +54,7 @@ export const RoomParticipantView = () => {
 
   if (!poll) {
     return (
-      <div className="min-h-[calc(100vh-64px)] bg-base-200 flex items-center justify-center p-6">
+      <div className="min-h-[calc(100svh)] bg-base-200 flex items-center justify-center p-6">
         <div className="text-center">
           <div className="loading loading-spinner loading-lg text-primary mb-4"></div>
           <h2 className="text-2xl font-semibold text-base-content mb-2">
@@ -74,7 +74,9 @@ export const RoomParticipantView = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <h3 className="text-2xl font-bold text-base-content">Answer Poll</h3>
+            <h3 className="text-2xl font-bold text-base-content">
+              Answer Poll
+            </h3>
             <PollTimer poll={poll} />
           </div>
           <button

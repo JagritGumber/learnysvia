@@ -7,6 +7,7 @@ import {
   getActiveRoomParticipants,
   removeParticipant,
   cleanupAnonymousUser,
+  getParticipantById,
 } from "@/services/participants.service";
 import {
   getRoomByIdentifierWithParticipantCount,
@@ -26,6 +27,10 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
     z.object({
       event: z.literal("poll:get"),
       roomId: z.string(),
+    }),
+    z.object({
+      event: z.literal("participant:kick"),
+      participantId: z.string(),
     }),
   ]),
   response: z.union([
@@ -57,6 +62,10 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
     z.object({
       event: z.literal("redirect:join"),
       code: z.string(),
+    }),
+    z.object({
+      event: z.literal("participant:kicked"),
+      message: z.string(),
     }),
   ]),
   params: z.object({
@@ -134,6 +143,48 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
         event: "poll:result",
         poll,
       });
+    } else if (data.event === "participant:kick") {
+      try {
+        // Get the current participant to check if they are the host
+        const currentParticipant = await getParticipantById(ws.data.params.pid);
+
+        if (!currentParticipant || currentParticipant.role !== "host") {
+          ws.send({
+            event: "error",
+            message: "Only the host can kick participants",
+          });
+          return;
+        }
+
+        // Remove the participant
+        const removedParticipant = await removeParticipant(data.participantId);
+
+        if (!removedParticipant) {
+          ws.send({
+            event: "error",
+            message: "Participant not found",
+          });
+          return;
+        }
+
+        // Notify all participants that someone was removed
+        app.server?.publish(
+          `room_${ws.data.params.id}`,
+          "participants:notfresh"
+        );
+        // Send success message to the host
+        ws.send({
+          event: "participant:kicked",
+          message: "Participant kicked successfully",
+        });
+        app.server?.publish(`room_${ws.data.params.id}`, "participant:kicked");
+      } catch (error) {
+        console.error("Failed to kick participant:", error);
+        ws.send({
+          event: "error",
+          message: "Failed to kick participant",
+        });
+      }
     }
   },
 });
