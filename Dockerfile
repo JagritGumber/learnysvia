@@ -33,11 +33,14 @@ RUN bun build \
     --outfile ./dist/index.js \
     src/index.ts
 
-# Production stage with nginx and Node.js
-FROM nginx:alpine
+# Production stage with nginx and Bun
+FROM oven/bun AS runtime
 
-# Install Node.js and npm for running the JavaScript backend
-RUN apk add --no-cache nodejs npm ca-certificates
+# Install nginx
+RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
+
+# Set up nginx to run in foreground
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 
 # Copy built client files to nginx html directory
 COPY --from=client-build /app/dist /usr/share/nginx/html
@@ -53,4 +56,4 @@ EXPOSE 80
 
 # Start both nginx and backend server
 # Backend runs on port 3000, nginx proxies requests
-CMD node /app/dist/index.js & nginx -g 'daemon off;'
+CMD bun run /app/dist/index.js & nginx -g 'daemon off;'
