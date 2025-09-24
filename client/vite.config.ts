@@ -3,6 +3,7 @@ import viteReact from "@vitejs/plugin-react";
 import viteTsConfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
+import { cloudflare } from "@cloudflare/vite-plugin";
 
 const config = defineConfig({
   plugins: [
@@ -16,6 +17,7 @@ const config = defineConfig({
     }),
     tailwindcss(),
     viteReact(),
+    cloudflare(),
   ],
   server: {
     proxy: {

@@ -2,7 +2,6 @@ node_modules
 .git
 .gitignore
 README.md
-.env
 .env.local
 .env.development.local
 .env.test.local
@@ -22,7 +21,6 @@ build
 *.swo
 *~
 backend/node_modules
-backend/.env
 backend/.env.local
 backend/.env.development.local
 backend/.env.test.local
@@ -38,7 +36,6 @@ backend/*.swp
 backend/*.swo
 backend/*~
 client/node_modules
-client/.env
 client/.env.local
 client/.env.development.local
 client/.env.test.local
