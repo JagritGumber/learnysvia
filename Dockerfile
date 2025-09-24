@@ -6,6 +6,7 @@ WORKDIR /app
 # Copy backend files
 COPY backend/package.json backend/bun.lock ./
 COPY backend/src ./src
+COPY backend/tsconfig.json ./tsconfig.json
 
 # Build backend
 ENV NODE_ENV=production
