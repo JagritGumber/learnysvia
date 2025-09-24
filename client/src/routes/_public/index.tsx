@@ -229,76 +229,115 @@ export default function App() {
         </section>
 
         {/* HOW IT WORKS */}
-        <section id="how-it-works" className="pt-16 pb-20 bg-base-200">
+        <section id="how-it-works" className="pt-20 pb-24 bg-base-200 relative overflow-hidden">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4">How it works</h2>
-              <p className="text-base-content/70 max-w-2xl mx-auto">
-                Simple, intuitive flows that get you up and running in minutes.
+            <div className="text-center mb-20">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+                <Icon icon="lineicons:rocket" className="text-primary text-lg" />
+                <span className="text-primary font-medium text-sm">Simple Setup</span>
+              </div>
+              <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+                How it works
+              </h2>
+              <p className="text-lg text-base-content/70 max-w-3xl mx-auto leading-relaxed">
+                Two simple flows working together seamlessly — teachers create engaging polls while students participate effortlessly.
               </p>
             </div>
 
             {/* Teacher Flow */}
-            <div className="mb-16">
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-semibold text-primary-content mb-2">
-                  Teacher Flow
-                </h3>
-                <p className="text-base-content/70">
-                  Set up and manage your classroom polls
-                </p>
+            <div className="mb-24">
+              <div className="text-center mb-12">
+                <div className="inline-flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+                    <Icon icon="lineicons:user" className="text-xl text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-primary">Teacher Flow</h3>
+                    <p className="text-base-content/60">Set up and manage your classroom polls</p>
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="card bg-base-100 border border-base-300">
-                  <div className="card-body text-center">
-                    <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Icon
-                        icon="lineicons:user"
-                        className="text-2xl text-base-content"
-                      />
-                    </div>
-                    <h4 className="card-title text-lg justify-center">
-                      1. Sign Up
-                    </h4>
-                    <p className="text-base-content/70">
-                      Create your account and get started immediately.
-                    </p>
+              <div className="relative">
+                {/* Connection arrows */}
+                <div className="hidden lg:flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full justify-center items-center z-0">
+                  <div className="flex items-center gap-8">
+                    <Icon icon="lineicons:chevron-right" className="text-2xl text-primary/40" />
+                    <Icon icon="lineicons:chevron-right" className="text-2xl text-secondary/40" />
                   </div>
                 </div>
 
-                <div className="card bg-base-100 border border-base-300">
-                  <div className="card-body text-center">
-                    <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Icon
-                        icon="lineicons:home"
-                        className="text-2xl text-base-content"
-                      />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 relative z-10">
+                  <div className="group">
+                    <div className="card bg-base-100 border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                      <div className="card-body text-center p-8">
+                        <div className="relative mb-6">
+                          <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <Icon icon="lineicons:user" className="text-3xl text-white" />
+                          </div>
+                          <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
+                            1
+                          </div>
+                        </div>
+                        <h4 className="card-title text-xl justify-center mb-4 text-primary font-bold">
+                          Sign Up
+                        </h4>
+                        <p className="text-base-content/70 leading-relaxed">
+                          Create your free account in seconds and get instant access to all features.
+                        </p>
+                        <div className="mt-4 text-xs text-primary/60 font-medium">
+                          Takes 30 seconds
+                        </div>
+                      </div>
                     </div>
-                    <h4 className="card-title text-lg justify-center">
-                      2. Create Room
-                    </h4>
-                    <p className="text-base-content/70">
-                      Generate a secure room and share the link with students.
-                    </p>
                   </div>
-                </div>
 
-                <div className="card bg-base-100 border border-base-300">
-                  <div className="card-body text-center">
-                    <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Icon
-                        icon="lineicons:bar-chart"
-                        className="text-2xl text-base-content"
-                      />
+                  <div className="group">
+                    <div className="card bg-base-100 border-2 border-secondary/20 hover:border-secondary/40 transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                      <div className="card-body text-center p-8">
+                        <div className="relative mb-6">
+                          <div className="w-20 h-20 bg-secondary rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <Icon icon="lineicons:home" className="text-3xl text-white" />
+                          </div>
+                          <div className="absolute -top-2 -right-2 w-8 h-8 bg-secondary text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
+                            2
+                          </div>
+                        </div>
+                        <h4 className="card-title text-xl justify-center mb-4 text-secondary font-bold">
+                          Create Room
+                        </h4>
+                        <p className="text-base-content/70 leading-relaxed">
+                          Generate a secure room with a simple click and share the link with your students.
+                        </p>
+                        <div className="mt-4 text-xs text-secondary/60 font-medium">
+                          One-click setup
+                        </div>
+                      </div>
                     </div>
-                    <h4 className="card-title text-lg justify-center">
-                      3. Launch Polls
-                    </h4>
-                    <p className="text-base-content/70">
-                      Use catalogs or create questions on-the-fly and launch
-                      polls.
-                    </p>
+                  </div>
+
+                  <div className="group">
+                    <div className="card bg-base-100 border-2 border-accent/20 hover:border-accent/40 transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                      <div className="card-body text-center p-8">
+                        <div className="relative mb-6">
+                          <div className="w-20 h-20 bg-accent rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <Icon icon="lineicons:bar-chart" className="text-3xl text-white" />
+                          </div>
+                          <div className="absolute -top-2 -right-2 w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
+                            3
+                          </div>
+                        </div>
+                        <h4 className="card-title text-xl justify-center mb-4 text-accent font-bold">
+                          Launch Polls
+                        </h4>
+                        <p className="text-base-content/70 leading-relaxed">
+                          Use your question catalogs or create polls on-the-fly. See results in real-time.
+                        </p>
+                        <div className="mt-4 text-xs text-accent/60 font-medium">
+                          Live results
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -306,65 +345,108 @@ export default function App() {
 
             {/* Student Flow */}
             <div>
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-semibold text-secondary-content mb-2">
-                  Student Flow
-                </h3>
-                <p className="text-base-content/70">
-                  Zero-friction participation
-                </p>
+              <div className="text-center mb-12">
+                <div className="inline-flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-success rounded-xl flex items-center justify-center shadow-lg">
+                    <Icon icon="lineicons:users" className="text-xl text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-success">Student Flow</h3>
+                    <p className="text-base-content/60">Zero-friction participation</p>
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="card bg-base-100 border border-base-300">
-                  <div className="card-body text-center">
-                    <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Icon
-                        icon="lineicons:link"
-                        className="text-2xl text-base-content"
-                      />
-                    </div>
-                    <h4 className="card-title text-lg justify-center">
-                      Join Instantly
-                    </h4>
-                    <p className="text-base-content/70">
-                      Click the room link — no account or app required.
-                    </p>
+              <div className="relative">
+                {/* Connection arrows */}
+                <div className="hidden lg:flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full justify-center items-center z-0">
+                  <div className="flex items-center gap-8">
+                    <Icon icon="lineicons:chevron-right" className="text-2xl text-success/40" />
+                    <Icon icon="lineicons:chevron-right" className="text-2xl text-info/40" />
                   </div>
                 </div>
 
-                <div className="card bg-base-100 border border-base-300">
-                  <div className="card-body text-center">
-                    <div className="w-16 h-16 bg-info rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Icon
-                        icon="lineicons:check"
-                        className="text-2xl text-base-content"
-                      />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 relative z-10">
+                  <div className="group">
+                    <div className="card bg-base-100 border-2 border-success/20 hover:border-success/40 transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                      <div className="card-body text-center p-8">
+                        <div className="relative mb-6">
+                          <div className="w-20 h-20 bg-success rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <Icon icon="lineicons:link" className="text-3xl text-white" />
+                          </div>
+                          <div className="absolute -top-2 -right-2 w-8 h-8 bg-success text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
+                            1
+                          </div>
+                        </div>
+                        <h4 className="card-title text-xl justify-center mb-4 text-success font-bold">
+                          Join Instantly
+                        </h4>
+                        <p className="text-base-content/70 leading-relaxed">
+                          Students click the room link — no account creation, no app downloads required.
+                        </p>
+                        <div className="mt-4 text-xs text-success/60 font-medium">
+                          No signup needed
+                        </div>
+                      </div>
                     </div>
-                    <h4 className="card-title text-lg justify-center">
-                      Answer Polls
-                    </h4>
-                    <p className="text-base-content/70">
-                      Quick multiple-choice questions that take seconds to
-                      complete.
-                    </p>
                   </div>
-                </div>
 
-                <div className="card bg-base-100 border border-base-300">
-                  <div className="card-body text-center">
-                    <div className="w-16 h-16 bg-warning rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Icon
-                        icon="lineicons:thumbs-up"
-                        className="text-2xl text-base-content"
-                      />
+                  <div className="group">
+                    <div className="card bg-base-100 border-2 border-info/20 hover:border-info/40 transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                      <div className="card-body text-center p-8">
+                        <div className="relative mb-6">
+                          <div className="w-20 h-20 bg-info rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <Icon icon="lineicons:check" className="text-3xl text-white" />
+                          </div>
+                          <div className="absolute -top-2 -right-2 w-8 h-8 bg-info text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
+                            2
+                          </div>
+                        </div>
+                        <h4 className="card-title text-xl justify-center mb-4 text-info font-bold">
+                          Answer Polls
+                        </h4>
+                        <p className="text-base-content/70 leading-relaxed">
+                          Quick multiple-choice questions appear automatically. Takes just seconds to complete.
+                        </p>
+                        <div className="mt-4 text-xs text-info/60 font-medium">
+                          5 seconds average
+                        </div>
+                      </div>
                     </div>
-                    <h4 className="card-title text-lg justify-center">Done!</h4>
-                    <p className="text-base-content/70">
-                      That's it! Students just answer and continue with class.
-                    </p>
+                  </div>
+
+                  <div className="group">
+                    <div className="card bg-base-100 border-2 border-warning/20 hover:border-warning/40 transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                      <div className="card-body text-center p-8">
+                        <div className="relative mb-6">
+                          <div className="w-20 h-20 bg-warning rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <Icon icon="lineicons:thumbs-up" className="text-3xl text-white" />
+                          </div>
+                          <div className="absolute -top-2 -right-2 w-8 h-8 bg-warning text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
+                            3
+                          </div>
+                        </div>
+                        <h4 className="card-title text-xl justify-center mb-4 text-warning font-bold">
+                          Done!
+                        </h4>
+                        <p className="text-base-content/70 leading-relaxed">
+                          Students return to class seamlessly. Completely anonymous and stress-free.
+                        </p>
+                        <div className="mt-4 text-xs text-warning/60 font-medium">
+                          Back to learning
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Bottom CTA */}
+            <div className="text-center mt-16">
+              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-base-300/50 border border-base-300/50">
+                <Icon icon="lineicons:clock" className="text-base-content/60" />
+                <span className="text-base-content/70 font-medium">Entire setup takes less than 2 minutes</span>
               </div>
             </div>
           </div>
