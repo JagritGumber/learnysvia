@@ -4,8 +4,18 @@ import * as q from "drizzle-orm";
 
 /**
  * Parse duration string like "60m", "30m", "2h" into minutes
+ * Also handles duration as just a number in minutes (e.g., "60")
  */
 const parseDurationToMinutes = (duration: string): number => {
+  // Handle null or undefined duration
+  if (!duration) return 60; // default to 60 minutes
+
+  // Check if duration is just a number (no unit suffix)
+  if (/^\d+$/.test(duration)) {
+    return parseInt(duration); // already in minutes
+  }
+
+  // Handle duration with unit suffix (e.g., "60m", "2h")
   const match = duration.match(/^(\d+)([mh])$/);
   if (!match) return 60; // default to 60 minutes
 
