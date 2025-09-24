@@ -33,6 +33,9 @@ RUN bun build \
     --outfile server \
     src/index.ts
 
+# List files to see what was created
+RUN ls -la server*
+
 # Production stage with nginx
 FROM nginx:alpine
 
@@ -42,8 +45,8 @@ RUN apk add --no-cache ca-certificates
 # Copy built client files to nginx html directory
 COPY --from=client-build /app/dist /usr/share/nginx/html
 
-# Copy backend binary
-COPY --from=backend-build /app/server /app/server
+# Copy backend binary (Windows creates .exe files)
+COPY --from=backend-build /app/server.exe /app/server
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
