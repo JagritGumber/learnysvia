@@ -5,8 +5,8 @@ WORKDIR /app
 
 # Copy backend files
 COPY backend/package.json backend/bun.lock ./
-COPY backend/src ./src
 COPY backend/tsconfig.json ./tsconfig.json
+COPY backend/src ./src
 
 # Build backend
 ENV NODE_ENV=production
@@ -34,7 +34,12 @@ RUN bun install
 RUN bun run build
 
 # Final production image
-FROM gcr.io/distroless/base
+FROM debian:bookworm-slim
+
+# Install required dependencies for @libsql/client
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
