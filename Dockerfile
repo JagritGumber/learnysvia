@@ -36,8 +36,10 @@ RUN bun build \
 # Production stage with nginx
 FROM nginx:alpine
 
-# Install required dependencies for @libsql/client
-RUN apk add --no-cache ca-certificates
+# Install Bun and required dependencies
+RUN apk add --no-cache ca-certificates curl unzip
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:$PATH"
 
 # Copy built client files to nginx html directory
 COPY --from=client-build /app/dist /usr/share/nginx/html
