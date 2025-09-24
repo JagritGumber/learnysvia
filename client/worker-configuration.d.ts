@@ -8,6 +8,7 @@ declare namespace Cloudflare {
 }
 interface Env extends Cloudflare.Env {
       ASSETS: Fetcher;
+      VITE_SERVER_URL: string
 }
 
 // Begin runtime types

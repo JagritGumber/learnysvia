@@ -2,11 +2,40 @@ export default {
   async fetch(request, env): Promise<Response> {
     const url = new URL(request.url);
 
-    // Handle API routes
+    // Handle API routes - proxy to external server
     if (url.pathname.startsWith("/api/")) {
-      return Response.json({
-        name: "Cloudflare",
-      });
+      const serverUrl = env.VITE_SERVER_URL;
+      const apiUrl = new URL(url.pathname + url.search, serverUrl);
+
+      // Copy headers but remove host to avoid conflicts
+      const headers = new Headers();
+      for (const [key, value] of request.headers.entries()) {
+        if (key.toLowerCase() !== "host") {
+          headers.set(key, value);
+        }
+      }
+
+      try {
+        const response = await fetch(apiUrl.toString(), {
+          method: request.method,
+          headers: headers,
+          body: request.body,
+        });
+
+        return new Response(response.body, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers,
+        });
+      } catch (error) {
+        return new Response(
+          JSON.stringify({ error: "Failed to proxy request" }),
+          {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
     }
 
     // Try to serve static assets from the ASSETS binding
