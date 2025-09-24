@@ -69,7 +69,7 @@ export const RoomParticipantView = () => {
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-base-200 p-6">
+    <div className="min-h-[calc(100svh)] bg-base-200 p-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

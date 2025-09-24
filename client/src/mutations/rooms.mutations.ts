@@ -74,7 +74,7 @@ export const useRoomMutations = () => {
         ...(variables.type === "auth" ? { from: "/rooms" } : { from: "/" }),
         to: "/room/$id",
         params: { id: variables.code },
-        search: { pid: data?.id, rid: data.roomId },
+        search: { pid: data?.id, rid: data.roomId, type: variables.type },
         replace: true,
       });
     },

@@ -10,11 +10,13 @@ import { authClient } from "@/utils/auth-client";
 interface UseRoomWebSocketProps {
   roomId: string;
   participantId: string;
+  participantType: "auth" | "anon";
 }
 
 export function useRoomWebSocket({
   roomId,
   participantId,
+  participantType,
 }: UseRoomWebSocketProps) {
   const setPoll = usePollStore.getState().setPoll;
   const navigate = useNavigate();
@@ -98,7 +100,9 @@ export function useRoomWebSocket({
         useWebsocketStore.getState().setWebsocket(null);
         useWebsocketStore.getState().setParticipants([]);
         useWebsocketStore.getState().setParticipantsError(null);
-        await authClient.signOut();
+        if (participantType === "anon") {
+          await authClient.signOut();
+        }
       });
     } catch (error) {
       console.error("Failed to connect to the room", error);

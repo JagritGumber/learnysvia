@@ -22,6 +22,7 @@ import { RoomParticipantView } from "@/components/room/RoomParticipantView";
 const searchSchema = z.object({
   pid: z.string(),
   rid: z.string(),
+  type: z.enum(["auth", "anon"]),
 });
 
 export const Route = createFileRoute("/_protected/room/$id")({
@@ -38,7 +39,11 @@ function RoomPage() {
   );
 
   // Custom hooks
-  useRoomWebSocket({ roomId: search.rid, participantId: search.pid });
+  useRoomWebSocket({
+    roomId: search.rid,
+    participantId: search.pid,
+    participantType: search.type,
+  });
 
   // Check if current user is the host
   const { data: session } = authClient.useSession();
