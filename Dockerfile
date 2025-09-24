@@ -26,15 +26,12 @@ COPY backend/src ./src
 # Build backend
 ENV NODE_ENV=production
 RUN bun install
+RUN mkdir -p dist
 RUN bun build \
-    --compile \
     --minify-whitespace \
     --minify-syntax \
-    --outfile server \
+    --outfile ./dist/index.js \
     src/index.ts
-
-# List files to see what was created
-RUN ls -la
 
 # Production stage with nginx
 FROM nginx:alpine
@@ -45,8 +42,8 @@ RUN apk add --no-cache ca-certificates
 # Copy built client files to nginx html directory
 COPY --from=client-build /app/dist /usr/share/nginx/html
 
-# Copy backend binary
-COPY --from=backend-build /app/server /app/server
+# Copy backend JavaScript files
+COPY --from=backend-build /app/dist /app/dist
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -56,4 +53,4 @@ EXPOSE 80
 
 # Start both nginx and backend server
 # Backend runs on port 3000, nginx proxies requests
-CMD /app/server & nginx -g 'daemon off;'
+CMD bun run /app/dist/index.js & nginx -g 'daemon off;'
