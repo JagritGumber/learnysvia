@@ -23,7 +23,7 @@ export function ParticipantsPanel() {
           {participants?.length || 0} online
         </div>
       </div>
-      <div className="flex-1 p-2 max-h-[calc(100vh-200px)] overflow-y-auto">
+      <div className="flex-1 p-2 max-h-svh overflow-y-auto">
         {participants && participants.length > 0 ? (
           participants.map((participant) => (
             <div

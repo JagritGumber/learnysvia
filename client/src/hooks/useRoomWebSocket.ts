@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { SelectPollWithQuestionAndOptions } from "@/shared/types/poll";
 import { usePollStore } from "@/store/poll.store";
 import { useNavigate } from "@tanstack/react-router";
+import { authClient } from "@/utils/auth-client";
 
 interface UseRoomWebSocketProps {
   roomId: string;
@@ -72,6 +73,15 @@ export function useRoomWebSocket({
               code: data?.code,
             },
           });
+        } else if (data?.event === "participant:kicked") {
+          if (data.participantId === participantId) {
+            navigate({
+              to: "/",
+              search: {
+                reason: "kicked",
+              },
+            });
+          }
         }
       });
 
@@ -83,11 +93,12 @@ export function useRoomWebSocket({
         toast.error("Connection error occurred");
       });
 
-      ws.on("close", (event) => {
+      ws.on("close", async (event) => {
         console.log("WebSocket closed", event);
         useWebsocketStore.getState().setWebsocket(null);
         useWebsocketStore.getState().setParticipants([]);
         useWebsocketStore.getState().setParticipantsError(null);
+        await authClient.signOut();
       });
     } catch (error) {
       console.error("Failed to connect to the room", error);

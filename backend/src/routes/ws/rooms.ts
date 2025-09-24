@@ -65,7 +65,7 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
     }),
     z.object({
       event: z.literal("participant:kicked"),
-      message: z.string(),
+      participantId: z.string(),
     }),
   ]),
   params: z.object({
@@ -167,17 +167,21 @@ export const roomsWs = new Elysia({ name: "rooms" }).ws("/rooms/:id/:pid", {
           return;
         }
 
+        ws.send({
+          event: "participant:removed",
+        });
         // Notify all participants that someone was removed
+        app.server?.publish(
+          `room_${ws.data.params.id}`,
+          JSON.stringify({
+            event: "participant:kicked",
+            participantId: removedParticipant.id,
+          })
+        );
         app.server?.publish(
           `room_${ws.data.params.id}`,
           "participants:notfresh"
         );
-        // Send success message to the host
-        ws.send({
-          event: "participant:kicked",
-          message: "Participant kicked successfully",
-        });
-        app.server?.publish(`room_${ws.data.params.id}`, "participant:kicked");
       } catch (error) {
         console.error("Failed to kick participant:", error);
         ws.send({
