@@ -6,6 +6,7 @@ import { auth } from "./utils/auth";
 import { wsRouter } from "./routes/ws";
 import { cron } from "@elysiajs/cron";
 import { closeTimedOutRooms } from "./services/room-cleanup.service";
+import { staticPlugin } from "@elysiajs/static";
 
 export const app = new Elysia({
   precompile: true,
@@ -19,6 +20,12 @@ export const app = new Elysia({
       allowedHeaders: ["Content-Type", "Authorization"],
     })
   )
+  .use(staticPlugin({
+    prefix: "/",
+    assets: "./client-dist",
+    alwaysStatic: false,
+    indexHTML: true,
+  }))
   .use(apiRouter)
   .use(wsRouter)
   .mount(auth.handler)
