@@ -6,7 +6,7 @@ import { auth } from "./utils/auth";
 import { wsRouter } from "./routes/ws";
 import { cron } from "@elysiajs/cron";
 import { closeTimedOutRooms } from "./services/room-cleanup.service";
-import { staticPlugin } from "@elysiajs/static";
+
 
 export const app = new Elysia({
   precompile: true,
@@ -20,12 +20,6 @@ export const app = new Elysia({
       allowedHeaders: ["Content-Type", "Authorization"],
     })
   )
-  .use(staticPlugin({
-    prefix: "/",
-    assets: "./client-dist",
-    alwaysStatic: false,
-    indexHTML: true,
-  }))
   .use(apiRouter)
   .use(wsRouter)
   .mount(auth.handler)
@@ -37,8 +31,10 @@ export const app = new Elysia({
         try {
           const result = await closeTimedOutRooms();
           if (result.closed > 0) {
-            console.log(`🧹 Room cleanup: Closed ${result.closed} timed out rooms`);
-            result.rooms.forEach(room => {
+            console.log(
+              `🧹 Room cleanup: Closed ${result.closed} timed out rooms`
+            );
+            result.rooms.forEach((room) => {
               console.log(`   - Closed room "${room.name}" (${room.code})`);
             });
           }

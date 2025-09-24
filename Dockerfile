@@ -1,4 +1,19 @@
-# Multi-stage build for unified backend and client container
+# Multi-stage build for client and backend with nginx
+FROM oven/bun AS client-build
+
+WORKDIR /app
+
+# Copy client files
+COPY client/package.json client/bun.lock ./
+COPY client/src ./src
+COPY client/index.html client/vite.config.ts client/tsconfig.json ./
+COPY client/public ./public
+
+# Install client dependencies and build
+RUN bun install
+RUN bun run build
+
+# Backend build stage
 FROM oven/bun AS backend-build
 
 WORKDIR /app
@@ -18,43 +33,24 @@ RUN bun build \
     --outfile server \
     src/index.ts
 
-# Build client
-FROM oven/bun AS client-build
-
-WORKDIR /app
-
-# Copy client files
-COPY client/package.json client/bun.lock ./
-COPY client/src ./src
-COPY client/index.html client/vite.config.ts client/tsconfig.json ./
-COPY client/public ./public
-
-# Install client dependencies and build
-RUN bun install
-RUN bun run build
-
-# Final production image
-FROM debian:bookworm-slim
+# Production stage with nginx
+FROM nginx:alpine
 
 # Install required dependencies for @libsql/client
-RUN apt-get update && apt-get install -y \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache ca-certificates
 
-WORKDIR /app
+# Copy built client files to nginx html directory
+COPY --from=client-build /app/dist /usr/share/nginx/html
 
 # Copy backend binary
-COPY --from=backend-build /app/server server
+COPY --from=backend-build /app/server /app/server
 
-# Copy built client files
-COPY --from=client-build /app/dist ./client-dist
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Expose port
-EXPOSE 3000
+# Expose port 80
+EXPOSE 80
 
-# Set environment variables
-ENV NODE_ENV=production
-ENV CLIENT_URL=http://localhost:5173
-
-# Start the server
-CMD ["./server"]
+# Start both nginx and backend server
+# Backend runs on port 3000, nginx proxies requests
+CMD /app/server & nginx -g 'daemon off;'
