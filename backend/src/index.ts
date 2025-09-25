@@ -15,7 +15,7 @@ export const app = new Elysia({
       origin: env.CLIENT_URL,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       credentials: true,
-      allowedHeaders: ["Content-Type", "Authorization"],
+      allowedHeaders: ["*"],
     })
   )
   .get("/", () => "Hello Elysia")
