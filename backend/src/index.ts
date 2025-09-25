@@ -10,6 +10,14 @@ import { closeTimedOutRooms } from "./services/room-cleanup.service";
 export const app = new Elysia({
   precompile: true,
 })
+  .use(
+    cors({
+      origin: env.CLIENT_URL,
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      credentials: true,
+      allowedHeaders: ["Content-Type", "Authorization"],
+    })
+  )
   .get("/", () => "Hello Elysia")
   .use(apiRouter)
   .use(wsRouter)
