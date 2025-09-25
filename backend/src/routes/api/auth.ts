@@ -2,8 +2,10 @@ import { auth } from "@/utils/auth";
 import { stripPrefixFromCookie } from "@/utils/stripPrefix";
 import Elysia from "elysia";
 
-export const authRouter = new Elysia({ prefix: "/auth" })
-  .get("/get-session", async ({ request, set }) => {
+export const authRouter = new Elysia({ prefix: "/auth" }).get(
+  "/get-session",
+  async ({ request, set, status }) => {
+    console.log("I WAS CALLED");
     const cookieHeader = request.headers.get("cookie");
     let newReq = request;
 
@@ -32,25 +34,18 @@ export const authRouter = new Elysia({ prefix: "/auth" })
 
       if (!session) {
         console.log("No session found, available cookies:", cookieHeader);
-        set.status = 401;
-        return {
-          error: "No session found",
-          user: null,
-          session: null
-        };
+        return status(401, null);
       }
 
-      return {
-        user: session.user,
-        session: session.session,
-      };
+      return status(200, session);
     } catch (error) {
       console.error("Error getting session:", error);
       set.status = 500;
       return {
         error: "Internal server error",
         user: null,
-        session: null
+        session: null,
       };
     }
-  });
+  }
+);

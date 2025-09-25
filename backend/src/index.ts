@@ -6,7 +6,6 @@ import { auth } from "./utils/auth";
 import { wsRouter } from "./routes/ws";
 import { cron } from "@elysiajs/cron";
 import { closeTimedOutRooms } from "./services/room-cleanup.service";
-import { stripPrefixFromCookie } from "./utils/stripPrefix";
 
 export const app = new Elysia({
   precompile: true,
@@ -20,9 +19,9 @@ export const app = new Elysia({
     })
   )
   .get("/", () => "Hello Elysia")
+  .mount(auth.handler)
   .use(apiRouter)
   .use(wsRouter)
-  .mount(auth.handler)
   .use(
     cron({
       name: "room-cleanup",
