@@ -6,8 +6,7 @@
     "dev": "vite dev",
     "start": "vite preview",
     "build": "vite build",
-    "serve": "vite preview",
-    "test": "vitest run"
+    "serve": "vite preview"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.13.5",
