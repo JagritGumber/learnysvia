@@ -1,4 +1,5 @@
 import { SelectPoll } from "@/shared/types/poll";
+import { usePollSubmissionStore } from "@/store/pollSubmission.store";
 import { api } from "@/utils/treaty";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -66,12 +67,20 @@ export const usePollMutations = () => {
       }
       return response.data;
     },
-    onSuccess: (_data, { roomId, pollId }) => {
+    onSuccess: (_data, { roomId, pollId, optionId }) => {
       queryClient.invalidateQueries({ queryKey: ["rooms", "polls", roomId] });
       queryClient.invalidateQueries({
         queryKey: ["rooms", "polls", roomId, pollId],
       });
-      // Removed toast notification to prevent screen flooding
+
+      // Mark poll as submitted in the store
+      if (optionId) {
+        // Mark as answered if optionId is provided
+        usePollSubmissionStore.getState().markPollAsAnswered(pollId);
+      } else {
+        // Mark as skipped if optionId is empty
+        usePollSubmissionStore.getState().markPollAsSkipped(pollId);
+      }
     },
     onError: (error) => {
       console.error(`Failed to submit poll answer: ${error.message}`);

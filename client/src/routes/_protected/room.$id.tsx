@@ -46,7 +46,8 @@ function RoomPage() {
   });
 
   // Check if current user is the host
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending: isSessionRequestPending } =
+    authClient.useSession();
   const participants = useWebsocketStore((state) => state.participants);
   const currentParticipant = participants.find(
     (p) => p.userId === session?.user?.id
@@ -56,7 +57,7 @@ function RoomPage() {
     currentParticipant?.role === "co_host";
 
   // Early returns for loading and error states
-  if (isPending) {
+  if (isPending || isSessionRequestPending) {
     return <RoomLoadingState />;
   }
 
