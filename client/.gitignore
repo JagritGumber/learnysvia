@@ -12,3 +12,5 @@ count.txt
 todos.json
 .dev.vars
 .wrangler
+
+.firebase/
