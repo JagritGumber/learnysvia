@@ -21,7 +21,4 @@ export const auth = betterAuth({
       emailDomainName: env.CLIENT_URL.replace(/(https|http):\/\//g, ""),
     }),
   ],
-  advanced: {
-    cookiePrefix: "__Secure-",
-  },
 });

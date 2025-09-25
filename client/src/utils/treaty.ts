@@ -1,6 +1,10 @@
 import { treaty } from "@elysiajs/eden";
 import type { App } from "../../../backend/src/index";
 
-const api = treaty<App>(import.meta.env.VITE_SERVER_URL);
+const api = treaty<App>(import.meta.env.VITE_SERVER_URL, {
+  headers: {    
+    Cookie: document.cookie
+  }
+});
 
 export { api };
