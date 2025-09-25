@@ -15,6 +15,6 @@ RUN bun run start
 
 ENV NODE_ENV=production
 
-CMD ["bun", "run", "server"]
+CMD ["./server"]
 
 EXPOSE 8080
