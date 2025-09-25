@@ -17,4 +17,4 @@ ENV NODE_ENV=production
 
 CMD ["bun", "run", "server"]
 
-EXPOSE 3000
+EXPOSE 8080
