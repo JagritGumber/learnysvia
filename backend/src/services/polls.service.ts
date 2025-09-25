@@ -168,7 +168,7 @@ export const skipRoomPoll = async (rid: string, pid: string, uid: string) => {
     throw new Error("Poll not found or doesn't belong to this room");
   }
 
-  // Check if user already has an answer for this poll
+  // Check if user already has ANY answer for this poll (answered or skipped)
   const existingAnswer = await db.query.pollAnswer.findFirst({
     where: q.and(
       q.eq(t.pollAnswer.pollId, pid),
@@ -176,14 +176,17 @@ export const skipRoomPoll = async (rid: string, pid: string, uid: string) => {
     ),
   });
 
-  if (!existingAnswer) {
-    // Create a skipped poll answer record for this specific user
-    await db.insert(t.pollAnswer).values({
-      pollId: pid,
-      userId: uid,
-      status: "skipped",
-    });
+  // If user already has any answer (answered or skipped), do nothing
+  if (existingAnswer) {
+    return poll;
   }
+
+  // Only create a skipped poll answer record if no existing answer exists
+  await db.insert(t.pollAnswer).values({
+    pollId: pid,
+    userId: uid,
+    status: "skipped",
+  });
 
   return poll;
 };
@@ -212,9 +215,10 @@ export const deleteRoomPoll = async (rid: string, pid: string) => {
 };
 
 export const getNewlyCreatedPoll = async (rid: string) => {
+  // First try to get an active (non-expired) poll
   const now = new Date();
 
-  const poll = await db.query.poll.findFirst({
+  const activePoll = await db.query.poll.findFirst({
     where: q.and(q.eq(t.poll.roomId, rid), q.gt(t.poll.expiresAt, now)),
     orderBy: [q.desc(t.poll.createdAt)],
     with: {
@@ -226,7 +230,26 @@ export const getNewlyCreatedPoll = async (rid: string) => {
     },
   });
 
-  return poll ?? null;
+  // If there's an active poll, return it
+  if (activePoll) {
+    return activePoll;
+  }
+
+  // If no active poll, return the most recent poll regardless of expiration
+  // This ensures expired polls are still visible to hosts when they return
+  const mostRecentPoll = await db.query.poll.findFirst({
+    where: q.eq(t.poll.roomId, rid),
+    orderBy: [q.desc(t.poll.createdAt)],
+    with: {
+      question: {
+        with: {
+          options: true,
+        },
+      },
+    },
+  });
+
+  return mostRecentPoll ?? null;
 };
 
 // Calculate and store final poll results

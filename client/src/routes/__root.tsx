@@ -42,18 +42,20 @@ function RootComponent() {
       <main className="container mx-auto">
         <Outlet />
       </main>
-      <TanstackDevtools
-        config={{
-          position: "bottom-left",
-        }}
-        plugins={[
-          {
-            name: "Tanstack Router",
-            render: <TanStackRouterDevtoolsPanel />,
-          },
-          TanStackQueryDevtools,
-        ]}
-      />
+      {import.meta.env.PROD ? null : (
+        <TanstackDevtools
+          config={{
+            position: "bottom-left",
+          }}
+          plugins={[
+            {
+              name: "Tanstack Router",
+              render: <TanStackRouterDevtoolsPanel />,
+            },
+            TanStackQueryDevtools,
+          ]}
+        />
+      )}
     </div>
   );
 }

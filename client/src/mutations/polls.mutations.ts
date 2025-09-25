@@ -71,10 +71,11 @@ export const usePollMutations = () => {
       queryClient.invalidateQueries({
         queryKey: ["rooms", "polls", roomId, pollId],
       });
-      toast.success("Poll answer submitted successfully");
+      // Removed toast notification to prevent screen flooding
     },
     onError: (error) => {
-      toast.error(`Failed to submit poll answer: ${error.message}`);
+      console.error(`Failed to submit poll answer: ${error.message}`);
+      // Removed toast notification to prevent screen flooding
     },
   });
 
@@ -105,10 +106,9 @@ export const usePollMutations = () => {
       queryClient.invalidateQueries({
         queryKey: ["rooms", "polls", roomId, pollId],
       });
-      toast.success("Poll skipped");
     },
     onError: (error) => {
-      console.error(`Failed to skip poll: ${error.message}`);
+      console.error(`Failed to skip poll answer: ${error.message}`);
     },
   });
 
