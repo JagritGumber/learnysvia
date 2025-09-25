@@ -7,19 +7,10 @@ import { wsRouter } from "./routes/ws";
 import { cron } from "@elysiajs/cron";
 import { closeTimedOutRooms } from "./services/room-cleanup.service";
 
-
 export const app = new Elysia({
   precompile: true,
 })
   .get("/", () => "Hello Elysia")
-  .use(
-    cors({
-      origin: env.CLIENT_URL,
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      credentials: true,
-      allowedHeaders: ["Content-Type", "Authorization"],
-    })
-  )
   .use(apiRouter)
   .use(wsRouter)
   .mount(auth.handler)
@@ -44,7 +35,7 @@ export const app = new Elysia({
       },
     })
   )
-  .listen(3000);
+  .listen(8080);
 
 export type App = typeof app;
 
