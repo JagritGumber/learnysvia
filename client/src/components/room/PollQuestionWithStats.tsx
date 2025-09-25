@@ -143,8 +143,8 @@ export function PollQuestionWithStats({
         </div>
       </div>
 
-      {/* Pie Chart Section */}
-      {poll.expiresAt.getTime() <= Date.now() && (
+      {/* Pie Chart Section - Show when poll is expired OR all participants have answered */}
+      {(poll.expiresAt.getTime() <= Date.now() || answeredCount === totalParticipants) && (
         <div className="bg-base-100 rounded-lg p-6 border border-base-300 mb-6">
           <h3 className="text-lg font-semibold text-base-content mb-4">
             Results Overview
@@ -253,8 +253,8 @@ export function PollQuestionWithStats({
         </div>
       )}
 
-      {/* No answers state */}
-      {poll.expiresAt.getTime() >= Date.now() && (
+      {/* No answers state - Show when poll is still active AND not all participants have answered */}
+      {poll.expiresAt.getTime() >= Date.now() && answeredCount < totalParticipants && (
         <div className="bg-base-100 rounded-lg p-8 border border-base-300 text-center">
           <Icon
             icon="lineicons:chart-pie"
