@@ -5,7 +5,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
     "build": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile server src/index.ts",
-    "start": "bun --bun run build && ./server"
+    "start": "bun i && bun --bun run build"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.0",
