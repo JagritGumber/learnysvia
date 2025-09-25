@@ -22,29 +22,7 @@ export const app = new Elysia({
   .get("/", () => "Hello Elysia")
   .use(apiRouter)
   .use(wsRouter)
-  .mount("/api/auth", async (r) => {
-    const cookieHeader = r.headers.get("cookie");
-    let newReq = r;
-
-    if (cookieHeader) {
-      const rewrittenCookie = stripPrefixFromCookie(cookieHeader);
-      if (rewrittenCookie !== cookieHeader) {
-        // clone the request with new headers
-        const newHeaders = new Headers(r.headers);
-        newHeaders.set("cookie", rewrittenCookie);
-
-        newReq = new Request(r.url, {
-          method: r.method,
-          headers: newHeaders,
-          body: r.body, // works for most requests; for streams you may need r.clone()
-          redirect: r.redirect,
-        });
-
-        console.log("[cookieRewrite] Rewrote cookie:", rewrittenCookie);
-      }
-    }
-    return auth.handler(newReq);
-  })
+  .mount(auth.handler)
   .use(
     cron({
       name: "room-cleanup",
